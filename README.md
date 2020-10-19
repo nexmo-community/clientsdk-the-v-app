@@ -17,7 +17,13 @@ Coming soon...
 
 ### iOS Client
 
-Coming soon...
+Install the dependencies with [Cocoapods](https://cocoapods.org):
+
+`pod install`
+
+Open the project workspace:
+
+`open TheApp.xcworkspace`
 
 
 ### Android Client
