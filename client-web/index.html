@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Thee ONLY V-app across ALL platforms.">
+    <title>Thee V-app</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <form id="login">
+        <h1>Login</h1>
+        <label for="username">Enter your username: </label>
+        <input type="text" id="username" name="username" value="" class="textbox">
+        <button type="submit">Login</button>
+    </form>
+    <section id="messages">
+        <h1 id="sessionName"></h1>
+        <div id="loadSection">
+            <button id="loadMessages">
+                Load Previous Messages
+            </button>
+            &nbsp; &nbsp;<h2>Showing <span id="messagesCount"></span> starting at <span id="messageDate"></span></h2>
+        </div>
+        <div id="messageFeed"></div>
+        <div>
+            <textarea id="messageTextarea"></textarea>
+            <button id="send">Send</button>
+            <div id="status"></div>
+        </div>
+    </section>
+    <script src="./node_modules/nexmo-client/dist/nexmoClient.js"></script>
+    <script src="./chat.js"></script>    
+</body>
+</html>

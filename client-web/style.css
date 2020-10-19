@@ -1,0 +1,56 @@
+body {
+    font: 13px Helvetica, Arial;
+}
+
+#login, #messages {
+    width: 80%;
+    height: 500px;
+}
+
+form input[type=text] {
+    font-size: 20px;
+    height: 35px;
+    padding: 0;
+}
+button {
+    height: 35px;
+    background-color: red;
+    color: white;
+    position: relative;
+    font-size: 15px;
+}
+
+textarea {
+    width: 85%;
+    font-size: 20px;
+}
+
+#messageFeed {
+    font-size: 18px;
+    padding-bottom: 20px;
+    line-height: 22pt;
+}
+
+#status {
+    height: 35px;
+    font-size: 12px;
+    color: blue;
+}
+
+#send {
+    width: 85%;
+}
+
+#messages {
+    display: none;
+}
+
+#loadSection {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#loadMessages {
+    display: none;
+}
