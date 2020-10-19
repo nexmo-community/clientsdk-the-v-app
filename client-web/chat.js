@@ -46,10 +46,10 @@ loadMessagesButton.addEventListener('click', async (event) => {
 
 // authenticate the username DONE ON THE SERVER!
 function authenticate(username){
-    if (username = "user1") {
+    if (username = "Alice") {
         return USER1_JWT;
     }
-    if (username = "user2") {
+    if (username = "Bob") {
         return USER2_JWT;
     }
     alert ("User not recognized!");

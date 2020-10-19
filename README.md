@@ -12,8 +12,17 @@ This is "The V-app", a messaging multi-platform application that lets uses chat 
 
 ### Web Client
 
-Coming soon...
+Change Directory into client-web
+`cd client-web`
 
+Install dependencies
+`npm install`
+
+Replace JWTs and Conversation ID in the index.html with ones generated for your application.
+
+Open index.html into a web bowser
+
+Type either `Alice` or `Bob` into the input box.
 
 ### iOS Client
 
