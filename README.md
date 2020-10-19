@@ -22,7 +22,7 @@ Replace JWTs and Conversation ID in the index.html with ones generated for your 
 
 Open index.html into a web bowser
 
-Type either `Alice` or `Bob` into the input box.
+Type either `Alice` or `Bob` into the input box and press the Login button.
 
 ### iOS Client
 
