@@ -17,6 +17,9 @@ Coming soon...
 
 ### iOS Client
 
+To use the iOS client you will need to use the terminal to install the dependencies and open the project.
+Open your terminal, navigate to the `client-ios` folder and complete the following steps.
+
 Install the dependencies with [Cocoapods](https://cocoapods.org):
 
 `pod install`
