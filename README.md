@@ -22,10 +22,8 @@ Coming soon...
 
 ### Android Client
 
-Coming soon...
-
-
-
+1. Clone this repository
+2. Run `Android Studio`, use to `File` -> `Open` menu and selectd `client-android` folder to open this project
 
 ## Contributing
 
