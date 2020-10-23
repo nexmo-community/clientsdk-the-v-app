@@ -40,7 +40,8 @@ Open the project workspace:
 
 ### Android Client
 
-Coming soon...
+1. Clone this repository
+2. Run `Android Studio`, use to `File` -> `Open` menu and select `client-android` folder to open this project
 
 
 ## Contributing
