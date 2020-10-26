@@ -1,0 +1,16 @@
+{
+  "name": "v-app-backend",
+  "version": "1.0.0",
+  "description": "The backend fo that good node/Vonage stuff",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.21.0",
+    "express": "^4.17.1",
+    "pg": "^8.4.1"
+  }
+}
