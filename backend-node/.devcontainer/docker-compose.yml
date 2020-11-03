@@ -11,13 +11,13 @@ services:
         # On Linux, you may need to update USER_UID and USER_GID below if not your local UID is not 1000.
         USER_UID: 1000
         USER_GID: 1000
+        
+    env_file:
+      - ../.env
 
     volumes:
       - ..:/workspace:cached
-    environment:
-      postgresDatabaseUrl: postgresql://postgres:postgres@db:5432/postgres
-      passwordSalt: ed573368-a03e-4d0d-9e8f-c5a390030cb2
-      
+
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity
 
