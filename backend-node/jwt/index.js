@@ -33,13 +33,14 @@ const getAdminJWT = () => {
     });
 }
 
-const getUserJWT = (username, expiration) => {
+const getUserJWT = (username, userId, expiration) => {
   return jwt.sign(
     {
       application_id: vonageAppId,
       iat: new Date().getTime(),
       jti: uuid(),
       sub: username,
+      user_id: userId,
       exp: expiration | Math.round(new Date().getTime() / 1000) + 86400,
       acl: aclPaths
     },

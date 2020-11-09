@@ -15,6 +15,7 @@ const fromHeaderOrQuerystring = (req) => {
 }
 
 const private_key = fs.readFileSync('./private.key', { encoding: 'utf8', flag: 'r' });
+
 vonageRoutes.use(jwt({
   secret: private_key,
   algorithms: ['RS256'],
@@ -27,9 +28,45 @@ vonageRoutes.get('/users', async (req, res) => {
   const jwt = fromHeaderOrQuerystring(req);
 
   if (jwt) {
-    const vonageUsers = await Vonage.getVonageUsers(jwt);
+    const vonageUsers = await Vonage.getVonageUsers(req.user.name);
+    res.status(200).json(vonageUsers);
+  }
 
-    console.dir(vonageUsers);
+  res.status(200);
+});
+
+vonageRoutes.get('/conversations', async (req, res) => {
+
+  const jwt = fromHeaderOrQuerystring(req);
+
+  if (jwt) {
+    const vonageConversations = await Vonage.getVonageConversations(req.user.user_id);
+    res.status(200).json(vonageConversations);
+  }
+
+  res.status(200);
+});
+
+vonageRoutes.get('/conversations', async (req, res) => {
+
+  const jwt = fromHeaderOrQuerystring(req);
+
+  if (jwt) {
+    const vonageConversations = await Vonage.getVonageConversations(req.user.user_id);
+    res.status(200).json(vonageConversations);
+  }
+
+  res.status(200);
+});
+
+vonageRoutes.post('/conversations/new', async (req, res) => {
+
+  const jwt = fromHeaderOrQuerystring(req);
+  const users = req.body;
+
+  if (jwt && users && users.length > 0) {
+    const vonageConversation = await Vonage.createVonageConversation(req.user.user_id, users);
+    res.status(200).json(vonageConversation);
   }
 
   res.status(200);

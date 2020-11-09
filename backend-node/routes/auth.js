@@ -35,7 +35,7 @@ authRoutes.post('/signup', async (req, res) => {
     return;
   }
 
-  const user = await DB.createUser(username, password, name);
+  const user = await DB.createUser(username, password, name, vonageUser.id);
 
   if (!user) {
     res.status(500).send({
@@ -62,7 +62,7 @@ authRoutes.post('/signup', async (req, res) => {
   }
 
   // Create JWT
-  const token = JWT.getUserJWT(user.username);
+  const token = JWT.getUserJWT(user.username, user.userId);
 
   res.status(201).send({
     user,
@@ -99,7 +99,7 @@ authRoutes.post('/login', async (req, res) => {
   }
 
   // Create JWT
-  const token = JWT.getUserJWT(user.username);
+  const token = JWT.getUserJWT(user.username, user.userId);
 
   res.status(201).send({
     user,

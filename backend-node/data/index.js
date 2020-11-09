@@ -7,7 +7,7 @@ const pool = new Pool({
 });
 const passwordSalt = process.env.salt;
 
-const createUser = async function (username, password, name) {
+const createUser = async function (username, password, name, userId) {
 
   let user;
 
@@ -24,7 +24,7 @@ const createUser = async function (username, password, name) {
       .update(password)
       .digest('hex');
 
-    const res = await pool.query('INSERT INTO users(name, username, password) VALUES($1, $2, $3) RETURNING name, username', [name, username, passwordHash]);
+    const res = await pool.query('INSERT INTO users(name, username, password, userId) VALUES($1, $2, $3, $4) RETURNING name, username, userId', [name, username, passwordHash, userId]);
 
     if (res.rowCount === 1) {
       user = res.rows[0];
@@ -49,7 +49,7 @@ const identifyUser = async function (username, password) {
       .update(password)
       .digest('hex');
 
-    const res = await pool.query('SELECT name, username from users where username=$1::text and password=$2::text', [username, passwordHash]);
+    const res = await pool.query('SELECT name, username, userId from users where username=$1::text and password=$2::text', [username, passwordHash]);
 
     if (res.rowCount === 1) {
       user = res.rows[0];
@@ -69,7 +69,7 @@ const findUser = async function (username) {
   try {
     username = username.toLowerCase();
 
-    const res = await pool.query('SELECT name, username from users where username=$1::text', [username]);
+    const res = await pool.query('SELECT name, username, userId from users where username=$1::text', [username]);
 
     if (res.rowCount === 1) {
       user = res.rows[0];
