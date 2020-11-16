@@ -47,22 +47,10 @@ vonageRoutes.get('/conversations', async (req, res) => {
   res.status(200);
 });
 
-vonageRoutes.get('/conversations', async (req, res) => {
+vonageRoutes.post('/conversations', async (req, res) => {
 
   const jwt = fromHeaderOrQuerystring(req);
-
-  if (jwt) {
-    const vonageConversations = await Vonage.getVonageConversations(req.user.user_id);
-    res.status(200).json(vonageConversations);
-  }
-
-  res.status(200);
-});
-
-vonageRoutes.post('/conversations/new', async (req, res) => {
-
-  const jwt = fromHeaderOrQuerystring(req);
-  const users = req.body;
+  const users = req.body.users;
 
   if (jwt && users && users.length > 0) {
     const vonageConversation = await Vonage.createVonageConversation(req.user.user_id, users);

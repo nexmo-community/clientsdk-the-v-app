@@ -53,7 +53,8 @@ const getVonageUsers = async (username) => {
             .map(m => {
               return {
                 name: m.display_name || m.name,
-                username: m.name
+                username: m.name,
+                user_id: m.id
               }
             })
         ]
@@ -68,7 +69,7 @@ const getVonageUsers = async (username) => {
 }
 
 const getVonageConversations = async (userId) => {
-  let conversations;
+  let conversations = [];
 
   try {
 
@@ -76,7 +77,10 @@ const getVonageConversations = async (userId) => {
     const response = await axios.get(`${vonageAPIUrl}/users/${userId}/conversations`, config);
 
     if (response && response.data) {
-      conversations = await buildConversations(response.data._embedded.conversations, userId);
+      const lightConversations = response.data._embedded.conversations;
+      for (let i = 0; i < lightConversations.length; i++) {
+        conversations.push(await getVonageConversation(lightConversations[i].id, userId));
+      }
     }
   }
   catch (err) {
@@ -86,53 +90,49 @@ const getVonageConversations = async (userId) => {
   return conversations;
 }
 
-const buildConversations = async (conversations, userId) => {
-  return {
-    conversations: [
-      ...conversations.map(conversation => {
-        let users = await getConversationMembers(conversation.id);
-        const me = users.find(f => f.user_id === userId);
-        users = users.filter(f => f.user_id !== userId);
-
-        const name = users.map(m => m.name).join(', ');
-
-        return {
-          uuid: conversation.id,
-          name,
-          created_at: conversation.timestamp.created || null,
-          // invited_at: conversation.timestamp.created || null,
-          // joined_at: conversation.timestamp.created || null,
-          // left_at: conversation.timestamp.created || null,
-          users
-        }
-      })
-    ]
-  }
-}
-
-const getConversationMembers = (conversationId) => {
-  let members;
+const getVonageConversation = async (conversationId, userId) => {
+  let conversation;
 
   try {
 
     const config = getConfig(JWT.getAdminJWT());
-    const response = await axios.get(`${vonageAPIUrl}/conversations/${conversationId}/members`, config);
+    const response = await axios.get(`${vonageAPIUrl}/conversations/${conversationId}`, config);
 
     if (response && response.data) {
-      members = response.data._embedded.members.map(m => {
-        return {
-          name: m.display_name,
-          username: m.name,
-          user_id: m.user_id
-        };
-      });
+      conversation = buildConversation(response.data, userId);
     }
   }
   catch (err) {
     console.log(err);
   }
 
-  return members;
+  return conversation;
+}
+
+const buildConversation = async (conversation, userId) => {
+  let members = await getConversationMembers(conversation.id);
+  // let me = members.find(f => f.user_id === userId);
+  members = members.filter(f => f.user_id !== userId);
+
+  const name = members.map(m => m.name).join(', ');
+
+  return {
+    uuid: conversation.id,
+    name,
+    created_at: conversation.timestamp.created || null,
+    // invited_at: (me === undefined) ? null : me.timestamp.invited || null,
+    // joined_at: (me === undefined) ? null : me.timestamp.joined || null,
+    // left_at: (me === undefined) ? null : me.timestamp.left || null,
+    users: members
+  };
+}
+
+const buildConversations = (conversations, userId) => {
+  return {
+    conversations: [
+      ...conversations.map(async (conversation) => await buildConversation(conversation, userId))
+    ]
+  }
 }
 
 const createVonageConversation = async (userId, usersIds) => {
@@ -147,12 +147,17 @@ const createVonageConversation = async (userId, usersIds) => {
     const response = await axios.post(`${vonageAPIUrl}/conversations`, body, config);
 
     if (response && response.status === 201) {
-      // Create members for this new conversation
+      let conversation = response.data;
 
+      // Create members for this new conversation
+      usersIds.push(userId);
+      for (let i = 0; i < usersIds.length; i++) {
+        await createMember(conversation.id, usersIds[i]);
+      }
 
       // Send back the convo-mumbo-jumbo
+      vonageConversation = await getVonageConversation(conversation.id, userId);
     }
-
   }
   catch (err) {
     console.log(err);
@@ -167,8 +172,13 @@ const createMember = async (conversationId, userId) => {
   try {
 
     const body = {
-      user_id: userId,
-      action: 'join'
+      user: {
+        id: userId
+      },
+      channel: {
+        type: 'app'
+      },
+      state: 'joined'
     };
 
     const config = getConfig(JWT.getAdminJWT());
@@ -176,14 +186,11 @@ const createMember = async (conversationId, userId) => {
     const response = await axios.post(`${vonageAPIUrl}/conversations/${conversationId}/members`, body, config);
 
     if (response && response.status === 201) {
-      console.dir(response.data);
-      vonageMember = response.data.map(m => {
-        return {
-          name: "Bob",
-          username: "bob",
-          state: "joined"
-        };
-      })
+      vonageMember = {
+        name: response.data._embedded.user.display_name || response.data._embedded.user.name,
+        username: response.data._embedded.user.name,
+        state: response.data.state
+      };
     }
 
   }
@@ -192,6 +199,32 @@ const createMember = async (conversationId, userId) => {
   }
 
   return vonageMember;
+}
+
+
+const getConversationMembers = async (conversationId) => {
+  let members;
+
+  try {
+    const config = getConfig(JWT.getAdminJWT());
+    const response = await axios.get(`${vonageAPIUrl}/conversations/${conversationId}/members`, config);
+
+    if (response && response.data) {
+      members = response.data._embedded.members.map(m => {
+        return {
+          name: m._embedded.user.display_name || m._embedded.user.name,
+          username: m._embedded.user.name,
+          user_id: m._embedded.user.id,
+          state: m.state
+        };
+      });
+    }
+  }
+  catch (err) {
+    console.log(err);
+  }
+
+  return members;
 }
 
 module.exports = {

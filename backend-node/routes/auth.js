@@ -62,7 +62,7 @@ authRoutes.post('/signup', async (req, res) => {
   }
 
   // Create JWT
-  const token = JWT.getUserJWT(user.username, user.userId);
+  const token = JWT.getUserJWT(user.username, user.userid);
 
   res.status(201).send({
     user,
