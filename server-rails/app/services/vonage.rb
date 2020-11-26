@@ -75,4 +75,64 @@ class Vonage
     return jsonApp
   end
 
+
+  # def self.numbers(api_key, api_secret)
+  #   uri = URI("https://rest.nexmo.com/account/numbers?api_key=#{api_key}&api_secret=#{api_secret}")
+  #   request = Net::HTTP::Get.new(uri)
+  #   request['Content-type'] = 'application/json'
+  #   response = Net::HTTP.start(uri.hostname, uri.port, :use_ssl => true) {|http|
+  #     http.request(request)
+  #   }
+  #   return [] unless response.is_a?(Net::HTTPSuccess)
+  #   json_object = JSON.parse(response.body, object_class: OpenStruct)
+  #   return json_object.numbers
+  # end
+
+
+  # def self.number_search(api_key, api_secret, country)
+  #   uri = URI("https://rest.nexmo.com/number/search?api_key=#{api_key}&api_secret=#{api_secret}&country=#{country}&features=VOICE&size=100")
+  #   request = Net::HTTP::Get.new(uri)
+  #   request['Content-type'] = 'application/json'
+  #   response = Net::HTTP.start(uri.hostname, uri.port, :use_ssl => true) {|http|
+  #     http.request(request)
+  #   }
+  #   return nil unless response.is_a?(Net::HTTPSuccess)
+  #   json_object = JSON.parse(response.body, object_class: OpenStruct)
+  #   return json_object.numbers
+  # end
+
+
+  # def self.number_buy(api_key, api_secret, country, msisdn)
+  #   uri = URI("https://rest.nexmo.com/number/buy?api_key=#{api_key}&api_secret=#{api_secret}")
+  #   request = Net::HTTP::Post.new(uri)
+  #   request.set_form_data({
+  #     country: country,
+  #     msisdn: msisdn
+  #   })
+  #   response = Net::HTTP.start(uri.hostname, uri.port, :use_ssl => true) {|http|
+  #     http.request(request)
+  #   }
+  #   return response.is_a?(Net::HTTPSuccess)
+  # end
+
+
+  # def self.number_link(api_key, api_secret, country, msisdn, app_id)
+  #   uri = URI("https://rest.nexmo.com/number/update?api_key=#{api_key}&api_secret=#{api_secret}")
+  #   request = Net::HTTP::Post.new(uri)
+  #   properties = {
+  #     country: country,
+  #     msisdn: msisdn
+  #   }
+  #   unless app_id == nil 
+  #     properties[:voiceCallbackType] = 'app'
+  #     properties[:voiceCallbackValue] = app_id
+  #   end
+  #   request.set_form_data(properties)
+  #   response = Net::HTTP.start(uri.hostname, uri.port, :use_ssl => true) {|http|
+  #     http.request(request)
+  #   }
+  #   return response.is_a?(Net::HTTPSuccess)
+  # end
+
+
 end
