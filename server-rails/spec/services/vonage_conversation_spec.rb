@@ -27,6 +27,11 @@ RSpec.describe VonageConversation do
   
   describe "retrieve users" do
 
+    it " - [LIVE]", :if => ENV['RUN_LIVE'] do
+      users = @vonage.users
+      expect(users.count).to be >= 0
+    end
+
     it " - retrieve users" do
       allow(@vonage.data_source).to receive(:users).and_return(VCR.load('users/list_success'))
       users = @vonage.users
@@ -75,6 +80,15 @@ RSpec.describe VonageConversation do
       @name = Faker::Name.first_name + "-" + SecureRandom.uuid
       @display_name = Faker::Name.name
     end
+
+    it " - [LIVE]", :if => ENV['RUN_LIVE'] do
+      users = @vonage.users
+      before_count = users.count
+      @vonage.create_user(@name, @display_name)
+      users = @vonage.users
+      expect(users.count).to eq(before_count + 1)
+    end
+
     it " - success" do
       allow(@vonage.data_source).to receive(:create_user).with(@name, @display_name).and_return(VCR.load('users/create_success'))
       user = @vonage.create_user(@name, @display_name)
@@ -99,17 +113,35 @@ RSpec.describe VonageConversation do
     end
   end
 
+  describe ' delete user' do
+    before(:all) do
+      @user_id = "USR-c25beea9-3b69-4583-a381-08d2e080eaae"
+      @name = Faker::Name.first_name + "-" + SecureRandom.uuid
+      @display_name = Faker::Name.name
+    end
 
+    it " - [LIVE] delete a user", :if => ENV['RUN_LIVE'] do
+      @vonage.create_user(@name, @display_name)
+      users = @vonage.users
+      before_count = users.count
+      expect(users.count).to be > 0
+      user_id = users.first.id
+      expect(user_id).to_not be_nil
+      expect(@vonage.delete_user(user_id)).to be_truthy
+      users = @vonage.users
+      expect(users.count).to eq(before_count - 1)
+    end
 
-  # it " - delete a user" do
-  #   users = Vonage.users(ENV['APP_ID'], ENV['APP_PRIVATE_KEY'])
-  #   before_count = users._embedded.users.count
-  #   expect(users._embedded.users.count).to be > 0
-  #   user_id = users._embedded.users.first.id
-  #   expect(user_id).to_not be_nil
-  #   expect(Vonage.delete_user(ENV['APP_ID'], ENV['APP_PRIVATE_KEY'], user_id)).to be_truthy
-  #   users = Vonage.users(ENV['APP_ID'], ENV['APP_PRIVATE_KEY'])
-  #   expect(users._embedded.users.count).to eq(before_count - 1)
-  # end
+    it " - success" do
+      allow(@vonage.data_source).to receive(:delete_user).with(@user_id).and_return(true)
+      expect(@vonage.delete_user(@user_id)).to be_truthy
+    end
+
+    it " - error" do
+      allow(@vonage.data_source).to receive(:delete_user).with(@user_id).and_return(false)
+      expect(@vonage.delete_user(@user_id)).to be_falsy
+    end
+
+  end
 
 end

@@ -45,6 +45,19 @@ class VonageConversationDataSource
     }
     return response.is_a?(Net::HTTPSuccess) ? response.body : nil
   end
+
+  def delete_user(user_id)
+    uri = URI('https://api.nexmo.com/v0.3/users/' + user_id)
+    request = Net::HTTP::Delete.new(uri)
+    auth = "Bearer " + admin_jwt
+    request['Authorization'] = auth
+    request['Content-type'] = 'application/json'
+
+    response = Net::HTTP.start(uri.hostname, uri.port, :use_ssl => true) {|http|
+      http.request(request)
+    }
+    return response.is_a?(Net::HTTPSuccess)
+  end
 end
 
 
@@ -101,18 +114,9 @@ class VonageConversation
   end
 
 
-  # def self.delete_user(app_id, private_key, user_id)
-  #   uri = URI('https://api.nexmo.com/v0.3/users/' + user_id)
-  #   request = Net::HTTP::Delete.new(uri)
-  #   auth = "Bearer " + admin_jwt(app_id, private_key)
-  #   request['Authorization'] = auth
-  #   request['Content-type'] = 'application/json'
-
-  #   response = Net::HTTP.start(uri.hostname, uri.port, :use_ssl => true) {|http|
-  #     http.request(request)
-  #   }
-  #   return response.is_a?(Net::HTTPSuccess)
-  # end
+  def delete_user(user_id)
+    return @data_source.delete_user(user_id)
+  end
 
 
 end
