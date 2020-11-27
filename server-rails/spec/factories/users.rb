@@ -2,7 +2,11 @@ FactoryBot.define do
   factory :user do
     name { Faker::Name.first_name + "-" + SecureRandom.uuid }
     display_name { Faker::Name.name }
+
     password { SecureRandom.uuid }
+    trait :no_password do
+      password { nil}
+    end
     
     is_active { true }
     trait :inactive do

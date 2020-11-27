@@ -38,9 +38,21 @@ RSpec.describe VonageConversation do
       # puts users
       expect(users).to_not be_nil
       expect(users.count).to be >= 0
-      # expect(users._embedded.users).to_not be_nil
-      # expect(users._links).to_not be_nil
     end
+
+    it " - syncronising users" do
+      user_1 = FactoryBot.create(:user, vonage_id: "USR-c25beea9-3b69-4583-a381-08d2e080eaae")
+      expect(user_1.sync_at).to be <= 5.minutes.ago
+      expect(User.all.count).to eq(1)
+      allow(@vonage.data_source).to receive(:users).and_return(VCR.load('users/list_success'))
+      expect(@vonage.users.count).to eq(5)
+      expect(User.all.count).to eq(5)
+      user_1.reload
+      expect(user_1.name).to eq("Annice-3465f2ce-9bd5-4e3f-9a11-4de946ffd03b")
+      expect(user_1.display_name).to eq("Donald McLaughlin")
+      expect(user_1.sync_at).to be >= 10.seconds.ago
+    end
+
 
     it " - error users - invalid response" do
       allow(@vonage.data_source).to receive(:users).and_return(nil)

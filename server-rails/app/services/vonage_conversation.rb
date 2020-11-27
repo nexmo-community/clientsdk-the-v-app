@@ -97,6 +97,15 @@ class VonageConversation
       users += users(response_object._links.next.href)
     end
 
+    users.each do |api_user|
+      local_user = User.find_by(vonage_id: api_user.id)
+      if local_user == nil 
+        local_user = User.create(vonage_id: api_user.id, name: api_user.name, display_name: api_user.display_name, sync_at: DateTime.now)
+      else
+        local_user.update(name: api_user.name, display_name: api_user.display_name, sync_at: DateTime.now)
+      end
+    end
+
     return users
   end
 
