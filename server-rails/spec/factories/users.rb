@@ -5,7 +5,7 @@ FactoryBot.define do
 
     password { SecureRandom.uuid }
     trait :no_password do
-      password { nil}
+      password { nil }
     end
     
     is_active { true }

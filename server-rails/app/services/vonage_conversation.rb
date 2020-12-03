@@ -85,6 +85,7 @@ class VonageConversation
       response_object._embedded.class.name != 'OpenStruct' ||
       response_object._embedded.users == nil || 
       response_object._embedded.users.class.name != 'Array'
+    
     users = response_object._embedded.users
 
     if response_object._links != nil &&
@@ -114,17 +115,27 @@ class VonageConversation
     response = @data_source.create_user(name, display_name)
     return nil if response == nil
     begin
-      user = JSON.parse(response, object_class: OpenStruct)
+      api_user = JSON.parse(response, object_class: OpenStruct)
     rescue JSON::ParserError
       return nil
     end
-    return nil if user.id == nil || user.name == nil
-    return user
+    return nil if api_user.id == nil || api_user.name == nil
+    local_user = User.find_by(vonage_id: api_user.id)
+    if local_user == nil 
+      local_user = User.create(vonage_id: api_user.id, name: api_user.name, display_name: api_user.display_name, sync_at: DateTime.now)
+    else
+      local_user.update(name: api_user.name, display_name: api_user.display_name, sync_at: DateTime.now)
+    end
+    return local_user
   end
 
 
   def delete_user(user_id)
-    return @data_source.delete_user(user_id)
+    user = User.find_by(vonage_id: user_id)
+    if user != nil && @data_source.delete_user(user.vonage_id)
+      user.update(is_active: false)
+    end
+    return user
   end
 
 

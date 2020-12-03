@@ -5,5 +5,8 @@ class User < ApplicationRecord
   validates :vonage_id, uniqueness: true
   validates :name, uniqueness: true, presence: { message: 'is required'}
   
-
+  def active?
+    is_active
+  end
+  
 end
