@@ -99,19 +99,31 @@ class VonageConversation
     end
 
     users.each do |api_user|
+      # vonage_id is the connection
       local_user = User.find_by(vonage_id: api_user.id)
-      if local_user == nil 
-        local_user = User.create(vonage_id: api_user.id, name: api_user.name, display_name: api_user.display_name, sync_at: DateTime.now)
-      else
+      # if vonage_id
+      if local_user != nil
         local_user.update(name: api_user.name, display_name: api_user.display_name, sync_at: DateTime.now)
+        next
       end
+      # if local user with name but no vonage_id
+      local_user_with_name = User.find_by(name: api_user.name, vonage_id: nil)
+      if local_user_with_name != nil
+        local_user_with_name.update(vonage_id: api_user.id, display_name: api_user.display_name, sync_at: DateTime.now)
+        next
+      end
+      # not a local user
+      User.create!(vonage_id: api_user.id, name: api_user.name, display_name: api_user.display_name, sync_at: DateTime.now)
     end
 
-    return users
+    return User.all
   end
 
 
   def create_user(name, display_name)
+    # TODO - this will fail if we try to create the same user twice (or users with same name)
+    # - should check the local DB if it exists first
+    # - this will also fail if the user is already created on the CAPI but not synced locally - should sync users first!
     response = @data_source.create_user(name, display_name)
     return nil if response == nil
     begin

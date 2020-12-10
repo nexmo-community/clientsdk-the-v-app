@@ -3,16 +3,6 @@ require 'dotenv/load'
 require 'faker'
 require 'securerandom'
 
-class VCR
-  def self.load(file_path)
-    path = Rails.root.join('spec', 'fixtures', file_path + '.json')
-    # puts path
-    if File.exist?(path)
-      return File.read(path)
-    end
-  end
-end
-
 RSpec.describe VonageConversation do
 
   before(:each) do
@@ -37,28 +27,36 @@ RSpec.describe VonageConversation do
       users = @vonage.users
       # puts users
       expect(users).to_not be_nil
-      expect(users.count).to be >= 0
+      expect(users.count).to eq(5)
     end
 
-    it " - syncronising users" do
-      user_1 = FactoryBot.create(:user, vonage_id: "USR-c25beea9-3b69-4583-a381-08d2e080eaae")
-      expect(user_1.sync_at).to be <= 5.minutes.ago
-      expect(User.all.count).to eq(1)
-      allow(@vonage.data_source).to receive(:users).and_return(VCR.load('users/list_success'))
-      api_users = @vonage.users
-      expect(api_users.count).to eq(5)
-      expect(User.all.count).to eq(5)
-      user_1.reload
-      expect(user_1.name).to eq("Annice-3465f2ce-9bd5-4e3f-9a11-4de946ffd03b")
-      expect(user_1.display_name).to eq("Donald McLaughlin")
-      expect(user_1.sync_at).to be >= 10.seconds.ago
+    describe " - syncronising users" do
+      before(:each) do
+        allow(@vonage.data_source).to receive(:users).and_return(VCR.load('users/list_success'))
+      end
 
-      user_2 = User.find_by(vonage_id: 'USR-150d7f6e-3c65-4213-9fa6-a39ee8ef6090')
-      expect(user_2).to_not be_nil
-      expect(user_2.name).to eq("Asa-5ebfcafc-6c1f-4744-b74c-6cf5fc666aae")
-      expect(user_2.display_name).to eq("Nakesha Price PhD")
-      expect(user_2.sync_at).to be >= 10.seconds.ago
+      it " - exists locally (with vonage_id & name)" do 
+        local_user = FactoryBot.create(:user, vonage_id: "USR-c25beea9-3b69-4583-a381-08d2e080eaae", name: "Annice-3465f2ce-9bd5-4e3f-9a11-4de946ffd03b")
+        expect {
+          api_users = @vonage.users
+        }.to change { User.count }.by 4
+        local_user.reload
+        expect(local_user.display_name).to eq("Donald McLaughlin")
+      end
+
+      it " - exists locally (with name - no vonage_id)" do 
+        local_user = FactoryBot.create(:user, vonage_id: nil, name: "Annice-3465f2ce-9bd5-4e3f-9a11-4de946ffd03b")
+        expect(local_user.vonage_id).to_not eq("USR-c25beea9-3b69-4583-a381-08d2e080eaae")
+        expect {
+          api_users = @vonage.users
+        }.to change { User.count }.by 4
+        local_user.reload
+        expect(local_user.vonage_id).to eq("USR-c25beea9-3b69-4583-a381-08d2e080eaae")
+        expect(local_user.name).to eq("Annice-3465f2ce-9bd5-4e3f-9a11-4de946ffd03b")
+      end
+      
     end
+
 
     it " - error - invalid response" do
       allow(@vonage.data_source).to receive(:users).and_return(nil)
