@@ -1,5 +1,7 @@
 FactoryBot.define do
   factory :user do
+
+    vonage_id { "USR-" + SecureRandom.uuid }
     name { Faker::Name.first_name + "-" + SecureRandom.uuid }
     display_name { Faker::Name.name }
 
