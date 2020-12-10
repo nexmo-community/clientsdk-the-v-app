@@ -41,6 +41,7 @@ group :development, :test do
   gem 'rails-controller-testing'
   gem 'pry'                             # Debugging
   gem 'guard-livereload', '~> 2.5', require: false
+  gem 'webmock'
 
   gem 'dotenv-rails'
 end

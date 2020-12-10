@@ -62,3 +62,15 @@ RSpec.configure do |config|
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
 end
+
+
+
+class VCR
+  def self.load(file_path)
+    path = Rails.root.join('spec', 'fixtures', file_path + '.json')
+    # puts path
+    if File.exist?(path)
+      return File.read(path)
+    end
+  end
+end
