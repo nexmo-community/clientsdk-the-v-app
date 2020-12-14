@@ -154,6 +154,37 @@ RSpec.describe "Auths", type: :request do
 
     end
 
+
+    context 'bad data' do
+      before(:each) do
+        stub_request(:any, /api.nexmo.com/).to_return(body: VCR.load('users/create_success'), status: 200)
+      end
+      it '- return error if no data' do
+        expect {
+          post login_path
+          expect(response).to have_http_status(400)
+        }.to change {User.count}.by 0
+      end
+      it '- return error if no name' do
+        expect {
+          post login_path, params: @valid_attributes.except(:name)
+          expect(response).to have_http_status(400)
+        }.to change {User.count}.by 0
+      end
+      it '- return error if unknown name' do
+        expect {
+          post login_path, params: @valid_attributes.merge({name: SecureRandom.uuid})
+          expect(response).to have_http_status(404)
+        }.to change {User.count}.by 0
+      end
+      it '- return error if no password' do
+        expect {
+          post login_path, params: @valid_attributes.merge({password: SecureRandom.uuid})
+          expect(response).to have_http_status(403)
+        }.to change {User.count}.by 0
+      end
+    end
+
   end
 
 end

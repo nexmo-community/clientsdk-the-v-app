@@ -10,11 +10,8 @@ class AuthController < ApplicationController
       return
     end
     local_user = User.find_by(name: params[:name])
-    # puts local_user.inspect
-    # puts local_user.password.inspect
     VonageConversation.new().users
     local_user = User.find_by(name: params[:name])
-    # puts local_user.inspect
     if local_user != nil && local_user.password_digest != nil
       render json: {
         "type": "auth:unauthorized",
