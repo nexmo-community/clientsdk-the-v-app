@@ -1,0 +1,84 @@
+{
+  "from": "MEM-0f5c5e22-9f36-42d0-97c7-b30cb2b031f2",
+  "conversation_id": "CON-b273a8fc-c4f3-45bf-a059-139e925ce5d7",
+  "body": {
+      "cname": "twitch 20201214-001",
+      "conversation": {
+          "conversation_id": "CON-b273a8fc-c4f3-45bf-a059-139e925ce5d7",
+          "display_name": "twitch 20201214-001",
+          "name": "NAM-ec666b5d-10f4-4b02-94a3-faf50e46e591"
+      },
+      "user": {
+          "member_id": "MEM-0f5c5e22-9f36-42d0-97c7-b30cb2b031f2",
+          "user_id": "USR-44326d04-cd82-41f5-ad24-315c2a2eac41",
+          "media": {
+              "audio_settings": {
+                  "enabled": false,
+                  "earmuffed": false,
+                  "muted": false
+              },
+              "audio": {
+                  "enabled": false,
+                  "earmuffed": false,
+                  "muted": false
+              }
+          },
+          "name": "paul"
+      },
+      "channel": {
+          "type": "app",
+          "legs": [],
+          "leg_ids": []
+      },
+      "media": {
+          "audio_settings": {
+              "enabled": false,
+              "earmuffed": false,
+              "muted": false
+          },
+          "audio": {
+              "enabled": false,
+              "earmuffed": false,
+              "muted": false
+          }
+      },
+      "timestamp": {
+          "invited": "2020-12-14T14:46:57.473Z"
+      },
+      "initiator": {
+          "invited": {
+              "isSystem": true
+          }
+      },
+      "invited_by_member": {
+          "channel": {
+              "type": "app",
+              "legs": [],
+              "leg_settings": {}
+          },
+          "media": {
+              "audio_settings": {
+                  "enabled": false,
+                  "earmuffed": false,
+                  "muted": false
+              },
+              "audio": {
+                  "enabled": false,
+                  "earmuffed": false,
+                  "muted": false
+              }
+          },
+          "member_id": "MEM-49d9821d-1cc7-4070-955f-4419339b5401",
+          "name": "dwane",
+          "state": "JOINED",
+          "timestamp": {
+              "joined": "2020-12-14T14:42:32.511Z"
+          },
+          "user_id": "USR-43462453-b3be-4e01-9d3c-5f2525bc79d5"
+      }
+  },
+  "id": 2,
+  "application_id": "19e0465b-7cd9-4e7e-96d8-c7942a9bdb87",
+  "timestamp": "2020-12-14T14:46:57.475Z",
+  "type": "member:invited"
+}
