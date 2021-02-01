@@ -13,29 +13,33 @@ const getConfig = (jwt) => {
   };
 }
 
-const createVonageUser = async (username, name) => {
+const createVonageUser = async (name, display_name) => {
   let vonageUser;
+  let error;
 
   try {
-
-    const body = {
-      name: username,
-      display_name: name
-    };
+    const body = { name, display_name };
     const config = getConfig(JWT.getAdminJWT());
 
     const response = await axios.post(`${vonageAPIUrl}/users`, body, config);
 
-    if (response && response.status === 201) {
-      vonageUser = response.data;
+    if (response) {
+      if(response.status === 201) {
+        vonageUser = response.data;
+      } else {
+        error = "Unexpected error";
+      }
     }
 
   }
   catch (err) {
-    console.log(err);
+    // console.log(err.response.status);
+    // console.log(err.response.data);
+    // console.log(err.response.data.detail);
+    error = err.response.data || err;
   }
 
-  return vonageUser;
+  return { vonageUser, error};
 }
 
 const getVonageUsers = async (username) => {
@@ -47,18 +51,16 @@ const getVonageUsers = async (username) => {
     const response = await axios.get(`${vonageAPIUrl}/users?page_size=100`, config);
 
     if (response && response.data) {
-      users = {
-        users: [
-          ...response.data._embedded.users.filter(f => f.name !== username)
-            .map(m => {
-              return {
-                name: m.display_name || m.name,
-                username: m.name,
-                user_id: m.id
-              }
-            })
-        ]
-      }
+      users = [
+        ...response.data._embedded.users.filter(f => f.name !== username)
+          .map(m => {
+            return {
+              vonage_id: m.id,
+              name: m.name,
+              display_name: m.display_name || m.name
+            }
+          })
+      ]
     }
   }
   catch (err) {
@@ -68,18 +70,18 @@ const getVonageUsers = async (username) => {
   return users;
 }
 
-const getVonageConversations = async (userId) => {
+const getVonageConversations = async (vonageId) => {
   let conversations = [];
 
   try {
 
     const config = getConfig(JWT.getAdminJWT());
-    const response = await axios.get(`${vonageAPIUrl}/users/${userId}/conversations`, config);
+    const response = await axios.get(`${vonageAPIUrl}/users/${vonageId}/conversations`, config);
 
     if (response && response.data) {
       const lightConversations = response.data._embedded.conversations;
       for (let i = 0; i < lightConversations.length; i++) {
-        conversations.push(await getVonageConversation(lightConversations[i].id, userId));
+        conversations.push(await getVonageConversation(lightConversations[i].id, vonageId));
       }
     }
   }
@@ -90,7 +92,7 @@ const getVonageConversations = async (userId) => {
   return conversations;
 }
 
-const getVonageConversation = async (conversationId, userId) => {
+const getVonageConversation = async (conversationId, vonageId) => {
   let conversation;
 
   try {
@@ -99,7 +101,7 @@ const getVonageConversation = async (conversationId, userId) => {
     const response = await axios.get(`${vonageAPIUrl}/conversations/${conversationId}`, config);
 
     if (response && response.data) {
-      conversation = buildConversation(response.data, userId);
+      conversation = buildConversation(response.data, vonageId);
     }
   }
   catch (err) {
@@ -109,10 +111,10 @@ const getVonageConversation = async (conversationId, userId) => {
   return conversation;
 }
 
-const buildConversation = async (conversation, userId) => {
+const buildConversation = async (conversation, vonageId) => {
   let members = await getConversationMembers(conversation.id);
-  // let me = members.find(f => f.user_id === userId);
-  members = members.filter(f => f.user_id !== userId);
+  // let me = members.find(f => f.user_id === vonageId);
+  members = members.filter(f => f.user_id !== vonageId);
 
   const name = members.map(m => m.name).join(', ');
 
@@ -127,15 +129,15 @@ const buildConversation = async (conversation, userId) => {
   };
 }
 
-const buildConversations = (conversations, userId) => {
+const buildConversations = (conversations, vonageId) => {
   return {
     conversations: [
-      ...conversations.map(async (conversation) => await buildConversation(conversation, userId))
+      ...conversations.map(async (conversation) => await buildConversation(conversation, vonageId))
     ]
   }
 }
 
-const createVonageConversation = async (userId, usersIds) => {
+const createVonageConversation = async (vonageId, usersIds) => {
   let vonageConversation;
 
   try {
@@ -150,13 +152,13 @@ const createVonageConversation = async (userId, usersIds) => {
       let conversation = response.data;
 
       // Create members for this new conversation
-      usersIds.push(userId);
+      usersIds.push(vonageId);
       for (let i = 0; i < usersIds.length; i++) {
         await createMember(conversation.id, usersIds[i]);
       }
 
       // Send back the convo-mumbo-jumbo
-      vonageConversation = await getVonageConversation(conversation.id, userId);
+      vonageConversation = await getVonageConversation(conversation.id, vonageId);
     }
   }
   catch (err) {
@@ -166,14 +168,14 @@ const createVonageConversation = async (userId, usersIds) => {
   return vonageConversation;
 }
 
-const createMember = async (conversationId, userId) => {
+const createMember = async (conversationId, vonageId) => {
   let vonageMember;
 
   try {
 
     const body = {
       user: {
-        id: userId
+        id: vonageId
       },
       channel: {
         type: 'app'

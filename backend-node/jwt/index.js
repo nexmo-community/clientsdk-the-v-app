@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const uuid = require('uuid').v4;
 
 const vonageAppId = process.env.vonageAppId;
-const private_key = fs.readFileSync('./private.key', { encoding: 'utf8', flag: 'r' });
+const private_key = process.env.vonageAppPrivateKey;
 
 const aclPaths = {
   "paths": {
@@ -33,14 +33,14 @@ const getAdminJWT = () => {
     });
 }
 
-const getUserJWT = (username, userId, expiration) => {
+const getUserJWT = (name, vonageId, expiration) => {
   return jwt.sign(
     {
       application_id: vonageAppId,
       iat: new Date().getTime(),
       jti: uuid(),
-      sub: username,
-      user_id: userId,
+      sub: name,
+      user_id: vonageId,
       exp: expiration | Math.round(new Date().getTime() / 1000) + 86400,
       acl: aclPaths
     },

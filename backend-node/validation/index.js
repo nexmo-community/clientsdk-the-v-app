@@ -1,31 +1,31 @@
 
-const validateSignupParameters = (username, password, name) => {
+const validateSignupParameters = (name, password, display_name) => {
   const invalid_parameters = [];
-  validateUsername(username, invalid_parameters);
-  validatePassword(password, invalid_parameters);
   validateName(name, invalid_parameters);
+  validatePassword(password, invalid_parameters);
+  validateDisplayName(display_name, invalid_parameters);
   return invalid_parameters;
 }
 
-const validateLoginParameters = (username, password) => {
+const validateLoginParameters = (name, password) => {
   const invalid_parameters = [];
-  validateUsername(username, invalid_parameters);
+  validateName(name, invalid_parameters);
   validatePassword(password, invalid_parameters);
   return invalid_parameters;
 }
 
-const validateUsername = (username, invalid_parameters) => {
-  if (!username) {
+const validateName = (name, invalid_parameters) => {
+  if (!name) {
     invalid_parameters.push(
       {
-        "name": "username",
+        "name": "name",
         "reason": "must exist"
       }
     )
-  } else if (username.length < 3) {
+  } else if (name.length < 3) {
     invalid_parameters.push(
       {
-        "name": "username",
+        "name": "name",
         "reason": "must be longer than 2 characters"
       }
     )
@@ -50,18 +50,18 @@ const validatePassword = (password, invalid_parameters) => {
   }
 }
 
-const validateName = (name, invalid_parameters) => {
-  if (!name) {
+const validateDisplayName = (display_name, invalid_parameters) => {
+  if (!display_name) {
     invalid_parameters.push(
       {
-        "name": "name",
+        "name": "display_name",
         "reason": "must exist"
       }
     )
-  } else if (name.length < 3) {
+  } else if (display_name.length < 3) {
     invalid_parameters.push(
       {
-        "name": "name",
+        "name": "display_name",
         "reason": "must be longer than 2 characters"
       }
     )

@@ -8,10 +8,10 @@ const Vonage = require('../vonage');
 const authRoutes = express.Router();
 
 authRoutes.post('/signup', async (req, res) => {
-  const { username, password, name } = req.body;
+  const { name, password, display_name } = req.body;
 
   // validate that they done passed everything in
-  const invalid_parameters = Validation.validateSignupParameters(username, password, name);
+  const invalid_parameters = Validation.validateSignupParameters(name, password, display_name);
 
   if (invalid_parameters.length > 0) {
     res.status(400).send({
@@ -23,19 +23,70 @@ authRoutes.post('/signup', async (req, res) => {
     return;
   }
 
-  // Create Vonage User
-  const vonageUser = await Vonage.createVonageUser(username, name);
-
-  if (!vonageUser) {
-    res.status(500).send({
-      "type": "system:error",
-      "title": "System Failure",
-      "detail": "There was an issue with the Vonage API.",
-    });
+  // Check if a Vonage User exists in the local DB
+  let user = await DB.users.get(name);
+  if (user) {
+    if(user.password_digest) {
+      res.status(409).send({
+        "type": "data:validation",
+        "title": "Bad Request",
+        "detail": "User already exists.",
+        "invalid_parameters": [
+          {
+            "name": "name",
+            "reason": "must be unique"
+          }
+        ]
+      });
+    } else {
+      await DB.users.addPassword(name, password);
+      const token = JWT.getUserJWT(user.name, user.vonage_id);
+      res.status(201).send({
+        user,
+        token
+      });
+    }
     return;
   }
 
-  const user = await DB.createUser(username, password, name, vonageUser.id);
+  // Create Vonage User
+  const { vonageUser, error } = await Vonage.createVonageUser(name, display_name);
+
+  if (error) {
+    if(error.code != 'user:error:duplicate-name') {
+      res.status(500).send({
+        "type": "system:error",
+        "title": "System Failure",
+        "detail": error.detail
+      });
+      return;
+    }
+    // retrieve all users from Vonage
+    let vonageUsers = await Vonage.getVonageUsers(null);
+    // sync all users into DB
+    await DB.users.sync(vonageUsers);
+    // find user in DB
+    user = await DB.users.get(name);
+    // console.log(user);
+    // no user in the DB - THIS SHOULD NEVER HAPPEN
+    if(!user) {
+      res.status(500).send({
+        "type": "system:error",
+        "title": "System Failure",
+        "detail": "There was an issue with the database.",
+      });
+      return
+    }
+    await DB.users.addPassword(name, password);
+    const token = JWT.getUserJWT(user.name, user.vonage_id);
+    res.status(201).send({
+      user,
+      token
+    });
+    return
+  }
+
+  user = await DB.users.create(name, password, display_name, vonageUser.id);
 
   if (!user) {
     res.status(500).send({
@@ -50,10 +101,10 @@ authRoutes.post('/signup', async (req, res) => {
     res.status(409).send({
       "type": "data:validation",
       "title": "Bad Request",
-      "detail": "Username already exists.",
+      "detail": "User already exists.",
       "invalid_parameters": [
         {
-          "name": "username",
+          "name": "name",
           "reason": "must be unique"
         }
       ]
@@ -62,7 +113,7 @@ authRoutes.post('/signup', async (req, res) => {
   }
 
   // Create JWT
-  const token = JWT.getUserJWT(user.username, user.userid);
+  const token = JWT.getUserJWT(user.name, user.vonage_id);
 
   res.status(201).send({
     user,
@@ -70,12 +121,16 @@ authRoutes.post('/signup', async (req, res) => {
   });
 });
 
+
+
+
+
 authRoutes.post('/login', async (req, res) => {
 
-  const { username, password } = req.body;
+  const { name, password } = req.body;
 
   // validate that they done passed everything in
-  const invalid_parameters = Validation.validateLoginParameters(username, password);
+  const invalid_parameters = Validation.validateLoginParameters(name, password);
 
   if (invalid_parameters.length > 0) {
     res.status(400).send({
@@ -87,7 +142,7 @@ authRoutes.post('/login', async (req, res) => {
     return;
   }
 
-  const user = await DB.identifyUser(username, password);
+  const user = await DB.users.authenticate(name, password);
 
   if (!user) {
     res.status(403).send({
@@ -99,7 +154,7 @@ authRoutes.post('/login', async (req, res) => {
   }
 
   // Create JWT
-  const token = JWT.getUserJWT(user.username, user.userId);
+  const token = JWT.getUserJWT(user.name, user.vonage_id);
 
   res.status(201).send({
     user,
