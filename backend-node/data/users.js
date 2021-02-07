@@ -27,7 +27,7 @@ const create = async function (vonage_id, name, display_name, password) {
       user = res.rows[0];
       user.status = 'created';
     }
-    console.log(`USER CREATED - ${user}`);
+    console.log(`USER CREATED - ${user.vonage_id}\t${user.name} \t ${user.display_name}`);
   } catch (err) {
     console.log(err);
   }
@@ -99,10 +99,13 @@ const sync = async function (vonageUsers) {
       user = await create(vonageUser.vonage_id, vonageUser.name, vonageUser.display_name, null);
     } else {
       // if present (update)
+      // console.log(`USER PRESENT - ${user.vonage_id}\t${user.name} \t ${user.display_name}`);
       try {
-        const res = await pool.query('UPDATE users(vonage_id, display_name) VALUES($1, $2) RETURNING vonage_id, name, display_name WHERE name=$3', [vonageUser.vonage_id, vonageUser.display_name, vonageUser.name]);
+        const res = await pool.query('UPDATE users SET vonage_id=$1, display_name=$2 WHERE name=$3 RETURNING vonage_id, name, display_name', [vonageUser.vonage_id, vonageUser.display_name, vonageUser.name]);
+        // console.log(res);
         if (res.rowCount === 1) {
           user = res.rows[0];
+          console.log(`USER UPDATED - ${user.vonage_id}\t${user.name} \t ${user.display_name}`);
         }
       } catch (err) {
         console.log(err);
