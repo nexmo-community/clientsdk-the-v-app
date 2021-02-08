@@ -1,0 +1,32 @@
+post http://localhost:3000/rtc/events HTTP/1.1
+Content-Type: application/json
+
+{
+  "from": "MEM-49d9821d-1cc7-4070-955f-4419339b5401",
+  "conversation_id": "CON-b273a8fc-c4f3-45bf-a059-139e925ce5d7",
+  "body": {
+      "user": {
+          "id": "USR-43462453-b3be-4e01-9d3c-5f2525bc79d5",
+          "user_id": "USR-43462453-b3be-4e01-9d3c-5f2525bc79d5",
+          "name": "dwane"
+      },
+      "channel": {
+          "type": "app",
+          "legs": [],
+          "leg_settings": {},
+          "leg_ids": []
+      },
+      "timestamp": {
+          "joined": "2020-12-14T14:42:32.511Z"
+      },
+      "initiator": {
+          "joined": {
+              "isSystem": true
+          }
+      }
+  },
+  "id": 1,
+  "application_id": "19e0465b-7cd9-4e7e-96d8-c7942a9bdb87",
+  "timestamp": "2020-12-14T14:42:32.514Z",
+  "type": "member:joined"
+}
