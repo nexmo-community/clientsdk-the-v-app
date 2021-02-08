@@ -93,7 +93,8 @@ const sync = async function (vonageUsers) {
       return;
     }
     // find user in DB (use name as key)
-    let user = await get(vonageUser.name)
+    vonageUserName = vonageUser.name.toLowerCase()
+    let user = await get(vonageUserName)
     // if not present (insert)
     if(!user) {
       user = await create(vonageUser.vonage_id, vonageUser.name, vonageUser.display_name, null);
@@ -101,7 +102,8 @@ const sync = async function (vonageUsers) {
       // if present (update)
       // console.log(`USER PRESENT - ${user.vonage_id}\t${user.name} \t ${user.display_name}`);
       try {
-        const res = await pool.query('UPDATE users SET vonage_id=$1, display_name=$2 WHERE name=$3 RETURNING vonage_id, name, display_name', [vonageUser.vonage_id, vonageUser.display_name, vonageUser.name]);
+        // console.log(`  UPDATE WITH - ${vonageUser.vonage_id}\t${vonageUser.name} \t ${vonageUser.display_name}`);
+        const res = await pool.query('UPDATE users SET vonage_id=$1, display_name=$2 WHERE name=$3 RETURNING vonage_id, name, display_name', [vonageUser.vonage_id, vonageUser.display_name, vonageUserName]);
         // console.log(res);
         if (res.rowCount === 1) {
           user = res.rows[0];
