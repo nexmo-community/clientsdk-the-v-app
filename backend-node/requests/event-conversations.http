@@ -1,0 +1,63 @@
+###  CONVERSATION CREATE
+post http://localhost:3000/rtc/events HTTP/1.1
+Content-Type: application/json
+
+{
+  "type": "conversation:created",
+  "body": {
+      "id": "CON-b273a8fc-c4f3-45bf-a059-139e925ce5d7",
+      "name": "NAM-ec666b5d-10f4-4b02-94a3-faf50e46e591",
+      "timestamp": {
+          "created": "2020-12-14T14:35:24.457Z"
+      },
+      "display_name": "twitch 20201214-001",
+      "state": "ACTIVE"
+  },
+  "application_id": "19e0465b-7cd9-4e7e-96d8-c7942a9bdb87",
+  "timestamp": "2020-12-14T14:35:24.463Z"
+}
+
+
+###  CONVERSATION UPDATE
+post http://localhost:3000/rtc/events HTTP/1.1
+Content-Type: application/json
+
+{
+  "type": "conversation:updated",
+  "conversation_id": "CON-54c42b4b-6dce-45f4-9674-67a66a937812",
+  "body": {
+    "id": "CON-b273a8fc-c4f3-45bf-a059-139e925ce5d7",
+    "name": "NAM-ec666b5d-10f4-4b02-94a3-faf50e46e591",
+    "timestamp": {
+      "created": "2020-12-14T14:35:24.457Z",
+      "updated": "2021-02-12T14:50:50.769Z"
+        
+    },
+    "display_name": "twitch 20201214-001",
+    "state": "ACTIVE"
+  },
+  "id": 3,
+  "application_id": "19e0465b-7cd9-4e7e-96d8-c7942a9bdb87",
+  "timestamp": "2021-02-12T14:50:50.771Z"
+}
+
+
+###  CONVERSATION DELETE
+post http://localhost:3000/rtc/events HTTP/1.1
+Content-Type: application/json
+
+{
+  "type": "conversation:deleted",
+  "body": {
+    "id": "CON-b273a8fc-c4f3-45bf-a059-139e925ce5d7",
+    "name": "NAM-ec666b5d-10f4-4b02-94a3-faf50e46e591",
+    "timestamp": {
+      "created": "2020-12-14T14:35:24.457Z",
+      "updated": "2021-02-12T14:50:50.769Z"
+        
+    },
+    "reason": "deleted"
+  },
+  "application_id": "19e0465b-7cd9-4e7e-96d8-c7942a9bdb87",
+  "timestamp": "2021-02-12T14:50:50.771Z"
+}

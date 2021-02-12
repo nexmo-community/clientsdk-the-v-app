@@ -18,7 +18,8 @@ CREATE TABLE conversations (
     name character varying NOT NULL,
     display_name character varying,
     state character varying NOT NULL,
-    vonage_created_at timestamp without time zone
+    created_at timestamp without time zone,
+    deleted_at timestamp without time zone
 );
 CREATE UNIQUE INDEX conversations_pkey ON conversations(id int8_ops);
 

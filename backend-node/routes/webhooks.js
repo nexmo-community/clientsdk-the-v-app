@@ -5,7 +5,7 @@ const webhookRoutes = express.Router();
 
 webhookRoutes.post('/rtc/events', async (req, res) => {
   const { application_id, timestamp, type, body } = req.body;
-  // console.log(`${application_id} - ${type}`);
+  
 
   if(application_id !== process.env.vonageAppId) {
     res.status(403).json({status: "Invalid application id"});
@@ -16,8 +16,22 @@ webhookRoutes.post('/rtc/events', async (req, res) => {
     return;
   }
 
-  if(type === "conversation:created") {
-    status = await rtcEvents.conversations.create(body);
+  let status = ""
+  switch(type) {
+    case  "conversation:created":
+      status = await rtcEvents.conversations.create(body);
+      break;
+    case  "conversation:updated":
+      status = await rtcEvents.conversations.update(body);
+      break;
+    case  "conversation:deleted":
+      status = await rtcEvents.conversations.destroy(body);
+      break;
+    default:
+      console.log(`🚨🚨🚨 UNHANDLED TYPE: ${type}`);
+      console.log(req.body);
+      console.log("----------------------------");
+      status = `🚨🚨🚨 UNHANDLED TYPE: ${type}`;
   }
 
   res.status(200).json({status});
