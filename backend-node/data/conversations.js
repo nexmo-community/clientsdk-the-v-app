@@ -9,7 +9,7 @@ const pool = new Pool({
 const Vonage = require('../vonage');
 
 
-const get = async function (vonage_id, apiFallback = false) {
+const get = async (vonage_id, apiFallback = false) => {
   let conversation;
   try {
     const res = await pool.query('SELECT vonage_id, name, display_name, state from conversations where vonage_id=$1', [vonage_id]);
@@ -35,7 +35,7 @@ const get = async function (vonage_id, apiFallback = false) {
 
 
 
-const create = async function (vonage_id, name, display_name, state, createdAt) {
+const create = async (vonage_id, name, display_name, state, createdAt) => {
   let conversation = await get(vonage_id)
   // console.log(conversation);
   if(conversation) {
@@ -58,7 +58,7 @@ const create = async function (vonage_id, name, display_name, state, createdAt) 
 
 
 
-const update = async function (vonage_id, name, display_name, state, createdAt) {
+const update = async (vonage_id, name, display_name, state, createdAt) => {
   let conversation = await get(vonage_id)
   // console.log(conversation);
   if(!conversation) {
@@ -81,12 +81,11 @@ const update = async function (vonage_id, name, display_name, state, createdAt) 
 }
 
 
-const destroy = async function (vonage_id) {
-  let conversation = await get(vonage_id)
+const destroy = async (vonage_id) => {
+  let conversation = await get(vonage_id);
   // console.log(conversation);
   if(!conversation) {
-    conversation = await create(vonage_id, name, display_name, state, createdAt);
-    return conversation;
+    return;
   }
   try {
     const res = await pool.query('UPDATE conversations SET deleted_at=NOW() WHERE vonage_id=$1', [vonage_id]);
@@ -94,13 +93,23 @@ const destroy = async function (vonage_id) {
   } catch (err) {
     console.log(err);
   }
-  return conversation;
+  return;
 }
 
+
+const syncMembers = async (vonage_id) => {
+  let conversation = await get(vonage_id);
+  if(!conversation) {
+    return;
+  }
+  console.log(`SYNC USERS FOR: ${JSON.stringify(conversation)}`);
+
+}
 
 module.exports = {
   get,
   create,
   update,
-  destroy
+  destroy,
+  syncMembers
 }

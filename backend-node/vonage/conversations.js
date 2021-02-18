@@ -16,6 +16,7 @@ const getConfig = (jwt) => {
 const get = async (conversationId) => {
   let vonageConversation;
   let error;
+  console.log(`VONAGE: Retrieving conversation ${JSON.stringify(conversationId)}`);
   try {
     const config = getConfig(JWT.getAdminJWT());
     const response = await axios.get(`${vonageAPIUrl}/conversations/${conversationId}`, config);

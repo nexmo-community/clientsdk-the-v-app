@@ -41,6 +41,9 @@ webhookRoutes.post('/rtc/events', async (req, res) => {
     case  "member:left":
       status = await rtcEvents.members.statusUpdate('LEFT', req.body);
       break;
+    case  "text":
+      status = await rtcEvents.text.create(req.body);
+      break;
     default:
       console.log(`🚨🚨🚨 UNHANDLED TYPE: ${type}`);
       console.log(req.body);
