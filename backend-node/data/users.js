@@ -7,10 +7,14 @@ const pool = new Pool({
 });
 const passwordSalt = process.env.salt;
 
+
+const Vonage = require('../vonage');
+
+
 const create = async function (vonage_id, name, display_name, password) {
   let user;
   name = name.toLowerCase();
-  user = await get(name);
+  user = await getByName(name);
   if (user) {
     user.status = 'existed';
     return user;
@@ -38,7 +42,7 @@ const create = async function (vonage_id, name, display_name, password) {
 const addPassword = async function (name, password) {
   let user;
   name = name.toLowerCase();
-  user = await get(name);
+  user = await getByName(name);
   if (user) {
     let passwordHash = '';
     if(password) {
@@ -71,7 +75,8 @@ const authenticate = async function (name, password) {
   return user;
 }
 
-const get = async function (name) {
+
+const getByName = async function (name, apiFallback = false) {
   let user;
   try {
     name = name.toLowerCase();
@@ -82,10 +87,36 @@ const get = async function (name) {
   } catch (err) {
     console.log(err);
   }
-  return user;
+  if(user || !apiFallback) {
+    return user;
+  }
+  await sync();
+  return await getByName(name, false);
 }
 
-const sync = async function (vonageUsers) {
+
+const getByVonageId = async function (vonageId, apiFallback = false) {
+  let user;
+  try {
+    const res = await pool.query('SELECT vonage_id, name, display_name, password_digest from users where vonage_id=$1', [vonageId]);
+    if (res.rowCount === 1) {
+      user = res.rows[0];
+    }
+  } catch (err) {
+    console.log(err);
+  }
+  if(user || !apiFallback) {
+    return user;
+  }
+  await sync();
+  return await getByVonageId(vonageId, false);
+}
+
+
+const sync = async function () {
+
+  let vonageUsers = await Vonage.users.getAll();
+
   // console.log(vonageUsers);
   for(let i = 0; i < vonageUsers.length; i++) {
     let vonageUser = vonageUsers[i];
@@ -94,7 +125,7 @@ const sync = async function (vonageUsers) {
     }
     // find user in DB (use name as key)
     vonageUserName = vonageUser.name.toLowerCase()
-    let user = await get(vonageUserName)
+    let user = await getByName(vonageUserName)
     // if not present (insert)
     if(!user) {
       user = await create(vonageUser.vonage_id, vonageUser.name, vonageUser.display_name, null);
@@ -119,7 +150,8 @@ const sync = async function (vonageUsers) {
 module.exports = {
   create,
   addPassword,
-  get,
+  getByName,
+  getByVonageId,
   authenticate,
   sync
 }

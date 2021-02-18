@@ -50,7 +50,7 @@ authRoutes.post('/signup', async (req, res) => {
   }
 
   // Create Vonage User
-  const { vonageUser, error } = await Vonage.createVonageUser(name, display_name);
+  const { vonageUser, error } = await Vonage.users.create(name, display_name);
 
   if (error) {
     if(error.code != 'user:error:duplicate-name') {
@@ -61,10 +61,8 @@ authRoutes.post('/signup', async (req, res) => {
       });
       return;
     }
-    // retrieve all users from Vonage
-    let vonageUsers = await Vonage.getVonageUsers(null);
-    // sync all users into DB
-    await DB.users.sync(vonageUsers);
+    // retrieve all users from Vonage into DB
+    await DB.users.sync();
     // find user in DB
     user = await DB.users.get(name);
     // console.log(user);

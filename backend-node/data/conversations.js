@@ -6,8 +6,10 @@ const pool = new Pool({
 });
 
 
+const Vonage = require('../vonage');
 
-const get = async function (vonage_id) {
+
+const get = async function (vonage_id, apiFallback = false) {
   let conversation;
   try {
     const res = await pool.query('SELECT vonage_id, name, display_name, state from conversations where vonage_id=$1', [vonage_id]);
@@ -16,6 +18,17 @@ const get = async function (vonage_id) {
     }
   } catch (err) {
     console.log(err);
+  }
+  if(conversation || !apiFallback) {
+    return conversation;
+  }
+  const { vonageConversation, error} = await Vonage.conversations.get(vonage_id);
+  if(!vonageConversation) {
+    return conversation;
+  }
+  const { id, name, display_name, state, timestamp } = vonageConversation;
+  if(id && name && state && timestamp && timestamp.created ) {
+    conversation = await create(id, name, display_name, state, timestamp.created);
   }
   return conversation;
 }
@@ -29,7 +42,7 @@ const create = async function (vonage_id, name, display_name, state, createdAt) 
     return conversation;
   }
   try {
-    const res = await pool.query('INSERT INTO conversations(vonage_id, name, display_name, state, created_at) VALUES($1, $2, $3, $4, $5) RETURNING vonage_id, name, display_name, state', [vonage_id, name, display_name, state, createdAt]);
+    const res = await pool.query('INSERT INTO conversations(vonage_id, name, display_name, state, created_at) VALUES($1, $2, $3, $4, $5) RETURNING vonage_id, name, display_name, state', [vonage_id, name, display_name || name, state, createdAt]);
     if (res.rowCount === 1) {
       conversation = res.rows[0];
     }

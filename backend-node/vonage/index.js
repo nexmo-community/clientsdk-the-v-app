@@ -13,63 +13,6 @@ const getConfig = (jwt) => {
   };
 }
 
-const createVonageUser = async (name, display_name) => {
-  let vonageUser;
-  let error;
-
-  try {
-    const body = { name, display_name };
-    const config = getConfig(JWT.getAdminJWT());
-
-    const response = await axios.post(`${vonageAPIUrl}/users`, body, config);
-
-    if (response) {
-      if(response.status === 201) {
-        vonageUser = response.data;
-      } else {
-        error = "Unexpected error";
-      }
-    }
-
-  }
-  catch (err) {
-    // console.log(err.response.status);
-    // console.log(err.response.data);
-    // console.log(err.response.data.detail);
-    error = err.response.data || err;
-  }
-
-  return { vonageUser, error};
-}
-
-const getVonageUsers = async (username) => {
-  let users;
-
-  try {
-
-    const config = getConfig(JWT.getAdminJWT());
-    const response = await axios.get(`${vonageAPIUrl}/users?page_size=100`, config);
-
-    if (response && response.data) {
-      users = [
-        ...response.data._embedded.users.filter(f => f.name !== username)
-          .map(m => {
-            return {
-              vonage_id: m.id,
-              name: m.name,
-              display_name: m.display_name || m.name
-            }
-          })
-      ]
-    }
-  }
-  catch (err) {
-    console.log(err);
-  }
-
-  return users;
-}
-
 const getVonageConversations = async (vonageId) => {
   let conversations = [];
 
@@ -92,42 +35,6 @@ const getVonageConversations = async (vonageId) => {
   return conversations;
 }
 
-const getVonageConversation = async (conversationId, vonageId) => {
-  let conversation;
-
-  try {
-
-    const config = getConfig(JWT.getAdminJWT());
-    const response = await axios.get(`${vonageAPIUrl}/conversations/${conversationId}`, config);
-
-    if (response && response.data) {
-      conversation = buildConversation(response.data, vonageId);
-    }
-  }
-  catch (err) {
-    console.log(err);
-  }
-
-  return conversation;
-}
-
-const buildConversation = async (conversation, vonageId) => {
-  let members = await getConversationMembers(conversation.id);
-  // let me = members.find(f => f.user_id === vonageId);
-  members = members.filter(f => f.user_id !== vonageId);
-
-  const name = members.map(m => m.name).join(', ');
-
-  return {
-    uuid: conversation.id,
-    name,
-    created_at: conversation.timestamp.created || null,
-    // invited_at: (me === undefined) ? null : me.timestamp.invited || null,
-    // joined_at: (me === undefined) ? null : me.timestamp.joined || null,
-    // left_at: (me === undefined) ? null : me.timestamp.left || null,
-    users: members
-  };
-}
 
 const buildConversations = (conversations, vonageId) => {
   return {
@@ -231,7 +138,18 @@ const getConversationMembers = async (conversationId) => {
 
 module.exports = {
   createVonageConversation,
-  createVonageUser,
-  getVonageConversations,
-  getVonageUsers
+  getVonageConversations
+}
+
+
+
+
+const users = require('./users');
+const conversations = require('./conversations');
+const members = require('./members');
+
+module.exports = {
+  users,
+  conversations,
+  members
 }

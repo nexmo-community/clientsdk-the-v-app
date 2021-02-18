@@ -28,7 +28,8 @@ vonageRoutes.get('/users', async (req, res) => {
   const jwt = fromHeaderOrQuerystring(req);
 
   if (jwt) {
-    const vonageUsers = await Vonage.getVonageUsers(req.user.name);
+    const vonageUsers = await Vonage.users.getAll();
+    // .filter(f => f.name !== req.user.name)
     res.status(200).json(vonageUsers);
   }
 

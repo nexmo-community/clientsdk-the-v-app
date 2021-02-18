@@ -7,12 +7,6 @@ async function create(body) {
     return 'Missing data';
   }
 
-  let conversation = Data.conversations.get(id)
-  // existing conversation
-  if(conversation) {
-    conversation = await Data.conversations.update(id, name, display_name, state, timestamp.created);
-    return `created conversation: ${conversation.vonage_id}`;
-  }
   // new conversation
   conversation = await Data.conversations.create(id, name, display_name, state, timestamp.created);
   if(conversation) {
@@ -25,7 +19,7 @@ async function create(body) {
 
 async function update(body) {
   const { id, name, display_name, state, timestamp } = body;
-  if(!id || !name || !display_name || !state || !timestamp || !timestamp.created ) {
+  if(!id || !name || !state || !timestamp || !timestamp.created ) {
     return 'Missing data';
   }
 
