@@ -1,4 +1,4 @@
-console.log("Syncronising...")
+console.log("Syncronising users...")
 
 require('dotenv').config();
 const DB = require('../data');

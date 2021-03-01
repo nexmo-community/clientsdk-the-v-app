@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js",
-    "sync": "node scripts/sync.js"
+    "sync-users": "node scripts/sync-users.js",
+    "sync-conv": "node scripts/sync-conv.js"
   },
   "author": "",
   "license": "MIT",

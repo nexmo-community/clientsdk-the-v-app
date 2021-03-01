@@ -5,9 +5,7 @@ const pool = new Pool({
   connectionString
 });
 
-
 const Vonage = require('../vonage');
-
 
 const get = async (conversation_id, vonage_id) => {
   let event;
@@ -20,10 +18,7 @@ const get = async (conversation_id, vonage_id) => {
     console.log(err);
   }
   return event;
-
 }
-
-
 
 const create = async (conversation_id, from_member_id, to_member_id, vonage_id, vonage_type, content, created_at) => {
   let event = await get(conversation_id, vonage_id);
@@ -44,7 +39,6 @@ const create = async (conversation_id, from_member_id, to_member_id, vonage_id, 
   }
   return event;
 }
-
 
 module.exports = {
   get,
