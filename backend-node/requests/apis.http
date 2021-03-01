@@ -1,0 +1,46 @@
+@BASE_URL = http://localhost:3000
+@name = paul
+@password = abcd1234
+@displayName = Paul
+@JWT = eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBsaWNhdGlvbl9pZCI6IjE5ZTA0NjViLTdjZDktNGU3ZS05NmQ4LWM3OTQyYTliZGI4NyIsImlhdCI6MTYxNDYxMTA3NjgxMywianRpIjoiYjE4OTY1NjItZjUwMS00YWM5LWI4MTYtY2Q5ODI1YzhhYjNlIiwic3ViIjoicGF1bCIsInVzZXJfaWQiOiJVU1ItNDQzMjZkMDQtY2Q4Mi00MWY1LWFkMjQtMzE1YzJhMmVhYzQxIiwiZXhwIjoxNjE0Njk3NDc3LCJhY2wiOnsicGF0aHMiOnsiLyovdXNlcnMvKioiOnt9LCIvKi9jb252ZXJzYXRpb25zLyoqIjp7fSwiLyovc2Vzc2lvbnMvKioiOnt9LCIvKi9kZXZpY2VzLyoqIjp7fSwiLyovaW1hZ2UvKioiOnt9LCIvKi9tZWRpYS8qKiI6e30sIi8qL2FwcGxpY2F0aW9ucy8qKiI6e30sIi8qL3B1c2gvKioiOnt9LCIvKi9rbm9ja2luZy8qKiI6e319fX0.V6G4CB0JFGucm4HhSVTuRlGBqXEVu57gbVrU77EKS6ciL3fAa3AR0V-fNLyXZnv838Cs_kuTLnYl2stoFMJ4pwlxb3vGPQpXhmde_ZrfClCKAJc7X4x520zwY475r6Y7mhRexBuJbj75yZbEUdmRUJ_nWZqSYhHp4rb-_LPopBNU10Zp-aOjmw-7eJhaa5BbMoHYLHEqRRS0QtYSrbIO3RVQGiIXuVHdm3UAZsgR7wF1mq8GtFKhblbmh-7YyC8L_ooNRJq1PMHaUxkIDG06RJeXCixt3PfaMXB9df1fNPooCswyqkZ36TQ_1JqTiMTGouMCGEveQl6WoWqtw0Y3bw
+@CONV_ID = 123
+
+
+### SIGNUP
+post {{BASE_URL}}/signup HTTP/1.1
+Content-Type: application/json
+
+{ "name": "{{name}}", "password": "{{password}}", "display_name": "{{displayName}}" }
+
+### LOGIN
+post http://localhost:3000/login
+Content-Type: application/json
+
+{ "name": "{{name}}", "password": "{{password}}"}
+
+
+###  LIST OF USERS
+get http://localhost:3000/users
+Content-Type: application/json
+Authorization: Bearer {{JWT}}
+
+
+###  LIST OF CONVERSATIONS
+get http://localhost:3000/conversations
+Content-Type: application/json
+Authorization: Bearer {{JWT}}
+
+
+###  RETRIEVE A CONVERSATION (inc. members & events)
+get http://localhost:3000/conversations/{{CONV_ID}}
+Content-Type: application/json
+Authorization: Bearer {{JWT}}
+
+
+###  CREATE A CONVERSATION
+post http://localhost:3000/conversations
+Content-Type: application/json
+Authorization: Bearer {{JWT}}
+
+{ "users": []}
+

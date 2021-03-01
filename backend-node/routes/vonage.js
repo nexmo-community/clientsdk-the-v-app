@@ -1,7 +1,8 @@
 const express = require('express');
 const jwt = require('express-jwt');
+const jsonwebtoken = require('jsonwebtoken');
 const fs = require('fs');
-const Vonage = require('../vonage');
+const Data = require('../data');
 
 const vonageRoutes = express.Router();
 
@@ -24,28 +25,22 @@ vonageRoutes.use(jwt({
 }));
 
 vonageRoutes.get('/users', async (req, res) => {
-
   const jwt = fromHeaderOrQuerystring(req);
-
-  if (jwt) {
-    const vonageUsers = await Vonage.users.getAll();
-    // .filter(f => f.name !== req.user.name)
-    res.status(200).json(vonageUsers);
+  if (!jwt || !req.user || !req.user.sub) {
+    return res.status(403);
   }
-
-  res.status(200);
+  let vonageUsers = await Data.users.getAll();
+  vonageUsers = vonageUsers.filter(f => f.name !== req.user.sub)
+  res.status(200).json(vonageUsers);
 });
 
 vonageRoutes.get('/conversations', async (req, res) => {
-
   const jwt = fromHeaderOrQuerystring(req);
-
-  if (jwt) {
-    const vonageConversations = await Vonage.getVonageConversations(req.user.user_id);
-    res.status(200).json(vonageConversations);
+  if (!jwt || !req.user || !req.user.user_id) {
+    return res.status(403);
   }
-
-  res.status(200);
+  const vonageConversations = await Data.conversations.getAllForUser(req.user.user_id);
+  res.status(200).json(vonageConversations);
 });
 
 vonageRoutes.post('/conversations', async (req, res) => {

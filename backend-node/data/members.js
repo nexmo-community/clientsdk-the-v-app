@@ -12,7 +12,7 @@ const users = require('./users');
 const get = async function (vonage_id) {
   let member;
   try {
-    const res = await pool.query('SELECT vonage_id, conversation_id, user_id, state from members where vonage_id=$1', [vonage_id]);
+    const res = await pool.query('SELECT vonage_id, conversation_id, user_id, state FROM members where vonage_id=$1', [vonage_id]);
     if (res.rowCount === 1) {
       member = res.rows[0];
     }

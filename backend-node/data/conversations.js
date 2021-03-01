@@ -9,6 +9,47 @@ const pool = new Pool({
 const Vonage = require('../vonage');
 const Members = require('./members');
 const Events = require('./events');
+const Users = require('./users');
+
+
+const getAllForUser = async function (userId) {
+  try {
+    const res = await pool.query('SELECT conversations.vonage_id, conversations.name, conversations.display_name, conversations.state FROM conversations JOIN members ON conversations.vonage_id = members.conversation_id WHERE user_id=$1', [userId]);
+    if (res.rowCount > 0 ) {
+      let conversations = res.rows;
+
+      let conversationsWithMembers = await Promise.all(conversations.map(async (conv) => {
+        conv.members = await getMembers(conv.vonage_id);
+        return conv;
+      }));
+      return conversationsWithMembers;
+    }
+  } catch (err) {
+    console.log(err);
+  }
+  return [];
+}
+
+
+const getMembers = async function (conversationId) {
+  try {
+    const res = await pool.query('SELECT vonage_id as member_id, conversation_id, user_id, state FROM members where conversation_id=$1', [conversationId]);
+    if (res.rowCount > 0 ) {
+      let members = res.rows;
+      let membersWithUsers = await Promise.all(members.map(async (member) => {
+        user = await Users.getByVonageId(member.user_id);
+        member.name = user.name;
+        member.display_name = user.display_name;
+        return member;
+      }));
+      return membersWithUsers;
+    }
+  } catch (err) {
+    console.log(err);
+  }
+  return [];
+}
+
 
 const get = async (vonage_id, apiFallback = false) => {
   let conversation;
@@ -157,6 +198,8 @@ const syncEvents = async (conversation_id) => {
 
 
 module.exports = {
+  getAllForUser,
+  getMembers,
   get,
   create,
   update,

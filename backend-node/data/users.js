@@ -7,8 +7,22 @@ const pool = new Pool({
 });
 const passwordSalt = process.env.salt;
 
-
 const Vonage = require('../vonage');
+
+
+
+const getAll = async function () {
+  try {
+    const res = await pool.query('SELECT vonage_id, name, display_name FROM users');
+    if (res.rowCount > 0 ) {
+      return res.rows;
+    }
+  } catch (err) {
+    console.log(err);
+  }
+  return [];
+}
+
 
 
 const create = async function (vonage_id, name, display_name, password) {
@@ -148,6 +162,7 @@ const sync = async function () {
 }
 
 module.exports = {
+  getAll,
   create,
   addPassword,
   getByName,

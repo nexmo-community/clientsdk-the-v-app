@@ -24,7 +24,7 @@ authRoutes.post('/signup', async (req, res) => {
   }
 
   // Check if a Vonage User exists in the local DB
-  let user = await DB.users.get(name);
+  let user = await DB.users.getByName(name);
   if (user) {
     if(user.password_digest) {
       res.status(409).send({
@@ -64,7 +64,7 @@ authRoutes.post('/signup', async (req, res) => {
     // retrieve all users from Vonage into DB
     await DB.users.sync();
     // find user in DB
-    user = await DB.users.get(name);
+    user = await DB.users.getByName(name);
     // console.log(user);
     // no user in the DB - THIS SHOULD NEVER HAPPEN
     if(!user) {
