@@ -29,9 +29,8 @@ vonageRoutes.get('/users', async (req, res) => {
   if (!jwt || !req.user || !req.user.sub) {
     return res.status(403);
   }
-  let vonageUsers = await Data.users.getAll();
-  vonageUsers = vonageUsers.filter(f => f.name !== req.user.sub)
-  res.status(200).json(vonageUsers);
+  let users = await Data.users.getInterlocutorsFor(req.user.sub);
+  res.status(200).json(users);
 });
 
 vonageRoutes.get('/conversations', async (req, res) => {

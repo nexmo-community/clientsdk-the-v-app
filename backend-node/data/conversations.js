@@ -14,15 +14,46 @@ const Users = require('./users');
 
 const getAllForUser = async function (userId) {
   try {
-    const res = await pool.query('SELECT conversations.vonage_id, conversations.name, conversations.display_name, conversations.state FROM conversations JOIN members ON conversations.vonage_id = members.conversation_id WHERE user_id=$1', [userId]);
+    const res = await pool.query('SELECT conversations.vonage_id, conversations.state, conversations.created_at FROM conversations JOIN members ON conversations.vonage_id = members.conversation_id WHERE user_id=$1', [userId]);
     if (res.rowCount > 0 ) {
-      let conversations = res.rows;
+      let conversations = await Promise.all(res.rows.map(async (conv) => {
+        conv.id = conv.vonage_id;
+        delete conv.vonage_id;
 
-      let conversationsWithMembers = await Promise.all(conversations.map(async (conv) => {
-        conv.members = await getMembers(conv.vonage_id);
+        const members = await getMembers(conv.id);
+        const myMember = members.find(m => m.user_id == userId);
+        conv.users = members.filter(m => m.user_id != userId).map(m => {
+          return {
+            'id': m.user_id,
+            'name': m.name,
+            'display_name': m.display_name,
+            'state': m.state
+          }
+        })
+        const interlocutorNames = conv.users.map(u => u.display_name);
+        conv.name = interlocutorNames.join(", ");
+
+        if(!myMember) { return; }
+
+        let events = await getEvents(conv.id);
+        // conv.events = events;
+
+        let invitedEvent = events.find(e => e.vonage_type == 'member:invited' && e.from_member_id == myMember.member_id);
+        if(invitedEvent) { 
+          conv.invited_at = invitedEvent.created_at;
+        }
+        let joinedEvent = events.find(e => e.vonage_type == 'member:joined' && e.from_member_id == myMember.member_id);
+        if(joinedEvent) { 
+          conv.joined_at = joinedEvent.created_at;
+        }
+        let leftEvent = events.find(e => e.vonage_type == 'member:left' && e.from_member_id == myMember.member_id );
+        if(leftEvent) { 
+          conv.left_at = leftEvent.created_at;
+        }
+
         return conv;
       }));
-      return conversationsWithMembers;
+      return conversations;
     }
   } catch (err) {
     console.log(err);
@@ -49,6 +80,20 @@ const getMembers = async function (conversationId) {
   }
   return [];
 }
+
+const getEvents = async function (conversationId) {
+  try {
+    const res = await pool.query('SELECT conversation_id, from_member_id, to_member_id, vonage_type, content, created_at FROM events where conversation_id=$1', [conversationId]);
+    if (res.rowCount > 0 ) {
+      let events = res.rows;
+      return events;
+    }
+  } catch (err) {
+    console.log(err);
+  }
+  return [];
+}
+
 
 
 const get = async (vonage_id, apiFallback = false) => {
@@ -184,22 +229,31 @@ const syncEvents = async (conversation_id) => {
   if(!vonageEvents) { return; }
   // console.log(`vonageEvents ${JSON.stringify(vonageEvents)}`);
   vonageEvents.forEach(async (vonageEvent) => {
-    const {id, type, conversation_id, to, from, body, timestamp} = vonageEvent;
-    if(!id || !type || !conversation_id || !from || !body || !body.text || !timestamp) {
+    const {id, type, from, body, timestamp} = vonageEvent;
+    if(!id || !type || !from || !body || !timestamp) {
       return;
     }
-    if(type != "text") {
+
+    if(type == "text") {
+      const {to} = vonageEvent;
+      if(body.text) {
+        let event = await Events.create(conversation_id, from, to, id, type, body.text, timestamp);
+        console.dir(event);
+      }
       return;
     }
-    let event = await Events.create(conversation_id, from, to, id, type, body.text, timestamp);
-    console.dir(event);
+    if(["member:invited", "member:joined", "member:left"].includes(type)) {
+      let event = await Events.create(conversation_id, from, null, id, type, null, timestamp);
+      console.dir(event);
+    }
+
+    
   });
 }
 
 
 module.exports = {
   getAllForUser,
-  getMembers,
   get,
   create,
   update,

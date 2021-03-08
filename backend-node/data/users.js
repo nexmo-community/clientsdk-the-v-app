@@ -24,6 +24,13 @@ const getAll = async function () {
 }
 
 
+const getInterlocutorsFor = async function (user_name) {
+  const users = await getAll();
+  return users.filter(f => f.name !== user_name).map(u => { 
+    return { 'id': u.vonage_id, 'name': u.name, 'display_name': u.display_name } 
+  })
+}
+
 
 const create = async function (vonage_id, name, display_name, password) {
   let user;
@@ -163,6 +170,7 @@ const sync = async function () {
 
 module.exports = {
   getAll,
+  getInterlocutorsFor,
   create,
   addPassword,
   getByName,

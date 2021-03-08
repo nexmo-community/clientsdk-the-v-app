@@ -1,10 +1,10 @@
 console.log("Syncronising conversations...")
 
 require('dotenv').config();
-const DB = require('../data');
+const Data = require('../data');
 
 async function sync() {
-  await DB.conversations.sync();
+  await Data.conversations.sync();
 }
 
 sync();

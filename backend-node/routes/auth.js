@@ -1,6 +1,6 @@
 const express = require('express');
 
-const DB = require('../data');
+const Data = require('../data');
 const JWT = require('../jwt');
 const Validation = require('../validation');
 const Vonage = require('../vonage');
@@ -23,8 +23,8 @@ authRoutes.post('/signup', async (req, res) => {
     return;
   }
 
-  // Check if a Vonage User exists in the local DB
-  let user = await DB.users.getByName(name);
+  // Check if a Vonage User exists in the local Data
+  let user = await Data.users.getByName(name);
   if (user) {
     if(user.password_digest) {
       res.status(409).send({
@@ -39,7 +39,7 @@ authRoutes.post('/signup', async (req, res) => {
         ]
       });
     } else {
-      await DB.users.addPassword(name, password);
+      await Data.users.addPassword(name, password);
       const token = JWT.getUserJWT(user.name, user.vonage_id);
       res.status(201).send({
         user,
@@ -61,12 +61,12 @@ authRoutes.post('/signup', async (req, res) => {
       });
       return;
     }
-    // retrieve all users from Vonage into DB
-    await DB.users.sync();
-    // find user in DB
-    user = await DB.users.getByName(name);
+    // retrieve all users from Vonage into Data
+    await Data.users.sync();
+    // find user in Data
+    user = await Data.users.getByName(name);
     // console.log(user);
-    // no user in the DB - THIS SHOULD NEVER HAPPEN
+    // no user in the Data - THIS SHOULD NEVER HAPPEN
     if(!user) {
       res.status(500).send({
         "type": "system:error",
@@ -75,7 +75,7 @@ authRoutes.post('/signup', async (req, res) => {
       });
       return
     }
-    await DB.users.addPassword(name, password);
+    await Data.users.addPassword(name, password);
     const token = JWT.getUserJWT(user.name, user.vonage_id);
     res.status(201).send({
       user,
@@ -84,7 +84,7 @@ authRoutes.post('/signup', async (req, res) => {
     return
   }
 
-  user = await DB.users.create(name, password, display_name, vonageUser.id);
+  user = await Data.users.create(name, password, display_name, vonageUser.id);
 
   if (!user) {
     res.status(500).send({
@@ -113,9 +113,17 @@ authRoutes.post('/signup', async (req, res) => {
   // Create JWT
   const token = JWT.getUserJWT(user.name, user.vonage_id);
 
+  // All other users
+  let users = await Data.users.getInterlocutorsFor(user.name);
+
+  // All conversations for this user
+  const conversations = await Data.conversations.getAllForUser(user.vonage_id);
+
   res.status(201).send({
     user,
-    token
+    token,
+    users,
+    conversations
   });
 });
 
@@ -140,7 +148,7 @@ authRoutes.post('/login', async (req, res) => {
     return;
   }
 
-  const user = await DB.users.authenticate(name, password);
+  const user = await Data.users.authenticate(name, password);
 
   if (!user) {
     res.status(403).send({
@@ -154,9 +162,17 @@ authRoutes.post('/login', async (req, res) => {
   // Create JWT
   const token = JWT.getUserJWT(user.name, user.vonage_id);
 
+  // All other users
+  let users = await Data.users.getInterlocutorsFor(user.name);
+
+  // All conversations for this user
+  const conversations = await Data.conversations.getAllForUser(user.vonage_id);
+
   res.status(201).send({
     user,
-    token
+    token,
+    users,
+    conversations
   });
 });
 
