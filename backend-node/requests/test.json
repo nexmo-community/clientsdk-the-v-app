@@ -1,0 +1,25 @@
+{
+  from: 'MEM-92164d69-e350-4eb4-ba22-dc2715d67584',
+  conversation_id: 'CON-3f2e0470-e913-478a-b489-7b93caacd907',
+  body: {
+    cname: 'Testing twitch 3',
+    conversation: {
+      conversation_id: 'CON-3f2e0470-e913-478a-b489-7b93caacd907',
+      name: 'Testing twitch 3'
+    },
+    user: {
+      member_id: 'MEM-92164d69-e350-4eb4-ba22-dc2715d67584',
+      user_id: 'USR-43462453-b3be-4e01-9d3c-5f2525bc79d5',
+      media: [Object],
+      name: 'dwane'
+    },
+    channel: { type: 'app', legs: [], leg_ids: [] },
+    media: { audio_settings: [Object], audio: [Object] },
+    timestamp: { invited: '2021-02-15T15:34:53.050Z' },
+    initiator: { invited: [Object] }
+  },
+  id: 1,
+  application_id: '19e0465b-7cd9-4e7e-96d8-c7942a9bdb87',
+  timestamp: '2021-02-15T15:34:53.052Z',
+  type: 'member:invited'
+}
