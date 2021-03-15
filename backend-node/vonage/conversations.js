@@ -59,6 +59,23 @@ const get = async (conversationId) => {
 }
 
 
+const create = async (ownerId, usersIds) => {
+  let vonageConversation;
+  try {
+    const body = {};
+    const config = getConfig(JWT.getAdminJWT());
+    const response = await axios.post(`${vonageAPIUrl}/conversations`, body, config);
+    if (response && response.status === 201) {
+      vonageConversation = response.data;
+    }
+  }
+  catch (err) {
+    console.log(err);
+  }
+  return vonageConversation;
+}
+
+
 
 const getMembers = async (conversationId) => {
   let vonageMembers;
@@ -83,6 +100,29 @@ const getMembers = async (conversationId) => {
   return { vonageMembers, error};
 }
 
+const createMember = async (conversationId, userId) => {
+  let vonageMember;
+  try {
+    const body = {
+      state: 'joined',
+      user: {
+        id: userId
+      },
+      channel: {
+        type: 'app'
+      }
+    };
+    const config = getConfig(JWT.getAdminJWT());
+    const response = await axios.post(`${vonageAPIUrl}/conversations/${conversationId}/members`, body, config);
+    if (response && response.status === 201) {
+      vonageMember = response.data;
+    }
+  }
+  catch (err) {
+    console.log(err);
+  }
+  return vonageMember;
+}
 
 const getEvents = async (conversationId) => {
   let vonageEvents;
@@ -111,6 +151,8 @@ const getEvents = async (conversationId) => {
 module.exports = {
   getAll,
   get,
+  create,
   getMembers,
+  createMember,
   getEvents
 }

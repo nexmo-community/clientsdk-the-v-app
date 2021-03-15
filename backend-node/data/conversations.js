@@ -17,41 +17,7 @@ const getAllForUser = async function (userId) {
     const res = await pool.query('SELECT conversations.vonage_id, conversations.state, conversations.created_at FROM conversations JOIN members ON conversations.vonage_id = members.conversation_id WHERE user_id=$1', [userId]);
     if (res.rowCount > 0 ) {
       let conversations = await Promise.all(res.rows.map(async (conv) => {
-        conv.id = conv.vonage_id;
-        delete conv.vonage_id;
-
-        const members = await getMembers(conv.id);
-        const myMember = members.find(m => m.user_id == userId);
-        conv.users = members.filter(m => m.user_id != userId).map(m => {
-          return {
-            'id': m.user_id,
-            'name': m.name,
-            'display_name': m.display_name,
-            'state': m.state
-          }
-        })
-        const interlocutorNames = conv.users.map(u => u.display_name);
-        conv.name = interlocutorNames.join(", ");
-
-        if(!myMember) { return; }
-
-        let events = await getEvents(conv.id);
-        // conv.events = events;
-
-        let invitedEvent = events.find(e => e.vonage_type == 'member:invited' && e.from_member_id == myMember.member_id);
-        if(invitedEvent) { 
-          conv.invited_at = invitedEvent.created_at;
-        }
-        let joinedEvent = events.find(e => e.vonage_type == 'member:joined' && e.from_member_id == myMember.member_id);
-        if(joinedEvent) { 
-          conv.joined_at = joinedEvent.created_at;
-        }
-        let leftEvent = events.find(e => e.vonage_type == 'member:left' && e.from_member_id == myMember.member_id );
-        if(leftEvent) { 
-          conv.left_at = leftEvent.created_at;
-        }
-
-        return conv;
+        return await buildConversation(conv, userId);
       }));
       return conversations;
     }
@@ -59,6 +25,67 @@ const getAllForUser = async function (userId) {
     console.log(err);
   }
   return [];
+}
+
+const getConversationForUser = async function (conversationId, userId) {
+  try {
+    const res = await pool.query('SELECT conversations.vonage_id, conversations.state, conversations.created_at FROM conversations JOIN members ON conversations.vonage_id = members.conversation_id WHERE conversations.vonage_id=$1 AND user_id=$2', [conversationId, userId]);
+    if(res.rowCount != 1) {
+      return null;
+    }
+    let conv = await buildConversation(res.rows[0], userId);
+    let events = await getEvents(conv.id);
+    console.dir(events);
+    conv.events = events.filter( event => ['text','member:joined','member:left'].includes(event.vonage_type)).map( event => {
+      return {
+        id: event.vonage_id,
+        from: event.user_id,
+        type: event.vonage_type,
+        content: event.content,
+        timestamp: event.created_at
+      }
+    });
+    return conv;
+  } catch (err) {
+    console.log(err);
+  }
+  return null;
+}
+
+async function buildConversation(conv, userId) {
+  conv.id = conv.vonage_id;
+  delete conv.vonage_id;
+
+  const members = await getMembers(conv.id);
+  const myMember = members.find(m => m.user_id == userId);
+  conv.users = members.filter(m => m.user_id != userId).map(m => {
+    return {
+      'id': m.user_id,
+      'name': m.name,
+      'display_name': m.display_name,
+      'state': m.state
+    }
+  })
+  const interlocutorNames = conv.users.map(u => u.display_name);
+  conv.name = interlocutorNames.join(", ");
+
+  if(!myMember) { return; }
+
+  let events = await getEvents(conv.id);
+
+  let invitedEvent = events.find(e => e.vonage_type == 'member:invited' && e.from_member_id == myMember.member_id);
+  if(invitedEvent) { 
+    conv.invited_at = invitedEvent.created_at;
+  }
+  let joinedEvent = events.find(e => e.vonage_type == 'member:joined' && e.from_member_id == myMember.member_id);
+  if(joinedEvent) { 
+    conv.joined_at = joinedEvent.created_at;
+  }
+  let leftEvent = events.find(e => e.vonage_type == 'member:left' && e.from_member_id == myMember.member_id );
+  if(leftEvent) { 
+    conv.left_at = leftEvent.created_at;
+  }
+  return conv;
 }
 
 
@@ -83,7 +110,7 @@ const getMembers = async function (conversationId) {
 
 const getEvents = async function (conversationId) {
   try {
-    const res = await pool.query('SELECT conversation_id, from_member_id, to_member_id, vonage_type, content, created_at FROM events where conversation_id=$1', [conversationId]);
+    const res = await pool.query('SELECT events.vonage_id, events.conversation_id, events.from_member_id, events.to_member_id, events.vonage_type, events.content, events.created_at, members.user_id FROM events JOIN members ON events.from_member_id = members.vonage_id WHERE events.conversation_id=$1', [conversationId]);
     if (res.rowCount > 0 ) {
       let events = res.rows;
       return events;
@@ -142,6 +169,29 @@ const create = async (vonage_id, name, display_name, state, createdAt) => {
   }
   return conversation;
 }
+
+
+const createConversationForUserWithInterlocutors  = async (userId, users) => {
+  const newConversation = await Vonage.conversations.create(userId, users);
+  console.dir(newConversation);
+  if(!newConversation) { return }
+  await create(newConversation.id, newConversation.name, newConversation.display_name, newConversation.state, newConversation.timestamp.created);
+
+  // add the members
+  users.push(userId);
+  for(let i = 0; i < users.length; i++) {
+    let user = users[i];
+    const member = await Vonage.conversations.createMember(newConversation.id, user);
+    console.dir(member);
+    if(member) {
+      await Members.create(member.id, newConversation.id, user, member.state);
+    }
+  };
+
+  const conv = await getConversationForUser(newConversation.id, userId);
+  return conv;
+}
+
 
 
 
@@ -254,8 +304,10 @@ const syncEvents = async (conversation_id) => {
 
 module.exports = {
   getAllForUser,
+  getConversationForUser,
   get,
   create,
+  createConversationForUserWithInterlocutors,
   update,
   destroy,
   sync,
