@@ -1,2 +1,2 @@
 include ':app'
-rootProject.name = "v-app"
+rootProject.name = "clientsdk-the-v-app"
