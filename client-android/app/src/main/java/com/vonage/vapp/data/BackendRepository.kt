@@ -7,8 +7,12 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 
 object BackendRepository {
 
+    private val loggingInterceptor = HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.BODY
+    }
+
     private val client = OkHttpClient.Builder()
-        .addInterceptor(HttpLoggingInterceptor())
+        .addInterceptor(loggingInterceptor)
         .build()
 
     private val retofit = Retrofit.Builder()
@@ -19,5 +23,7 @@ object BackendRepository {
 
     private val service: BackendService = retofit.create(BackendService::class.java)
 
-
+    suspend fun signup(name: String, displayName: String, password: String) {
+        service.signup(name, displayName, password)
+    }
 }
