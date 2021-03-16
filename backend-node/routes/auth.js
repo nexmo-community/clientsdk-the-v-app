@@ -41,10 +41,18 @@ authRoutes.post('/signup', async (req, res) => {
     } else {
       await Data.users.addPassword(name, password);
       const token = JWT.getUserJWT(user.name, user.vonage_id);
+
+      // All other users
+      let users = await Data.users.getInterlocutorsFor(user.name);
+      // All conversations for this user
+      const conversations = await Data.conversations.getAllForUser(user.vonage_id);
       res.status(201).send({
         user,
-        token
+        token,
+        users,
+        conversations
       });
+
     }
     return;
   }
@@ -84,7 +92,7 @@ authRoutes.post('/signup', async (req, res) => {
     return
   }
 
-  user = await Data.users.create(name, password, display_name, vonageUser.id);
+  user = await Data.users.create(vonageUser.id, name, display_name, password);
 
   if (!user) {
     res.status(500).send({
