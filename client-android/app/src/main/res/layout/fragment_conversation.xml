@@ -4,7 +4,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".presentation.ChatActivity">
+        android:layout_margin="20dp">
 
     <androidx.core.widget.NestedScrollView
             android:id="@+id/conversationEventsScrollView"

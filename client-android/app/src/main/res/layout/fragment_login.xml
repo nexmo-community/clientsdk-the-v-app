@@ -6,6 +6,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_margin="20dp"
         android:orientation="vertical"
+        android:gravity="center"
         tools:context=".presentation.SignupFragment">
 
     <com.google.android.material.textfield.TextInputLayout
