@@ -176,7 +176,7 @@ authRoutes.post('/login', async (req, res) => {
   // All conversations for this user
   const conversations = await Data.conversations.getAllForUser(user.vonage_id);
 
-  res.status(201).send({
+  res.status(200).send({
     user,
     token,
     users,
