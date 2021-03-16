@@ -24,13 +24,15 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
     }
 
     private fun signUp() {
-        if (isTextViewEmpty(binding.nameTextView) ||
-            isTextViewEmpty(binding.displayNameTextView) ||
-            isTextViewEmpty(binding.passwordTextView)
+
+        updateTextView(binding.nameTextView, "Enter name")
+        updateTextView(binding.displayNameTextView, "Enter display name")
+        updateTextView(binding.passwordTextView, "Enter password")
+
+        if(binding.nameTextView.error != null
+            || binding.displayNameTextView.error != null
+            || binding.passwordTextView.error != null
         ) {
-
-            binding.messageTextView.text = "Please fill all fields"
-
             return
         }
 
@@ -45,7 +47,9 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
         }
     }
 
-    private fun isTextViewEmpty(textView: TextView): Boolean {
-        return textView.text.toString().isEmpty()
+    private fun updateTextView(textView: TextView, errorMessage: String) {
+        textView.apply {
+            error = if(text.toString().isEmpty()) errorMessage else null
+        }
     }
 }
