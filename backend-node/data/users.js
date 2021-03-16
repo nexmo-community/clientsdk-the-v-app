@@ -53,7 +53,6 @@ const create = async function (vonage_id, name, display_name, password) {
     const res = await pool.query('INSERT INTO users(vonage_id, name, display_name, password_digest) VALUES($1, $2, $3, $4) RETURNING vonage_id, name, display_name', [vonage_id, name, display_name, passwordHash]);
     if (res.rowCount === 1) {
       user = res.rows[0];
-      user.status = 'created';
     }
     console.log(`USER CREATED - ${user.vonage_id}\t${user.name} \t ${user.display_name}`);
   } catch (err) {
