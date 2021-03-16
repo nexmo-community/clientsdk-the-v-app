@@ -10,7 +10,7 @@ object Config {
     const val CONVERSATION_ID = "CONVERSATION_ID"
 
     val igor = User(
-        "Igor",
-        "IGOR_JWT"
+        "Alice",
+        ""
     )
 }

@@ -1,7 +1,7 @@
-package com.vonage.vapp
+package com.vonage.vapp.presentation
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.nexmo.client.NexmoAttachmentEvent
 import com.nexmo.client.NexmoClient
 import com.nexmo.client.NexmoConversation
@@ -18,10 +18,11 @@ import com.nexmo.client.NexmoTextEvent
 import com.nexmo.client.NexmoTypingEvent
 import com.nexmo.client.request_listener.NexmoApiError
 import com.nexmo.client.request_listener.NexmoRequestListener
-import kotlinx.android.synthetic.main.activity_chat.*
+import com.vonage.vapp.Config
+import com.vonage.vapp.R
+import kotlinx.android.synthetic.main.fragment_conversation.*
 
-class ChatActivity : AppCompatActivity() {
-
+class ConversationFragment : Fragment(R.layout.fragment_conversation) {
     private val client: NexmoClient = NexmoClient.get()
 
     private var conversation: NexmoConversation? = null
@@ -45,7 +46,6 @@ class ChatActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_chat)
 
         getConversation()
 
@@ -53,13 +53,13 @@ class ChatActivity : AppCompatActivity() {
             val message = messageEditText.text.toString()
 
             if(message.isNotBlank()) {
-               conversation?.sendText(message, object : NexmoRequestListener<Void> {
-                   override fun onSuccess(p0: Void?) {
-                   }
+                conversation?.sendText(message, object : NexmoRequestListener<Void> {
+                    override fun onSuccess(p0: Void?) {
+                    }
 
-                   override fun onError(apiError: NexmoApiError) {
-                   }
-               })
+                    override fun onError(apiError: NexmoApiError) {
+                    }
+                })
             }
 
             messageEditText.setText("")
@@ -69,7 +69,7 @@ class ChatActivity : AppCompatActivity() {
     private fun getConversation() {
         client.getConversation(Config.CONVERSATION_ID, object : NexmoRequestListener<NexmoConversation> {
             override fun onSuccess(conversation: NexmoConversation?) {
-                this@ChatActivity.conversation = conversation
+                this@ConversationFragment.conversation = conversation
 
                 conversation?.let {
                     getConversationEvents(it)
@@ -78,7 +78,7 @@ class ChatActivity : AppCompatActivity() {
             }
 
             override fun onError(apiError: NexmoApiError) {
-                this@ChatActivity.conversation = null
+                this@ConversationFragment.conversation = null
             }
         })
     }
