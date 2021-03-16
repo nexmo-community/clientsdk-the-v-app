@@ -39,13 +39,17 @@ authRoutes.post('/signup', async (req, res) => {
         ]
       });
     } else {
+      user.id = user.vonage_id;
+      delete user.vonage_id;
+
       await Data.users.addPassword(name, password);
-      const token = JWT.getUserJWT(user.name, user.vonage_id);
+      const token = JWT.getUserJWT(user.name, user.id);
 
       // All other users
       let users = await Data.users.getInterlocutorsFor(user.name);
       // All conversations for this user
-      const conversations = await Data.conversations.getAllForUser(user.vonage_id);
+      const conversations = await Data.conversations.getAllForUser(user.id);
+
       res.status(201).send({
         user,
         token,
@@ -93,7 +97,6 @@ authRoutes.post('/signup', async (req, res) => {
   }
 
   user = await Data.users.create(vonageUser.id, name, display_name, password);
-
   if (!user) {
     res.status(500).send({
       "type": "system:error",
@@ -102,6 +105,8 @@ authRoutes.post('/signup', async (req, res) => {
     });
     return;
   }
+  user.id = user.vonage_id;
+  delete user.vonage_id;
 
   if (user.status === 'existed') {
     res.status(409).send({
@@ -119,13 +124,13 @@ authRoutes.post('/signup', async (req, res) => {
   }
 
   // Create JWT
-  const token = JWT.getUserJWT(user.name, user.vonage_id);
+  const token = JWT.getUserJWT(user.name, user.id);
 
   // All other users
   let users = await Data.users.getInterlocutorsFor(user.name);
 
   // All conversations for this user
-  const conversations = await Data.conversations.getAllForUser(user.vonage_id);
+  const conversations = await Data.conversations.getAllForUser(user.id);
 
   res.status(201).send({
     user,
@@ -167,14 +172,17 @@ authRoutes.post('/login', async (req, res) => {
     return;
   }
 
+  user.id = user.vonage_id;
+  delete user.vonage_id;
+
   // Create JWT
-  const token = JWT.getUserJWT(user.name, user.vonage_id);
+  const token = JWT.getUserJWT(user.name, user.id);
 
   // All other users
   let users = await Data.users.getInterlocutorsFor(user.name);
 
   // All conversations for this user
-  const conversations = await Data.conversations.getAllForUser(user.vonage_id);
+  const conversations = await Data.conversations.getAllForUser(user.id);
 
   res.status(200).send({
     user,
