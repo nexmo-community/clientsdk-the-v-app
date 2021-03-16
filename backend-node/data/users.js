@@ -47,6 +47,9 @@ const create = async function (vonage_id, name, display_name, password) {
         .update(password)
         .digest('hex');
     }
+    if(!vonage_id) { 
+      vonage_id = '';
+    }
     const res = await pool.query('INSERT INTO users(vonage_id, name, display_name, password_digest) VALUES($1, $2, $3, $4) RETURNING vonage_id, name, display_name', [vonage_id, name, display_name, passwordHash]);
     if (res.rowCount === 1) {
       user = res.rows[0];
