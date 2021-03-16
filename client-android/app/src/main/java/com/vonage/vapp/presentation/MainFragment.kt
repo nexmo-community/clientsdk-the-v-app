@@ -4,12 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.vonage.vapp.R
+import com.vonage.vapp.databinding.FragmentMainBinding
+import com.vonage.vapp.utils.viewBinding
 
 class MainFragment : Fragment(R.layout.fragment_main) {
+
+    private val binding: FragmentMainBinding by viewBinding()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -21,11 +25,11 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.findViewById<Button>(R.id.loginButton).setOnClickListener {
+        binding.loginButton.setOnClickListener {
             findNavController().navigate(R.id.action_MainFragment_to_loginFragment)
         }
 
-        view.findViewById<Button>(R.id.signUpButton).setOnClickListener {
+        binding.signUpButton.setOnClickListener {
             findNavController().navigate(R.id.action_MainFragment_to_SignupFragment)
         }
     }
