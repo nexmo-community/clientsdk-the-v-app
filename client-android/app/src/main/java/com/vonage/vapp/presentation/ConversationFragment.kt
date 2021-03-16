@@ -20,12 +20,15 @@ import com.nexmo.client.request_listener.NexmoApiError
 import com.nexmo.client.request_listener.NexmoRequestListener
 import com.vonage.vapp.Config
 import com.vonage.vapp.R
-import kotlinx.android.synthetic.main.fragment_conversation.*
+import com.vonage.vapp.databinding.FragmentConversationBinding
+import com.vonage.vapp.utils.viewBinding
 
 class ConversationFragment : Fragment(R.layout.fragment_conversation) {
     private val client: NexmoClient = NexmoClient.get()
 
     private var conversation: NexmoConversation? = null
+
+    private val binding: FragmentConversationBinding by viewBinding()
 
     private val messageListener = object : NexmoMessageEventListener {
         override fun onTypingEvent(typingEvent: NexmoTypingEvent) {}
@@ -49,8 +52,8 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
 
         getConversation()
 
-        sendMessageButton.setOnClickListener {
-            val message = messageEditText.text.toString()
+        binding.sendMessageButton.setOnClickListener {
+            val message = binding.messageEditText.text.toString()
 
             if(message.isNotBlank()) {
                 conversation?.sendText(message, object : NexmoRequestListener<Void> {
@@ -62,7 +65,7 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
                 })
             }
 
-            messageEditText.setText("")
+            binding.messageEditText.setText("")
         }
     }
 
@@ -125,6 +128,6 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
     }
 
     private fun displayConversationLine(line: String?) {
-        line?.let { conversationEventsTextView.append(it + System.lineSeparator()) }
+        line?.let { binding.conversationEventsTextView.append(it + System.lineSeparator()) }
     }
 }

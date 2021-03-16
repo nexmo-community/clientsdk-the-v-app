@@ -5,7 +5,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
-class BackendRepository {
+object BackendRepository {
 
     private val client = OkHttpClient.Builder()
         .addInterceptor(HttpLoggingInterceptor())
