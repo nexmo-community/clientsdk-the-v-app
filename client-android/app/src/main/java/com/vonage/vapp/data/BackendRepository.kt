@@ -27,18 +27,17 @@ object BackendRepository {
         .client(client)
         .build()
 
-
-
     private val service: BackendService = retrofit.create(BackendService::class.java)
 
     suspend fun signup(name: String, displayName: String, password: String): RepositoryResponse {
         val requestModel = SignupRequestModel(name, displayName, password)
         val response = service.signup(requestModel)
 
-        if(response.isSuccessful) {
+        if (response.isSuccessful) {
             return RepositoryResponse.Success(response)
         } else {
-            val errorResponseModel = moshi.adapter(ErrorResponseModel::class.java).fromJson(response.errorBody()?.source())
+            val errorResponseModel =
+                moshi.adapter(ErrorResponseModel::class.java).fromJson(response.errorBody()?.source())
             return RepositoryResponse.Error(errorResponseModel)
         }
     }
@@ -47,16 +46,17 @@ object BackendRepository {
         val requestModel = LoginRequestModel(name, password)
         val response = service.login(requestModel)
 
-        if(response.isSuccessful) {
+        if (response.isSuccessful) {
             return RepositoryResponse.Success(response)
         } else {
-            val errorResponseModel = moshi.adapter(ErrorResponseModel::class.java).fromJson(response.errorBody()?.source())
+            val errorResponseModel =
+                moshi.adapter(ErrorResponseModel::class.java).fromJson(response.errorBody()?.source())
             return RepositoryResponse.Error(errorResponseModel)
         }
     }
 }
 
 sealed class RepositoryResponse {
-    data class Success<T>(val data: T): RepositoryResponse()
-    data class Error(val data: ErrorResponseModel? = null): RepositoryResponse()
+    data class Success<T>(val data: T) : RepositoryResponse()
+    data class Error(val data: ErrorResponseModel? = null) : RepositoryResponse()
 }
