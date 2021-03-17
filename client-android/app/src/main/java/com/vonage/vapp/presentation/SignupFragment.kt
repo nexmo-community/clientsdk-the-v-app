@@ -37,7 +37,7 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
             return
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
+        lifecycleScope.launch {
             val result = BackendRepository.signup(
                 binding.nameTextView.text.toString(),
                 binding.displayNameTextView.text.toString(),
