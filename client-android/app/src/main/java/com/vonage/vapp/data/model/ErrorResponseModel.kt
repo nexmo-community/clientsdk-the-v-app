@@ -1,7 +1,9 @@
 package com.vonage.vapp.data.model
 
+import com.squareup.moshi.Json
+
 data class ErrorResponseModel(
-    val type: String,
-    val title: String,
-    val detail: String,
+    @field:Json(name="type") val type: String,
+    @field:Json(name="title") val title: String,
+    @field:Json(name="detail") val detail: String,
 )

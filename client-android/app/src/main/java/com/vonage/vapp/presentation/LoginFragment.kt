@@ -8,7 +8,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.vonage.vapp.R
 import com.vonage.vapp.data.BackendRepository
-import com.vonage.vapp.data.RepositoryResponse
+import com.vonage.vapp.data.model.ErrorResponseModel
+import com.vonage.vapp.data.model.LoginResponseModel
 import com.vonage.vapp.databinding.FragmentLoginBinding
 import com.vonage.vapp.utils.viewBinding
 import kotlinx.coroutines.launch
@@ -38,12 +39,10 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 binding.passwordTextView.text.toString()
             )
 
-            if (result is RepositoryResponse.Success<*>) {
+            if (result is LoginResponseModel) {
                 findNavController().navigate(R.id.action_loginFragment_to_conversationListFragment)
-            } else if (result is RepositoryResponse.Error) {
-                result.data?.let {
-                    binding.messageTextView.text = "${it.detail}"
-                }
+            } else if (result is ErrorResponseModel) {
+                binding.messageTextView.text = result.detail
             }
         }
     }
