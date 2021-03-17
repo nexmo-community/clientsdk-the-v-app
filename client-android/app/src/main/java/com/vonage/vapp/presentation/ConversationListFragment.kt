@@ -1,7 +1,11 @@
 package com.vonage.vapp.presentation
 
+import android.content.DialogInterface
 import android.os.Bundle
+import android.text.InputType
 import android.view.View
+import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -32,7 +36,32 @@ class ConversationListFragment : Fragment(R.layout.fragment_conversation_list) {
             findNavController().navigate(R.id.action_conversationListFragment_to_conversationFragment)
         }
 
+        binding.addFab.setOnClickListener {
+            showCreateConversationDialog()
+        }
+
         loadConversations()
+    }
+
+    private fun showCreateConversationDialog() {
+
+        context?.let { context ->
+            val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+            builder.setTitle("Enter conversation name")
+
+            val input = EditText(context)
+            input.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+            builder.setView(input)
+
+            builder.setPositiveButton("OK") { _, _ -> createConversation(input.text.toString()) }
+            builder.setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
+
+            builder.show()
+        }
+    }
+
+    private fun createConversation(name: String) {
+
     }
 
     private fun loadConversations() {
