@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.vonage.vapp.R
 import com.vonage.vapp.data.BackendRepository
 import com.vonage.vapp.data.RepositoryResponse
@@ -38,7 +39,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             )
 
             if (result is RepositoryResponse.Success<*>) {
-                // navigate
+                findNavController().navigate(R.id.action_loginFragment_to_conversationListFragment)
             } else if (result is RepositoryResponse.Error) {
                 result.data?.let {
                     binding.messageTextView.text = "${it.detail}"

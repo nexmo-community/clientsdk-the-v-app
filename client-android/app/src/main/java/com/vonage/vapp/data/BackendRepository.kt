@@ -32,19 +32,18 @@ object BackendRepository {
 
     suspend fun signup(name: String, displayName: String, password: String): RepositoryResponse {
         val requestModel = SignupRequestModel(name, displayName, password)
-        val response = service.signup(requestModel)
-
-        return getRepositoryResponse(response)
+        return getRepositoryResponse() { service.signup(requestModel) }
     }
 
     suspend fun login(name: String, password: String): RepositoryResponse {
         val requestModel = LoginRequestModel(name, password)
-        val response = service.login(requestModel)
-
-        return getRepositoryResponse(response)
+        return getRepositoryResponse() { service.login(requestModel) }
     }
 
-    private fun getRepositoryResponse(response: Response<*>): RepositoryResponse {
+    private suspend fun getRepositoryResponse(request: suspend (() -> Response<*>)): RepositoryResponse {
+
+        val response = request.invoke()
+
         return if (response.isSuccessful) {
             RepositoryResponse.Success(response)
         } else {
