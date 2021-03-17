@@ -6,6 +6,7 @@ import com.vonage.vapp.data.model.LoginRequestModel
 import com.vonage.vapp.data.model.SignupRequestModel
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
@@ -33,21 +34,19 @@ object BackendRepository {
         val requestModel = SignupRequestModel(name, displayName, password)
         val response = service.signup(requestModel)
 
-        if (response.isSuccessful) {
-            return RepositoryResponse.Success(response)
-        } else {
-            val errorResponseModel =
-                moshi.adapter(ErrorResponseModel::class.java).fromJson(response.errorBody()?.source())
-            return RepositoryResponse.Error(errorResponseModel)
-        }
+        return getRepositoryResponse(response)
     }
 
     suspend fun login(name: String, password: String): RepositoryResponse {
         val requestModel = LoginRequestModel(name, password)
         val response = service.login(requestModel)
 
-        if (response.isSuccessful) {
-            return RepositoryResponse.Success(response)
+        return getRepositoryResponse(response)
+    }
+
+    private fun getRepositoryResponse(response: Response<*>): RepositoryResponse {
+        return if (response.isSuccessful) {
+            RepositoryResponse.Success(response)
         } else {
             val errorResponseModel =
                 moshi.adapter(ErrorResponseModel::class.java).fromJson(response.errorBody()?.source())
