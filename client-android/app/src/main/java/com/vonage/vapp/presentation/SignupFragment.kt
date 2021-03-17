@@ -30,7 +30,7 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
         updateTextView(binding.displayNameTextView, "Enter display name")
         updateTextView(binding.passwordTextView, "Enter password")
 
-        if(binding.nameTextView.error != null
+        if (binding.nameTextView.error != null
             || binding.displayNameTextView.error != null
             || binding.passwordTextView.error != null
         ) {
@@ -46,8 +46,7 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
 
             if (result is RepositoryResponse.Success<*>) {
                 // navigate
-            }
-            else if (result is RepositoryResponse.Error) {
+            } else if (result is RepositoryResponse.Error) {
                 result.data?.let {
                     binding.messageTextView.text = "${it.detail}"
                 }
@@ -57,7 +56,7 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
 
     private fun updateTextView(textView: TextView, errorMessage: String) {
         textView.apply {
-            error = if(text.toString().isEmpty()) errorMessage else null
+            error = if (text.toString().isEmpty()) errorMessage else null
         }
     }
 }

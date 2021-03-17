@@ -39,8 +39,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
             if (result is RepositoryResponse.Success<*>) {
                 // navigate
-            }
-            else if (result is RepositoryResponse.Error) {
+            } else if (result is RepositoryResponse.Error) {
                 result.data?.let {
                     binding.messageTextView.text = "${it.detail}"
                 }
