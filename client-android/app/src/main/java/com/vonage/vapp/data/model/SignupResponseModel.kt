@@ -1,6 +1,6 @@
 package com.vonage.vapp.data.model
 
-data class SignupResponse(
+data class SignupResponseModel(
     val conversations: List<Conversation>,
     val token: String,
     val user: User,

@@ -17,7 +17,7 @@
 
         <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/nameTextView"
-                android:text="t1"
+                android:text="tt12"
                 android:maxLines="1"
                 android:inputType="text"
                 android:layout_width="match_parent"
@@ -50,7 +50,7 @@
 
         <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/passwordTextView"
-                android:text="t"
+                android:text="tsddsdsdss"
                 android:maxLines="1"
                 android:inputType="text"
                 android:layout_width="match_parent"

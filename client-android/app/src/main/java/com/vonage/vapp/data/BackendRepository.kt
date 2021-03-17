@@ -1,5 +1,6 @@
 package com.vonage.vapp.data
 
+import com.vonage.vapp.data.model.SignupRequestModel
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -24,6 +25,7 @@ object BackendRepository {
     private val service: BackendService = retofit.create(BackendService::class.java)
 
     suspend fun signup(name: String, displayName: String, password: String) {
-        service.signup(name, displayName, password)
+        val requestModel = SignupRequestModel(name, displayName, password)
+        service.signup(requestModel)
     }
 }
