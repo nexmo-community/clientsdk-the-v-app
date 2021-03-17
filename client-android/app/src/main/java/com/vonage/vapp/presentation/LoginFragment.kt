@@ -32,7 +32,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             return
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
+        lifecycleScope.launch {
             val result = BackendRepository.login(
                 binding.nameTextView.text.toString(),
                 binding.passwordTextView.text.toString()
