@@ -5,9 +5,11 @@ import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.vonage.vapp.R
 import com.vonage.vapp.data.BackendRepository
-import com.vonage.vapp.data.RepositoryResponse
+import com.vonage.vapp.data.model.ErrorResponseModel
+import com.vonage.vapp.data.model.SignupResponseModel
 import com.vonage.vapp.databinding.FragmentSignupBinding
 import com.vonage.vapp.utils.viewBinding
 import kotlinx.coroutines.launch
@@ -44,12 +46,10 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
                 binding.passwordTextView.text.toString()
             )
 
-            if (result is RepositoryResponse.Success<*>) {
-                // navigate
-            } else if (result is RepositoryResponse.Error) {
-                result.data?.let {
-                    binding.messageTextView.text = "${it.detail}"
-                }
+            if (result is SignupResponseModel) {
+                findNavController().navigate(R.id.action_SignupFragment_to_conversationListFragment)
+            } else if (result is ErrorResponseModel) {
+                binding.messageTextView.text = result.detail
             }
         }
     }

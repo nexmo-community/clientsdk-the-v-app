@@ -1,7 +1,9 @@
 package com.vonage.vapp.data.model
 
+import com.squareup.moshi.Json
+
 data class User(
-    val display_name: String,
-    val id: String,
-    val name: String
+    @field:Json(name="display_name") val displayName: String,
+    @field:Json(name="id") val id: String,
+    @field:Json(name="name") val name: String
 )

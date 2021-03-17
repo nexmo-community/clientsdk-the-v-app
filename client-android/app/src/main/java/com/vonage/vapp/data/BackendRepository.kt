@@ -1,8 +1,11 @@
 package com.vonage.vapp.data
 
 import com.squareup.moshi.Moshi
+import com.vonage.vapp.data.model.Conversation
 import com.vonage.vapp.data.model.ErrorResponseModel
+import com.vonage.vapp.data.model.GetConversationsResponseModel
 import com.vonage.vapp.data.model.LoginRequestModel
+import com.vonage.vapp.data.model.LoginResponseModel
 import com.vonage.vapp.data.model.SignupRequestModel
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -30,31 +33,48 @@ object BackendRepository {
 
     private val service: BackendService = retrofit.create(BackendService::class.java)
 
-    suspend fun signup(name: String, displayName: String, password: String): RepositoryResponse {
+    private var token: String? = null
+
+    suspend fun signup(name: String, displayName: String, password: String): Any? {
         val requestModel = SignupRequestModel(name, displayName, password)
-        return getRepositoryResponse() { service.signup(requestModel) }
-    }
-
-    suspend fun login(name: String, password: String): RepositoryResponse {
-        val requestModel = LoginRequestModel(name, password)
-        return getRepositoryResponse() { service.login(requestModel) }
-    }
-
-    private suspend fun getRepositoryResponse(request: suspend (() -> Response<*>)): RepositoryResponse {
-
-        val response = request.invoke()
+        val response = service.signup(requestModel)
 
         return if (response.isSuccessful) {
-            RepositoryResponse.Success(response)
+            val body = response.body()
+            token = body?.token
+            body
         } else {
-            val errorResponseModel =
-                moshi.adapter(ErrorResponseModel::class.java).fromJson(response.errorBody()?.source())
-            return RepositoryResponse.Error(errorResponseModel)
+            getErrorResponseModel(response)
         }
     }
-}
 
-sealed class RepositoryResponse {
-    data class Success<T>(val data: T) : RepositoryResponse()
-    data class Error(val data: ErrorResponseModel? = null) : RepositoryResponse()
+    suspend fun login(name: String, password: String): Any? {
+        val requestModel = LoginRequestModel(name, password)
+
+        val response = service.login(requestModel)
+
+        return if (response.isSuccessful) {
+            val body = response.body()
+            token = body?.token
+            body
+        } else {
+            getErrorResponseModel(response)
+        }
+    }
+
+    suspend fun getConversations(): Any? {
+        checkNotNull(token)
+
+        val response = service.getConversations("Bearer $token")
+
+        return if (response.isSuccessful) {
+            val conversations = response.body() ?: listOf()
+            GetConversationsResponseModel(conversations)
+        } else {
+            getErrorResponseModel(response)
+        }
+    }
+
+    private suspend fun getErrorResponseModel(response: Response<*>): ErrorResponseModel? =
+        moshi.adapter(ErrorResponseModel::class.java).fromJson(response.errorBody()?.source())
 }
