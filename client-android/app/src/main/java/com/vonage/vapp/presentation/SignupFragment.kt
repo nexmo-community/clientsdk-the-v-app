@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.vonage.vapp.R
 import com.vonage.vapp.data.BackendRepository
+import com.vonage.vapp.data.RepositoryResponse
 import com.vonage.vapp.databinding.FragmentSignupBinding
 import com.vonage.vapp.utils.viewBinding
 import kotlinx.coroutines.launch
@@ -37,13 +38,20 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            val respnse = BackendRepository.signup(
+            val result = BackendRepository.signup(
                 binding.nameTextView.text.toString(),
                 binding.displayNameTextView.text.toString(),
                 binding.passwordTextView.text.toString()
             )
 
-            val a  = 2
+            if (result is RepositoryResponse.Success<*>) {
+                // navigate
+            }
+            else if (result is RepositoryResponse.Error) {
+                result.data?.let {
+                    binding.messageTextView.text = "${it.detail}"
+                }
+            }
         }
     }
 
