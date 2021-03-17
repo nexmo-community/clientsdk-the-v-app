@@ -4,5 +4,4 @@ data class ErrorResponseModel(
     val type: String,
     val title: String,
     val detail: String,
-    val invalid_parameters: String
 )
