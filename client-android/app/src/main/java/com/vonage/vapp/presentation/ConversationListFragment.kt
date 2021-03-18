@@ -58,6 +58,7 @@ class ConversationListFragment : Fragment(R.layout.fragment_conversation_list) {
             builder.setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
 
             builder.show()
+            input.requestFocus();
         }
     }
 
