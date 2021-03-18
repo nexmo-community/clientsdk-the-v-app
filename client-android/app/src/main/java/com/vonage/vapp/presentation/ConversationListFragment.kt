@@ -50,19 +50,25 @@ class ConversationListFragment : Fragment(R.layout.fragment_conversation_list) {
     }
 
     private fun initClient() {
-        client.setConnectionListener { newConnectionStatus, _ ->
+        if (client.isConnected) {
+            conversationAdapter.setConversations(navArgs.conversations.toList())
+        } else {
+            binding.progressBar.visibility = View.VISIBLE
 
-            if (newConnectionStatus == NexmoConnectionListener.ConnectionStatus.CONNECTED) {
-                activity?.runOnUiThread {
-                    conversationAdapter.setConversations(navArgs.conversations.toList())
-                    binding.progressBar.visibility = View.GONE
+            client.setConnectionListener { newConnectionStatus, _ ->
+
+                if (newConnectionStatus == NexmoConnectionListener.ConnectionStatus.CONNECTED) {
+                    activity?.runOnUiThread {
+                        conversationAdapter.setConversations(navArgs.conversations.toList())
+                        binding.progressBar.visibility = View.GONE
+                    }
+
+                    return@setConnectionListener
                 }
-
-                return@setConnectionListener
             }
-        }
 
-        client.login(navArgs.token)
+            client.login(navArgs.token)
+        }
     }
 
     private fun showUserSelectionDialog() {
