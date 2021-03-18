@@ -51,7 +51,7 @@ class ConversationListFragment : Fragment(R.layout.fragment_conversation_list) {
             builder.setTitle("Enter conversation name")
 
             val input = EditText(context)
-            input.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+            input.inputType = InputType.TYPE_CLASS_TEXT
             builder.setView(input)
 
             builder.setPositiveButton("OK") { _, _ -> createConversation(input.text.toString()) }
