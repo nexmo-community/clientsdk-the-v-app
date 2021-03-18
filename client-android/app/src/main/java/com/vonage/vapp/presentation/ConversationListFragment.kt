@@ -1,6 +1,5 @@
 package com.vonage.vapp.presentation
 
-import android.content.DialogInterface
 import android.os.Bundle
 import android.text.InputType
 import android.view.View
@@ -9,6 +8,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.vonage.vapp.R
 import com.vonage.vapp.data.BackendRepository
@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 class ConversationListFragment : Fragment(R.layout.fragment_conversation_list) {
 
     private val binding: FragmentConversationListBinding by viewBinding()
+    private val navArgs: ConversationListFragmentArgs by navArgs()
     private val conversationAdapter = ConversationAdapter()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -61,7 +62,6 @@ class ConversationListFragment : Fragment(R.layout.fragment_conversation_list) {
     }
 
     private fun createConversation(name: String) {
-
     }
 
     private fun loadConversations() {
