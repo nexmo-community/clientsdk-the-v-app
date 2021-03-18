@@ -8,8 +8,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.nexmo.client.NexmoClient
+import com.nexmo.client.request_listener.NexmoConnectionListener
 import com.vonage.vapp.R
 import com.vonage.vapp.data.ApiRepository
+import com.vonage.vapp.data.model.Conversation
 import com.vonage.vapp.data.model.CreateConversationResponseModel
 import com.vonage.vapp.data.model.ErrorResponseModel
 import com.vonage.vapp.data.model.GetConversationsResponseModel
@@ -23,6 +26,7 @@ class ConversationListFragment : Fragment(R.layout.fragment_conversation_list) {
     private val binding: FragmentConversationListBinding by viewBinding()
     private val navArgs: ConversationListFragmentArgs by navArgs()
     private val conversationAdapter = ConversationAdapter()
+    private val client get() = NexmoClient.get()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -35,14 +39,30 @@ class ConversationListFragment : Fragment(R.layout.fragment_conversation_list) {
         }
 
         conversationAdapter.setOnClickListener {
-            findNavController().navigate(R.id.action_conversationListFragment_to_conversationFragment)
+            navigateToConversation(it)
         }
 
         binding.addFab.setOnClickListener {
             showUserSelectionDialog()
         }
 
-        loadConversations()
+        initClient()
+    }
+
+    private fun initClient() {
+        client.setConnectionListener { newConnectionStatus, _ ->
+
+            if (newConnectionStatus == NexmoConnectionListener.ConnectionStatus.CONNECTED) {
+                activity?.runOnUiThread {
+                    conversationAdapter.setConversations(navArgs.conversations.toList())
+                    binding.progressBar.visibility = View.GONE
+                }
+
+                return@setConnectionListener
+            }
+        }
+
+        client.login(navArgs.token)
     }
 
     private fun showUserSelectionDialog() {
@@ -73,14 +93,20 @@ class ConversationListFragment : Fragment(R.layout.fragment_conversation_list) {
         }
     }
 
-    private fun createConversation(users: Set<User>) {
+    private fun navigateToConversation(conversation: Conversation) {
+        val navDirections =
+            ConversationListFragmentDirections.actionConversationListFragmentToConversationFragment(conversation)
+        findNavController().navigate(navDirections)
+    }
 
+    private fun createConversation(users: Set<User>) {
         lifecycleScope.launch {
             val userIds = users.map { it.id }.toSet()
             val result = ApiRepository.createConversation(userIds)
 
             if (result is CreateConversationResponseModel) {
                 conversationAdapter.addConversation(result.conversation)
+                navigateToConversation(result.conversation)
 
                 // navigate
             } else if (result is ErrorResponseModel) {
