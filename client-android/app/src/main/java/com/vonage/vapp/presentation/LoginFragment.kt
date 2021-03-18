@@ -49,7 +49,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             )
 
             if (result is LoginResponseModel) {
-                val navDirections = LoginFragmentDirections.actionLoginFragmentToConversationListFragment(
+                val navDirections = LoginFragmentDirections.actionLoginFragmentToConversationsFragment(
                     result.user,
                     result.users.toTypedArray(),
                     result.conversations.toTypedArray(),

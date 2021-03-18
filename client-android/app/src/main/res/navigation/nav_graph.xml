@@ -11,14 +11,14 @@
             tools:layout="@layout/fragment_signup">
 
         <action
-                android:id="@+id/action_SignupFragment_to_conversationListFragment"
-                app:destination="@id/conversationListFragment" />
+                android:id="@+id/action_SignupFragment_to_conversationsFragment"
+                app:destination="@id/conversationsFragment" />
     </fragment>
     <fragment
-            android:id="@+id/conversationFragment"
-            android:name="com.vonage.vapp.presentation.ConversationFragment"
-            android:label="ConversationFragment"
-            tools:layout="@layout/fragment_conversation">
+            android:id="@+id/conversationDetailFragment"
+            android:name="com.vonage.vapp.presentation.ConversationDetailFragment"
+            android:label="ConversationDetailFragment"
+            tools:layout="@layout/fragment_conversation_detail">
         <argument
                 android:name="conversaion"
                 app:argType="com.vonage.vapp.data.model.Conversation" />
@@ -27,13 +27,13 @@
                 app:argType="com.vonage.vapp.data.model.User[]" />
     </fragment>
     <fragment
-            android:id="@+id/conversationListFragment"
-            android:name="com.vonage.vapp.presentation.ConversationListFragment"
-            android:label="ConversationListFragment"
-            tools:layout="@layout/fragment_conversation_list">
+            android:id="@+id/conversationsFragment"
+            android:name="com.vonage.vapp.presentation.ConversationsFragment"
+            android:label="ConversationsFragment"
+            tools:layout="@layout/fragment_conversations">
         <action
-                android:id="@+id/action_conversationListFragment_to_conversationFragment"
-                app:destination="@id/conversationFragment" />
+                android:id="@+id/action_conversationsFragment_to_conversationDetailFragment"
+                app:destination="@id/conversationDetailFragment" />
         <argument
                 android:name="user"
                 app:argType="com.vonage.vapp.data.model.User" />
@@ -53,8 +53,8 @@
             android:label="LoginFragment"
             tools:layout="@layout/fragment_login">
         <action
-                android:id="@+id/action_loginFragment_to_conversationListFragment"
-                app:destination="@id/conversationListFragment" />
+                android:id="@+id/action_loginFragment_to_conversationsFragment"
+                app:destination="@id/conversationsFragment" />
         <action
                 android:id="@+id/action_loginFragment_to_SignupFragment"
                 app:destination="@id/SignupFragment" />
