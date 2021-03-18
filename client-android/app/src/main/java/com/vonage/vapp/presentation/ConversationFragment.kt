@@ -72,6 +72,9 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
     }
 
     private fun getConversation() {
+        binding.progressBar.visibility = View.VISIBLE
+        binding.contentContainer.visibility = View.INVISIBLE
+
         client.getConversation(navArgs.conversaion.id, object : NexmoRequestListener<NexmoConversation> {
             override fun onSuccess(conversation: NexmoConversation?) {
                 this@ConversationFragment.conversation = conversation
@@ -94,6 +97,8 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
                 override fun onSuccess(nexmoEventsPage: NexmoEventsPage?) {
                     val events = nexmoEventsPage?.pageResponse?.data
                     displayConversationEvents(events)
+                    binding.progressBar.visibility = View.INVISIBLE
+                    binding.contentContainer.visibility = View.VISIBLE
                 }
 
                 override fun onError(apiError: NexmoApiError) {
