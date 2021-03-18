@@ -82,7 +82,7 @@ class ConversationListFragment : Fragment(R.layout.fragment_conversation_list) {
             builder.setTitle("Select users")
 
             val userNames = navArgs.users.map { it.name }.toTypedArray()
-            val selectedUsers = mutableSetOf(navArgs.user)
+            val selectedUsers = mutableSetOf<User>()
 
             builder.setMultiChoiceItems(userNames, null) { _, index, checked ->
                 val user = navArgs.users[index]
@@ -121,8 +121,6 @@ class ConversationListFragment : Fragment(R.layout.fragment_conversation_list) {
             if (result is CreateConversationResponseModel) {
                 conversationAdapter.addConversation(result.conversation)
                 navigateToConversation(result.conversation)
-
-                // navigate
             } else if (result is ErrorResponseModel) {
                 // Error
             }
@@ -141,7 +139,7 @@ class ConversationListFragment : Fragment(R.layout.fragment_conversation_list) {
                 binding.progressBar.visibility = View.GONE
                 binding.contentContainer.visibility = View.VISIBLE
             } else if (result is ErrorResponseModel) {
-                // how error
+                // error
             }
         }
     }
