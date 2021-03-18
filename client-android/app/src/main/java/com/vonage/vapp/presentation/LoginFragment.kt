@@ -40,7 +40,14 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             )
 
             if (result is LoginResponseModel) {
-                findNavController().navigate(R.id.action_loginFragment_to_conversationListFragment)
+                val navDirections = LoginFragmentDirections.actionLoginFragmentToConversationListFragment(
+                    result.user,
+                    result.users.toTypedArray(),
+                    result.conversations.toTypedArray(),
+                    result.token
+                )
+
+                findNavController().navigate(navDirections)
             } else if (result is ErrorResponseModel) {
                 binding.messageTextView.text = result.detail
             }

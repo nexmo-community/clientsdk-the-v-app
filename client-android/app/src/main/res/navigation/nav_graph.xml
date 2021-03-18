@@ -39,6 +39,18 @@
         <action
                 android:id="@+id/action_conversationListFragment_to_conversationFragment"
                 app:destination="@id/conversationFragment" />
+        <argument
+                android:name="user"
+                app:argType="com.vonage.vapp.data.model.User" />
+        <argument
+                android:name="users"
+                app:argType="com.vonage.vapp.data.model.User[]" />
+        <argument
+                android:name="conversations"
+                app:argType="com.vonage.vapp.data.model.Conversation[]" />
+        <argument
+                android:name="token"
+                app:argType="string" />
     </fragment>
     <fragment
             android:id="@+id/loginFragment"

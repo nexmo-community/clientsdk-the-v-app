@@ -47,7 +47,14 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
             )
 
             if (result is SignupResponseModel) {
-                findNavController().navigate(R.id.action_SignupFragment_to_conversationListFragment)
+                val navDirections = SignupFragmentDirections.actionSignupFragmentToConversationListFragment(
+                    result.user,
+                    result.users.toTypedArray(),
+                    result.conversations.toTypedArray(),
+                    result.token
+                )
+
+                findNavController().navigate(navDirections)
             } else if (result is ErrorResponseModel) {
                 binding.messageTextView.text = result.detail
             }
