@@ -22,6 +22,7 @@ import com.vonage.vapp.data.model.ErrorResponseModel
 import com.vonage.vapp.data.model.Event
 import com.vonage.vapp.data.model.GetConversationResponseModel
 import com.vonage.vapp.databinding.FragmentConversationDetailBinding
+import com.vonage.vapp.utils.toast
 import com.vonage.vapp.utils.viewBinding
 import kotlinx.coroutines.launch
 
@@ -65,6 +66,7 @@ class ConversationDetailFragment : Fragment(R.layout.fragment_conversation_detai
                     }
 
                     override fun onError(apiError: NexmoApiError) {
+                        toast { "Message send error" }
                     }
                 })
             }
@@ -86,6 +88,7 @@ class ConversationDetailFragment : Fragment(R.layout.fragment_conversation_detai
 
             override fun onError(apiError: NexmoApiError) {
                 this@ConversationDetailFragment.nexmoConversation = null
+                toast { "NexmoConversation load error" }
             }
         })
     }
@@ -104,7 +107,7 @@ class ConversationDetailFragment : Fragment(R.layout.fragment_conversation_detai
                 binding.progressBar.visibility = View.INVISIBLE
                 binding.contentContainer.visibility = View.VISIBLE
             } else if (result is ErrorResponseModel) {
-
+                toast { "${result.title + result.detail}" }
             }
         }
     }

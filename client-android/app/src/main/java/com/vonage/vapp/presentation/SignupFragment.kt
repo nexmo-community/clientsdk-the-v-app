@@ -11,6 +11,7 @@ import com.vonage.vapp.data.ApiRepository
 import com.vonage.vapp.data.model.ErrorResponseModel
 import com.vonage.vapp.data.model.SignupResponseModel
 import com.vonage.vapp.databinding.FragmentSignupBinding
+import com.vonage.vapp.utils.toast
 import com.vonage.vapp.utils.viewBinding
 import kotlinx.coroutines.launch
 
@@ -56,7 +57,7 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
 
                 findNavController().navigate(navDirections)
             } else if (result is ErrorResponseModel) {
-                binding.messageTextView.text = result.detail
+                toast { "${result.title + result.detail}" }
             }
         }
     }

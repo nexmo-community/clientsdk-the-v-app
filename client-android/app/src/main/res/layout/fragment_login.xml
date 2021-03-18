@@ -37,14 +37,6 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <TextView
-            android:id="@+id/messageTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#FF0000"
-            android:layout_marginTop="30dp"
-            tools:text="message" />
-
     <Button
             android:id="@+id/loginButton"
             android:layout_width="wrap_content"
