@@ -7,7 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.vonage.vapp.R
-import com.vonage.vapp.data.BackendRepository
+import com.vonage.vapp.data.ApiRepository
 import com.vonage.vapp.data.model.ErrorResponseModel
 import com.vonage.vapp.data.model.LoginResponseModel
 import com.vonage.vapp.databinding.FragmentLoginBinding
@@ -34,7 +34,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         }
 
         lifecycleScope.launch {
-            val result = BackendRepository.login(
+            val result = ApiRepository.login(
                 binding.nameTextView.text.toString(),
                 binding.passwordTextView.text.toString()
             )
