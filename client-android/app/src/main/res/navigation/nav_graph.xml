@@ -30,7 +30,11 @@
             android:id="@+id/conversationFragment"
             android:name="com.vonage.vapp.presentation.ConversationFragment"
             android:label="ConversationFragment"
-            tools:layout="@layout/fragment_conversation"/>
+            tools:layout="@layout/fragment_conversation">
+        <argument
+                android:name="conversaion"
+                app:argType="com.vonage.vapp.data.model.Conversation" />
+    </fragment>
     <fragment
             android:id="@+id/conversationListFragment"
             android:name="com.vonage.vapp.presentation.ConversationListFragment"
