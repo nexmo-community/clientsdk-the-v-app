@@ -5,6 +5,7 @@ import com.vonage.vapp.data.model.Conversation
 import com.vonage.vapp.data.model.CreateConversationRequestModel
 import com.vonage.vapp.data.model.CreateConversationResponseModel
 import com.vonage.vapp.data.model.ErrorResponseModel
+import com.vonage.vapp.data.model.GetConversationResponseModel
 import com.vonage.vapp.data.model.GetConversationsResponseModel
 import com.vonage.vapp.data.model.LoginRequestModel
 import com.vonage.vapp.data.model.SignupRequestModel
@@ -75,6 +76,19 @@ object ApiRepository {
         return if (response.isSuccessful) {
             val conversations = response.body() ?: listOf()
             GetConversationsResponseModel(conversations)
+        } else {
+            getErrorResponseModel(response)
+        }
+    }
+
+    suspend fun getConversation(conversationId: String): Any? {
+        checkNotNull(token)
+
+        val response = apiService.getConversation("Bearer $token", conversationId)
+
+        return if (response.isSuccessful) {
+            val conversations = response.body()
+            GetConversationResponseModel(conversations)
         } else {
             getErrorResponseModel(response)
         }

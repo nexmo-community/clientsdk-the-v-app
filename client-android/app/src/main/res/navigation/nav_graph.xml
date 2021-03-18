@@ -22,6 +22,9 @@
         <argument
                 android:name="conversaion"
                 app:argType="com.vonage.vapp.data.model.Conversation" />
+        <argument
+                android:name="users"
+                app:argType="com.vonage.vapp.data.model.User[]" />
     </fragment>
     <fragment
             android:id="@+id/conversationListFragment"
