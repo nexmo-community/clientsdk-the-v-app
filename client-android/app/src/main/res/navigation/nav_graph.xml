@@ -3,20 +3,8 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/nav_graph"
-        app:startDestination="@id/MainFragment">
+        app:startDestination="@id/loginFragment">
 
-    <fragment
-            android:id="@+id/MainFragment"
-            android:name="com.vonage.vapp.presentation.MainFragment"
-            tools:layout="@layout/fragment_main">
-
-        <action
-                android:id="@+id/action_MainFragment_to_loginFragment"
-                app:destination="@id/loginFragment" />
-        <action
-                android:id="@+id/action_MainFragment_to_SignupFragment"
-                app:destination="@id/SignupFragment" />
-    </fragment>
     <fragment
             android:id="@+id/SignupFragment"
             android:name="com.vonage.vapp.presentation.SignupFragment"
@@ -64,5 +52,8 @@
         <action
                 android:id="@+id/action_loginFragment_to_conversationListFragment"
                 app:destination="@id/conversationListFragment" />
+        <action
+                android:id="@+id/action_loginFragment_to_SignupFragment"
+                app:destination="@id/SignupFragment" />
     </fragment>
 </navigation>

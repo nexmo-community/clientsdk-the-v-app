@@ -23,6 +23,13 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         binding.loginButton.setOnClickListener {
             login()
         }
+        binding.loginButton.setOnClickListener {
+            login()
+        }
+
+        binding.signupButton.setOnClickListener {
+            findNavController().navigate(R.id.action_loginFragment_to_SignupFragment)
+        }
     }
 
     private fun login() {
