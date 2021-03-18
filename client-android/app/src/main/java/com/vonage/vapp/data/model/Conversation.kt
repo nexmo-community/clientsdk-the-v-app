@@ -11,5 +11,6 @@ data class Conversation(
     @field:Json(name = "joined_at") val joinedAt: String,
     @field:Json(name = "name") val name: String,
     @field:Json(name = "state") val state: String,
-    @field:Json(name = "users") val users: List<User>
+    @field:Json(name = "users") val users: List<User>,
+    @field:Json(name = "events") val events: List<Event>?
 ) : Parcelable

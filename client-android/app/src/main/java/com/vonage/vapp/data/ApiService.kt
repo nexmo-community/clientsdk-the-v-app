@@ -12,6 +12,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface ApiService {
 
@@ -23,8 +24,16 @@ interface ApiService {
     @POST("login")
     suspend fun login(@Body requestModel: LoginRequestModel): Response<LoginResponseModel>
 
+    @Headers("Content-Type: application/json")
     @GET("conversations")
     suspend fun getConversations(@Header("Authorization") token: String?): Response<List<Conversation>>
+
+    @Headers("Content-Type: application/json")
+    @GET("conversations/{conversationId}")
+    suspend fun getConversation(
+        @Header("Authorization") token: String?,
+        @Path("conversationId") conversationId: String
+    ): Response<Conversation>
 
     @Headers("Content-Type: application/json")
     @POST("conversations")

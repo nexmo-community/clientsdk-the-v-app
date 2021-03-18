@@ -94,7 +94,7 @@ class ConversationListFragment : Fragment(R.layout.fragment_conversation_list) {
                 }
             }
 
-            builder.setPositiveButton("OK") { dialog, _ ->
+            builder.setPositiveButton("OK") { _, _ ->
                 createConversation(selectedUsers)
             }
 
@@ -106,7 +106,10 @@ class ConversationListFragment : Fragment(R.layout.fragment_conversation_list) {
 
     private fun navigateToConversation(conversation: Conversation) {
         val navDirections =
-            ConversationListFragmentDirections.actionConversationListFragmentToConversationFragment(conversation)
+            ConversationListFragmentDirections.actionConversationListFragmentToConversationFragment(
+                conversation,
+                navArgs.users + navArgs.user
+            )
         findNavController().navigate(navDirections)
     }
 
