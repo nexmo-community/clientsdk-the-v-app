@@ -27,6 +27,7 @@ class ConversationListFragment : Fragment(R.layout.fragment_conversation_list) {
     private val navArgs: ConversationListFragmentArgs by navArgs()
     private val conversationAdapter = ConversationAdapter()
     private val client get() = NexmoClient.get()
+    private val conversations by lazy { navArgs.conversations.toMutableList() }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -55,16 +56,14 @@ class ConversationListFragment : Fragment(R.layout.fragment_conversation_list) {
     }
 
     private fun initClient() {
-        if (client.isConnected) {
-            conversationAdapter.setConversations(navArgs.conversations.toList())
-        } else {
+        if (!client.isConnected) {
             binding.progressBar.visibility = View.VISIBLE
 
             client.setConnectionListener { newConnectionStatus, _ ->
 
                 if (newConnectionStatus == NexmoConnectionListener.ConnectionStatus.CONNECTED) {
                     activity?.runOnUiThread {
-                        conversationAdapter.setConversations(navArgs.conversations.toList())
+                        conversationAdapter.setConversations(conversations)
                         binding.progressBar.visibility = View.GONE
                     }
 
