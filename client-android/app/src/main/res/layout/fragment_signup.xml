@@ -52,7 +52,7 @@
                 android:id="@+id/passwordTextView"
                 android:text="tsddsdsdss"
                 android:maxLines="1"
-                android:inputType="text"
+                android:inputType="textPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
