@@ -18,6 +18,7 @@ import com.vonage.vapp.data.model.ErrorResponseModel
 import com.vonage.vapp.data.model.GetConversationsResponseModel
 import com.vonage.vapp.data.model.User
 import com.vonage.vapp.databinding.FragmentConversationsBinding
+import com.vonage.vapp.utils.toast
 import com.vonage.vapp.utils.viewBinding
 import kotlinx.coroutines.launch
 
@@ -121,7 +122,7 @@ class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
                 conversationAdapter.addConversation(result.conversation)
                 navigateToConversation(result.conversation)
             } else if (result is ErrorResponseModel) {
-                // Error
+                toast { "${result.title + result.detail}" }
             }
         }
     }
@@ -138,7 +139,7 @@ class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
                 binding.progressBar.visibility = View.GONE
                 binding.contentContainer.visibility = View.VISIBLE
             } else if (result is ErrorResponseModel) {
-                // error
+                toast { "${result.title + result.detail}" }
             }
         }
     }
