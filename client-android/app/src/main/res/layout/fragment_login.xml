@@ -43,13 +43,20 @@
             android:layout_height="wrap_content"
             android:textColor="#FF0000"
             android:layout_marginTop="30dp"
-            tools:text="message"/>
+            tools:text="message" />
 
     <Button
             android:id="@+id/loginButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
-            android:text="Login"/>
+            android:text="Login" />
+
+    <Button
+            android:id="@+id/signupButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="120dp"
+            android:text="Signup" />
 
 </LinearLayout>
