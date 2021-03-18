@@ -46,6 +46,11 @@ class ConversationListFragment : Fragment(R.layout.fragment_conversation_list) {
             showUserSelectionDialog()
         }
 
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            binding.swipeRefreshLayout.isRefreshing = false
+            loadConversations()
+        }
+
         initClient()
     }
 
@@ -123,6 +128,7 @@ class ConversationListFragment : Fragment(R.layout.fragment_conversation_list) {
 
     private fun loadConversations() {
         binding.progressBar.visibility = View.VISIBLE
+        binding.contentContainer.visibility = View.INVISIBLE
 
         lifecycleScope.launch {
             val result = ApiRepository.getConversations()
@@ -130,6 +136,7 @@ class ConversationListFragment : Fragment(R.layout.fragment_conversation_list) {
             if (result is GetConversationsResponseModel) {
                 conversationAdapter.setConversations(result.conversations)
                 binding.progressBar.visibility = View.GONE
+                binding.contentContainer.visibility = View.VISIBLE
             } else if (result is ErrorResponseModel) {
                 // how error
             }
