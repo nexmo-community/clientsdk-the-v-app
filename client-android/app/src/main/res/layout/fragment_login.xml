@@ -16,7 +16,7 @@
 
         <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/nameTextView"
-                android:text="tt12"
+                android:text="igor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
@@ -32,7 +32,7 @@
                 android:id="@+id/passwordTextView"
                 android:layout_width="match_parent"
                 android:inputType="textPassword"
-                android:text="tsddsdsdss"
+                android:text="igorigor"
                 android:layout_height="wrap_content" />
 
     </com.google.android.material.textfield.TextInputLayout>
