@@ -1,7 +1,7 @@
 package com.vonage.vapp.data
 
 import com.vonage.vapp.data.model.Conversation
-import com.vonage.vapp.data.model.GetConversationsResponseModel
+import com.vonage.vapp.data.model.CreateConversationRequestModel
 import com.vonage.vapp.data.model.LoginRequestModel
 import com.vonage.vapp.data.model.LoginResponseModel
 import com.vonage.vapp.data.model.SignupRequestModel
@@ -25,4 +25,10 @@ interface BackendService {
 
     @GET("conversations")
     suspend fun getConversations(@Header("Authorization") token: String?): Response<List<Conversation>>
+
+    @GET("conversations")
+    suspend fun createConversation(
+        @Header("Authorization") token: String?,
+        @Body requestMode: CreateConversationRequestModel
+    ): Response<Conversation>
 }
