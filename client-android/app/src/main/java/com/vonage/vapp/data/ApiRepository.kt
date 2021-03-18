@@ -13,8 +13,9 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import java.util.concurrent.TimeUnit.SECONDS
 
-object BackendRepository {
+object ApiRepository {
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
@@ -22,6 +23,9 @@ object BackendRepository {
 
     private val client = OkHttpClient.Builder()
         .addInterceptor(loggingInterceptor)
+        .readTimeout(60, SECONDS)
+        .writeTimeout(60, SECONDS)
+        .connectTimeout(60, SECONDS)
         .build()
 
     private val moshi = Moshi.Builder().build();
@@ -32,13 +36,13 @@ object BackendRepository {
         .client(client)
         .build()
 
-    private val service: BackendService = retrofit.create(BackendService::class.java)
+    private val apiService: ApiService = retrofit.create(ApiService::class.java)
 
     private var token: String? = null
 
     suspend fun signup(name: String, displayName: String, password: String): Any? {
         val requestModel = SignupRequestModel(name, displayName, password)
-        val response = service.signup(requestModel)
+        val response = apiService.signup(requestModel)
 
         return if (response.isSuccessful) {
             val body = response.body()
@@ -52,7 +56,7 @@ object BackendRepository {
     suspend fun login(name: String, password: String): Any? {
         val requestModel = LoginRequestModel(name, password)
 
-        val response = service.login(requestModel)
+        val response = apiService.login(requestModel)
 
         return if (response.isSuccessful) {
             val body = response.body()
@@ -66,7 +70,7 @@ object BackendRepository {
     suspend fun getConversations(): Any? {
         checkNotNull(token)
 
-        val response = service.getConversations("Bearer $token")
+        val response = apiService.getConversations("Bearer $token")
 
         return if (response.isSuccessful) {
             val conversations = response.body() ?: listOf()
@@ -76,11 +80,11 @@ object BackendRepository {
         }
     }
 
-    suspend fun createConversation(userIds: List<String>): Any? {
+    suspend fun createConversation(userIds: Set<String>): Any? {
         checkNotNull(token)
 
         val requestModel = CreateConversationRequestModel(userIds)
-        val response = service.createConversation(token, requestModel)
+        val response = apiService.createConversation("Bearer $token", requestModel)
 
         return if (response.isSuccessful) {
             val conversations = response.body() as Conversation

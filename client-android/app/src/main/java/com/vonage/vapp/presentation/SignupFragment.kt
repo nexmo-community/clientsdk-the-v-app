@@ -7,7 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.vonage.vapp.R
-import com.vonage.vapp.data.BackendRepository
+import com.vonage.vapp.data.ApiRepository
 import com.vonage.vapp.data.model.ErrorResponseModel
 import com.vonage.vapp.data.model.SignupResponseModel
 import com.vonage.vapp.databinding.FragmentSignupBinding
@@ -40,7 +40,7 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
         }
 
         lifecycleScope.launch {
-            val result = BackendRepository.signup(
+            val result = ApiRepository.signup(
                 binding.nameTextView.text.toString(),
                 binding.displayNameTextView.text.toString(),
                 binding.passwordTextView.text.toString()

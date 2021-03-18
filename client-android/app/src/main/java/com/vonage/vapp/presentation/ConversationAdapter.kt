@@ -5,15 +5,22 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.vonage.vapp.data.model.Conversation
 import com.vonage.vapp.databinding.ItemConversationListBinding
-import kotlin.properties.Delegates
 
 class ConversationAdapter : RecyclerView.Adapter<ConversationAdapter.ViewHolder>() {
 
-    var conversations: List<Conversation> by Delegates.observable(listOf()) { _, _, _ ->
+    private var conversations = mutableListOf<Conversation>()
+
+    private var onClickListener: ((conversation: Conversation) -> Unit)? = null
+
+    fun setConversations(conversations: List<Conversation>) {
+        this.conversations = conversations.toMutableList()
         notifyDataSetChanged()
     }
 
-    private var onClickListener: ((conversation: Conversation) -> Unit)? = null
+    fun addConversation(conversation: Conversation) {
+        conversations.add(conversation)
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)

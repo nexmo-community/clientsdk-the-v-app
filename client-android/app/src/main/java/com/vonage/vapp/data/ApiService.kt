@@ -13,7 +13,7 @@ import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.POST
 
-interface BackendService {
+interface ApiService {
 
     @Headers("Content-Type: application/json")
     @POST("signup")
@@ -26,7 +26,8 @@ interface BackendService {
     @GET("conversations")
     suspend fun getConversations(@Header("Authorization") token: String?): Response<List<Conversation>>
 
-    @GET("conversations")
+    @Headers("Content-Type: application/json")
+    @POST("conversations")
     suspend fun createConversation(
         @Header("Authorization") token: String?,
         @Body requestMode: CreateConversationRequestModel
