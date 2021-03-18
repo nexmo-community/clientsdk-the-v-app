@@ -17,14 +17,14 @@ import com.vonage.vapp.data.model.CreateConversationResponseModel
 import com.vonage.vapp.data.model.ErrorResponseModel
 import com.vonage.vapp.data.model.GetConversationsResponseModel
 import com.vonage.vapp.data.model.User
-import com.vonage.vapp.databinding.FragmentConversationListBinding
+import com.vonage.vapp.databinding.FragmentConversationsBinding
 import com.vonage.vapp.utils.viewBinding
 import kotlinx.coroutines.launch
 
-class ConversationListFragment : Fragment(R.layout.fragment_conversation_list) {
+class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
 
-    private val binding: FragmentConversationListBinding by viewBinding()
-    private val navArgs: ConversationListFragmentArgs by navArgs()
+    private val binding: FragmentConversationsBinding by viewBinding()
+    private val navArgs: ConversationsFragmentArgs by navArgs()
     private val conversationAdapter = ConversationAdapter()
     private val client get() = NexmoClient.get()
     private val conversations by lazy { navArgs.conversations.toMutableList() }
@@ -105,7 +105,7 @@ class ConversationListFragment : Fragment(R.layout.fragment_conversation_list) {
 
     private fun navigateToConversation(conversation: Conversation) {
         val navDirections =
-            ConversationListFragmentDirections.actionConversationListFragmentToConversationFragment(
+            ConversationsFragmentDirections.actionConversationsFragmentToConversationDetailFragment(
                 conversation,
                 navArgs.users + navArgs.user
             )

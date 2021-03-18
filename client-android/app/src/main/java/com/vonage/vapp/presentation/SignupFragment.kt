@@ -47,7 +47,7 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
             )
 
             if (result is SignupResponseModel) {
-                val navDirections = SignupFragmentDirections.actionSignupFragmentToConversationListFragment(
+                val navDirections = SignupFragmentDirections.actionSignupFragmentToConversationsFragment(
                     result.user,
                     result.users.toTypedArray(),
                     result.conversations.toTypedArray(),

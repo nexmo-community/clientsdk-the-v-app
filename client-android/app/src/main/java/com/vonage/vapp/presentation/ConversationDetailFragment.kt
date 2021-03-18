@@ -21,17 +21,17 @@ import com.vonage.vapp.data.ApiRepository
 import com.vonage.vapp.data.model.ErrorResponseModel
 import com.vonage.vapp.data.model.Event
 import com.vonage.vapp.data.model.GetConversationResponseModel
-import com.vonage.vapp.databinding.FragmentConversationBinding
+import com.vonage.vapp.databinding.FragmentConversationDetailBinding
 import com.vonage.vapp.utils.viewBinding
 import kotlinx.coroutines.launch
 
-class ConversationFragment : Fragment(R.layout.fragment_conversation) {
+class ConversationDetailFragment : Fragment(R.layout.fragment_conversation_detail) {
     private val client: NexmoClient = NexmoClient.get()
 
     private var nexmoConversation: NexmoConversation? = null
 
-    private val binding: FragmentConversationBinding by viewBinding()
-    private val navArgs: ConversationFragmentArgs by navArgs()
+    private val binding: FragmentConversationDetailBinding by viewBinding()
+    private val navArgs: ConversationDetailFragmentArgs by navArgs()
 
     private val messageListener = object : NexmoMessageEventListener {
         override fun onTypingEvent(typingEvent: NexmoTypingEvent) {}
@@ -81,11 +81,11 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
             override fun onSuccess(conversation: NexmoConversation?) {
                 conversation?.addMessageEventListener(messageListener)
 
-                this@ConversationFragment.nexmoConversation = conversation
+                this@ConversationDetailFragment.nexmoConversation = conversation
             }
 
             override fun onError(apiError: NexmoApiError) {
-                this@ConversationFragment.nexmoConversation = null
+                this@ConversationDetailFragment.nexmoConversation = null
             }
         })
     }
