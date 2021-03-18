@@ -2,10 +2,11 @@ package com.vonage.vapp.data
 
 import com.squareup.moshi.Moshi
 import com.vonage.vapp.data.model.Conversation
+import com.vonage.vapp.data.model.CreateConversationRequestModel
+import com.vonage.vapp.data.model.CreateConversationResponseModel
 import com.vonage.vapp.data.model.ErrorResponseModel
 import com.vonage.vapp.data.model.GetConversationsResponseModel
 import com.vonage.vapp.data.model.LoginRequestModel
-import com.vonage.vapp.data.model.LoginResponseModel
 import com.vonage.vapp.data.model.SignupRequestModel
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -70,6 +71,20 @@ object BackendRepository {
         return if (response.isSuccessful) {
             val conversations = response.body() ?: listOf()
             GetConversationsResponseModel(conversations)
+        } else {
+            getErrorResponseModel(response)
+        }
+    }
+
+    suspend fun createConversation(userIds: List<String>): Any? {
+        checkNotNull(token)
+
+        val requestModel = CreateConversationRequestModel(userIds)
+        val response = service.createConversation(token, requestModel)
+
+        return if (response.isSuccessful) {
+            val conversations = response.body() as Conversation
+            CreateConversationResponseModel(conversations)
         } else {
             getErrorResponseModel(response)
         }
