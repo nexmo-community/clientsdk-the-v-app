@@ -30,7 +30,7 @@ class ConversationViewModel : ViewModel() {
 
     fun initClient(navArgs: ConversationsFragmentArgs) {
 
-        this.conversations = navArgs.conversations.toMutableList()
+        this.conversations = navArgs.conversations?.toMutableList()
         this.allUsers = (navArgs.users + navArgs.user).toList()
 
 

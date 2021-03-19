@@ -18,9 +18,9 @@ import com.vonage.vapp.presentation.ConversationViewModel.State
 
 class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
 
-    private val binding: FragmentConversationsBinding by viewBinding()
-    private val navArgs: ConversationsFragmentArgs by navArgs()
-    private val viewModel: ConversationViewModel by viewModels()
+    private val binding by viewBinding<FragmentConversationsBinding>()
+    private val navArgs by navArgs<ConversationsFragmentArgs>()
+    private val viewModel by viewModels<ConversationViewModel>()
 
     private val conversationAdapter = ConversationAdapter()
 
