@@ -25,7 +25,7 @@ class ConversationViewModel : ViewModel() {
     private var conversations = mutableListOf<Conversation>()
     private var allUsers = listOf<User>()
 
-    private val viewStateMutableLiveData = MutableLiveData<ConversationViewState>()
+    private val viewStateMutableLiveData = MutableLiveData<State>()
     val viewStateLiveData = viewStateMutableLiveData.asLiveData()
 
     fun initClient(navArgs: ConversationsFragmentArgs) {
@@ -35,12 +35,12 @@ class ConversationViewModel : ViewModel() {
 
 
         if (!client.isConnected) {
-            viewStateMutableLiveData.postValue(ConversationViewState.Loading)
+            viewStateMutableLiveData.postValue(State.Loading)
 
             client.setConnectionListener { newConnectionStatus, _ ->
 
                 if (newConnectionStatus == NexmoConnectionListener.ConnectionStatus.CONNECTED) {
-                    val conversation = ConversationViewState.Content(navArgs.conversations.toList())
+                    val conversation = State.Content(navArgs.conversations.toList())
                     viewStateMutableLiveData.postValue(conversation)
                 }
 
@@ -52,11 +52,11 @@ class ConversationViewModel : ViewModel() {
     }
 
     fun createConversation() {
-        viewStateMutableLiveData.postValue(ConversationViewState.SelectUsers)
+        viewStateMutableLiveData.postValue(State.SelectUsers)
     }
 
     fun createConversation(users: Set<User>) {
-        viewStateMutableLiveData.postValue(ConversationViewState.Loading)
+        viewStateMutableLiveData.postValue(State.Loading)
 
         viewModelScope.launch {
             val userIds = users.map { it.id }.toSet()
@@ -64,11 +64,11 @@ class ConversationViewModel : ViewModel() {
 
             if (result is CreateConversationResponseModel) {
                 conversations.add(result.conversation)
-                viewStateMutableLiveData.postValue(ConversationViewState.Content(conversations))
+                viewStateMutableLiveData.postValue(State.Content(conversations))
 
                 navigateToConversation(result.conversation)
             } else if (result is ErrorResponseModel) {
-                viewStateMutableLiveData.postValue(ConversationViewState.Error("${result.title} - ${result.detail}"))
+                viewStateMutableLiveData.postValue(State.Error("${result.title} - ${result.detail}"))
             }
         }
     }
@@ -83,25 +83,25 @@ class ConversationViewModel : ViewModel() {
     }
 
     fun loadConversations() {
-        viewStateMutableLiveData.postValue(ConversationViewState.Loading)
+        viewStateMutableLiveData.postValue(State.Loading)
 
         viewModelScope.launch {
             val result = apiRepository.getConversations()
 
             if (result is GetConversationsResponseModel) {
                 this@ConversationViewModel.conversations = result.conversations.toMutableList()
-                val conversation = ConversationViewState.Content(conversations)
+                val conversation = State.Content(conversations)
                 viewStateMutableLiveData.postValue(conversation)
             } else if (result is ErrorResponseModel) {
-                viewStateMutableLiveData.postValue(ConversationViewState.Error("${result.title} - ${result.detail}"))
+                viewStateMutableLiveData.postValue(State.Error("${result.title} - ${result.detail}"))
             }
         }
     }
-}
 
-sealed class ConversationViewState {
-    object Loading: ConversationViewState()
-    data class Content(val conversations: List<Conversation>): ConversationViewState()
-    object SelectUsers: ConversationViewState()
-    data class Error(val message: String): ConversationViewState()
+    sealed class State {
+        object Loading : State()
+        data class Content(val conversations: List<Conversation>) : State()
+        object SelectUsers : State()
+        data class Error(val message: String) : State()
+    }
 }
