@@ -2,3 +2,6 @@
 .vscode
 private.key
 .nexmo-app
+Pods/
+xcuserdata/
+*.xcworkspace
