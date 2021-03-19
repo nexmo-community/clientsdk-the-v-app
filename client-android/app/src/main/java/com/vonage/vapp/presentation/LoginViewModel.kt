@@ -37,7 +37,7 @@ class LoginViewModel : ViewModel() {
 
                 navManager.navigate(navDirections)
             } else if (result is ErrorResponseModel) {
-                viewStateMutableLiveData.postValue(State.Error("${result.title} - ${result.detail}"))
+                viewStateMutableLiveData.postValue(State.Error(result.fullMessage))
             }
         }
     }

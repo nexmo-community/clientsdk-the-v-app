@@ -67,7 +67,7 @@ class ConversationViewModel : ViewModel() {
 
                 navigateToConversation(result.conversation)
             } else if (result is ErrorResponseModel) {
-                viewStateMutableLiveData.postValue(State.Error("${result.title} - ${result.detail}"))
+                viewStateMutableLiveData.postValue(State.Error(result.fullMessage))
             }
         }
     }
@@ -92,7 +92,7 @@ class ConversationViewModel : ViewModel() {
                 val conversation = State.Content(conversations)
                 viewStateMutableLiveData.postValue(conversation)
             } else if (result is ErrorResponseModel) {
-                viewStateMutableLiveData.postValue(State.Error("${result.title} - ${result.detail}"))
+                viewStateMutableLiveData.postValue(State.Error(result.fullMessage))
             }
         }
     }

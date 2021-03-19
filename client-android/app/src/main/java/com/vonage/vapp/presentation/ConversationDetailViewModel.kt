@@ -85,7 +85,7 @@ class ConversationDetailViewModel : ViewModel() {
                 val events = result.conversation?.events ?: listOf()
                 displayConversationEvents(events)
             } else if (result is ErrorResponseModel) {
-                viewStateMutableLiveData.postValue(State.Error("${result.title} - ${result.detail}"))
+                viewStateMutableLiveData.postValue(State.Error(result.fullMessage))
             }
         }
     }
