@@ -122,7 +122,7 @@ class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
                 conversationAdapter.addConversation(result.conversation)
                 navigateToConversation(result.conversation)
             } else if (result is ErrorResponseModel) {
-                toast { "${result.title + result.detail}" }
+                toast { "${result.title} - ${result.detail}" }
             }
         }
     }
@@ -139,7 +139,7 @@ class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
                 binding.progressBar.visibility = View.GONE
                 binding.contentContainer.visibility = View.VISIBLE
             } else if (result is ErrorResponseModel) {
-                toast { "${result.title + result.detail}" }
+                toast { "${result.title} - ${result.detail}" }
             }
         }
     }

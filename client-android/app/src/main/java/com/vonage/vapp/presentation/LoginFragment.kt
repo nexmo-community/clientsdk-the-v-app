@@ -56,7 +56,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
                 findNavController().navigate(navDirections)
             } else if (result is ErrorResponseModel) {
-                toast { "${result.title + result.detail}" }
+                toast { "${result.title} - ${result.detail}" }
             }
         }
     }

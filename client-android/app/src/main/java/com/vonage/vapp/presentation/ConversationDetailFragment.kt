@@ -107,7 +107,7 @@ class ConversationDetailFragment : Fragment(R.layout.fragment_conversation_detai
                 binding.progressBar.visibility = View.INVISIBLE
                 binding.contentContainer.visibility = View.VISIBLE
             } else if (result is ErrorResponseModel) {
-                toast { "${result.title + result.detail}" }
+                toast { "${result.title} - ${result.detail}" }
             }
         }
     }
