@@ -9,12 +9,12 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.vonage.vapp.R
-import com.vonage.vapp.core.ext.toast
 import com.vonage.vapp.core.delegate.viewBinding
 import com.vonage.vapp.core.ext.observe
+import com.vonage.vapp.core.ext.toast
 import com.vonage.vapp.data.model.User
 import com.vonage.vapp.databinding.FragmentConversationsBinding
-import com.vonage.vapp.presentation.ConversationViewState.*
+import com.vonage.vapp.presentation.ConversationViewModel.State
 
 class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
 
@@ -24,19 +24,19 @@ class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
 
     private val conversationAdapter = ConversationAdapter()
 
-    private val stateObserver = Observer<ConversationViewState> {
+    private val stateObserver = Observer<State> {
         binding.progressBar.visibility = View.INVISIBLE
         binding.contentContainer.visibility = View.INVISIBLE
 
-            when(it) {
-                is Content -> {
-                    conversationAdapter.setConversations(it.conversations)
-                    binding.contentContainer.visibility = View.VISIBLE
-                }
-                is SelectUsers -> showUserSelectionDialog()
-                Loading -> binding.progressBar.visibility = View.VISIBLE
-                is Error -> toast { it.message }
+        when (it) {
+            is State.Content -> {
+                conversationAdapter.setConversations(it.conversations)
+                binding.contentContainer.visibility = View.VISIBLE
             }
+            is State.SelectUsers -> showUserSelectionDialog()
+            State.Loading -> binding.progressBar.visibility = View.VISIBLE
+            is State.Error -> toast { it.message }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
