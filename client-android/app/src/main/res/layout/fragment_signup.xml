@@ -17,7 +17,6 @@
 
         <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/nameTextView"
-                android:text="tt12"
                 android:maxLines="1"
                 android:inputType="text"
                 android:layout_width="match_parent"
@@ -33,7 +32,6 @@
 
         <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/displayNameTextView"
-                android:text="t1d"
                 android:maxLines="1"
                 android:inputType="text"
                 android:layout_width="match_parent"
@@ -50,7 +48,6 @@
 
         <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/passwordTextView"
-                android:text="tsddsdsdss"
                 android:maxLines="1"
                 android:inputType="textPassword"
                 android:layout_width="match_parent"
