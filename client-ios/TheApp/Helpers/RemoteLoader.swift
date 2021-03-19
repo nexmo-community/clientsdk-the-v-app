@@ -8,7 +8,7 @@ enum RemoteLoaderError: Error {
 
 final class RemoteLoader {
     
-    static let baseURL = "https://v-app-companion.herokuapp.com"
+    static let baseURL = ""
     
     static func load<T: Codable, U: Codable>(path: String,
                                              authToken: String? = nil,
