@@ -11,16 +11,16 @@ import com.vonage.vapp.core.delegate.viewBinding
 import com.vonage.vapp.core.ext.observe
 import com.vonage.vapp.core.ext.toast
 import com.vonage.vapp.databinding.FragmentSignupBinding
-import com.vonage.vapp.presentation.SignupViewModel.State
+import com.vonage.vapp.presentation.SignupViewModel.Action
 
 class SignupFragment : Fragment(R.layout.fragment_signup) {
 
     private val binding by viewBinding<FragmentSignupBinding>()
     private val viewModel by viewModels<SignupViewModel>()
 
-    private val stateObserver = Observer<State> {
+    private val actionObserver = Observer<Action> {
         when (it) {
-            is State.Error -> toast { it.message }
+            is Action.Error -> toast { it.message }
         }
     }
 
@@ -31,7 +31,7 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
             signUp()
         }
 
-        observe(viewModel.viewStateLiveData, stateObserver)
+        observe(viewModel.viewStateLiveData, actionObserver)
     }
 
     private fun signUp() {

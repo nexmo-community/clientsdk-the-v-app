@@ -24,7 +24,7 @@ class ConversationViewModel : ViewModel() {
     private var conversations = mutableListOf<Conversation>()
     private var allUsers = listOf<User>()
 
-    private val viewStateMutableLiveData = MutableLiveData<State>()
+    private val viewStateMutableLiveData = MutableLiveData<Action>()
     val viewStateLiveData = viewStateMutableLiveData.asLiveData()
 
     fun initClient(navArgs: ConversationsFragmentArgs) {
@@ -34,12 +34,12 @@ class ConversationViewModel : ViewModel() {
 
 
         if (!client.isConnected) {
-            viewStateMutableLiveData.postValue(State.Loading)
+            viewStateMutableLiveData.postValue(Action.ShowLoading)
 
             client.setConnectionListener { newConnectionStatus, _ ->
 
                 if (newConnectionStatus == NexmoConnectionListener.ConnectionStatus.CONNECTED) {
-                    val conversation = State.Content(navArgs.conversations.toList())
+                    val conversation = Action.ShowContent(navArgs.conversations.toList())
                     viewStateMutableLiveData.postValue(conversation)
                 }
 
@@ -51,11 +51,11 @@ class ConversationViewModel : ViewModel() {
     }
 
     fun createConversation() {
-        viewStateMutableLiveData.postValue(State.SelectUsers)
+        viewStateMutableLiveData.postValue(Action.SelectUsers)
     }
 
     fun createConversation(users: Set<User>) {
-        viewStateMutableLiveData.postValue(State.Loading)
+        viewStateMutableLiveData.postValue(Action.ShowLoading)
 
         viewModelScope.launch {
             val userIds = users.map { it.id }.toSet()
@@ -63,11 +63,11 @@ class ConversationViewModel : ViewModel() {
 
             if (result is CreateConversationResponseModel) {
                 conversations.add(result.conversation)
-                viewStateMutableLiveData.postValue(State.Content(conversations))
+                viewStateMutableLiveData.postValue(Action.ShowContent(conversations))
 
                 navigateToConversation(result.conversation)
             } else if (result is ErrorResponseModel) {
-                viewStateMutableLiveData.postValue(State.Error(result.fullMessage))
+                viewStateMutableLiveData.postValue(Action.ShowError(result.fullMessage))
             }
         }
     }
@@ -82,25 +82,25 @@ class ConversationViewModel : ViewModel() {
     }
 
     fun loadConversations() {
-        viewStateMutableLiveData.postValue(State.Loading)
+        viewStateMutableLiveData.postValue(Action.ShowLoading)
 
         viewModelScope.launch {
             val result = apiRepository.getConversations()
 
             if (result is GetConversationsResponseModel) {
                 this@ConversationViewModel.conversations = result.conversations.toMutableList()
-                val conversation = State.Content(conversations)
+                val conversation = Action.ShowContent(conversations)
                 viewStateMutableLiveData.postValue(conversation)
             } else if (result is ErrorResponseModel) {
-                viewStateMutableLiveData.postValue(State.Error(result.fullMessage))
+                viewStateMutableLiveData.postValue(Action.ShowError(result.fullMessage))
             }
         }
     }
 
-    sealed class State {
-        object Loading : State()
-        data class Content(val conversations: List<Conversation>) : State()
-        object SelectUsers : State()
-        data class Error(val message: String) : State()
+    sealed class Action {
+        object ShowLoading : Action()
+        data class ShowContent(val conversations: List<Conversation>) : Action()
+        object SelectUsers : Action()
+        data class ShowError(val message: String) : Action()
     }
 }

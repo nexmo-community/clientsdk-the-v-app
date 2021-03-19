@@ -14,7 +14,7 @@ import com.vonage.vapp.core.ext.observe
 import com.vonage.vapp.core.ext.toast
 import com.vonage.vapp.data.model.User
 import com.vonage.vapp.databinding.FragmentConversationsBinding
-import com.vonage.vapp.presentation.ConversationViewModel.State
+import com.vonage.vapp.presentation.ConversationViewModel.Action
 
 class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
 
@@ -24,18 +24,18 @@ class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
 
     private val conversationAdapter = ConversationAdapter()
 
-    private val stateObserver = Observer<State> {
+    private val actionObserver = Observer<Action> {
         binding.progressBar.visibility = View.INVISIBLE
         binding.contentContainer.visibility = View.INVISIBLE
 
         when (it) {
-            is State.Content -> {
+            is Action.ShowContent -> {
                 conversationAdapter.setConversations(it.conversations)
                 binding.contentContainer.visibility = View.VISIBLE
             }
-            is State.SelectUsers -> showUserSelectionDialog()
-            State.Loading -> binding.progressBar.visibility = View.VISIBLE
-            is State.Error -> toast { it.message }
+            is Action.SelectUsers -> showUserSelectionDialog()
+            Action.ShowLoading -> binding.progressBar.visibility = View.VISIBLE
+            is Action.ShowError -> toast { it.message }
         }
     }
 
@@ -62,7 +62,7 @@ class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
             viewModel.loadConversations()
         }
 
-        observe(viewModel.viewStateLiveData, stateObserver)
+        observe(viewModel.viewStateLiveData, actionObserver)
         viewModel.initClient(navArgs)
     }
 

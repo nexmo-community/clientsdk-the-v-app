@@ -20,18 +20,18 @@ class ConversationDetailFragment : Fragment(R.layout.fragment_conversation_detai
     private val navArgs by navArgs<ConversationDetailFragmentArgs>()
     private val viewModel by viewModels<ConversationDetailViewModel>()
 
-    private val stateObserver = Observer<ConversationDetailViewModel.State> {
+    private val actionObserver = Observer<ConversationDetailViewModel.Action> {
         binding.progressBar.visibility = View.INVISIBLE
         binding.contentContainer.visibility = View.INVISIBLE
 
         when (it) {
-            is ConversationDetailViewModel.State.Error -> toast { it.message }
-            is ConversationDetailViewModel.State.Loading -> binding.progressBar.visibility = View.VISIBLE
-            is ConversationDetailViewModel.State.AddConversationLine -> {
+            is ConversationDetailViewModel.Action.Error -> toast { it.message }
+            is ConversationDetailViewModel.Action.Loading -> binding.progressBar.visibility = View.VISIBLE
+            is ConversationDetailViewModel.Action.AddConversationLine -> {
                 binding.contentContainer.visibility = View.VISIBLE
                 binding.conversationEventsTextView.append(it.line)
             }
-            is ConversationDetailViewModel.State.SetConversation -> {
+            is ConversationDetailViewModel.Action.SetConversation -> {
                 binding.contentContainer.visibility = View.VISIBLE
                 binding.conversationEventsTextView.text = it.conversation
             }
@@ -41,7 +41,7 @@ class ConversationDetailFragment : Fragment(R.layout.fragment_conversation_detai
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        observe(viewModel.viewStateLiveData, stateObserver)
+        observe(viewModel.viewStateLiveData, actionObserver)
         viewModel.initClient(navArgs)
 
         binding.sendMessageButton.setOnClickListener {

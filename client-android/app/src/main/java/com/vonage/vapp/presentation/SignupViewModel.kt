@@ -15,7 +15,7 @@ class SignupViewModel : ViewModel() {
     private val apiRepository = ApiRepository
     private val navManager = NavManager
 
-    private val viewStateMutableLiveData = MutableLiveData<State>()
+    private val viewStateMutableLiveData = MutableLiveData<Action>()
     val viewStateLiveData = viewStateMutableLiveData.asLiveData()
 
     fun signUp(name: String, displayName: String, password: String) {
@@ -32,12 +32,12 @@ class SignupViewModel : ViewModel() {
 
                 navManager.navigate(navDirections)
             } else if (result is ErrorResponseModel) {
-                viewStateMutableLiveData.postValue(State.Error(result.fullMessage))
+                viewStateMutableLiveData.postValue(Action.Error(result.fullMessage))
             }
         }
     }
 
-    sealed class State {
-        data class Error(val message: String) : State()
+    sealed class Action {
+        data class Error(val message: String) : Action()
     }
 }
