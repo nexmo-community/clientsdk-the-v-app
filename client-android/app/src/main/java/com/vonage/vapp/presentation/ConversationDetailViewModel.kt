@@ -14,10 +14,8 @@ import com.nexmo.client.NexmoTextEvent
 import com.nexmo.client.NexmoTypingEvent
 import com.nexmo.client.request_listener.NexmoApiError
 import com.nexmo.client.request_listener.NexmoRequestListener
-import com.vonage.vapp.core.NavManager
 import com.vonage.vapp.core.ext.asLiveData
 import com.vonage.vapp.data.ApiRepository
-import com.vonage.vapp.data.model.Conversation
 import com.vonage.vapp.data.model.ErrorResponseModel
 import com.vonage.vapp.data.model.Event
 import com.vonage.vapp.data.model.GetConversationResponseModel
@@ -28,11 +26,7 @@ class ConversationDetailViewModel : ViewModel() {
 
     // should be injected
     private val client = NexmoClient.get()
-    private val apiRepository = ApiRepository
-    private val navManager = NavManager
-
-    private var conversations = mutableListOf<Conversation>()
-    private var allUsers = listOf<User>()
+    private val adiRepository = ApiRepository
 
     private val viewStateMutableLiveData = MutableLiveData<State>()
     val viewStateLiveData = viewStateMutableLiveData.asLiveData()
@@ -85,7 +79,7 @@ class ConversationDetailViewModel : ViewModel() {
         viewStateMutableLiveData.postValue(State.Loading)
 
         viewModelScope.launch {
-            val result = ApiRepository.getConversation(conversationId)
+            val result = adiRepository.getConversation(conversationId)
 
             if (result is GetConversationResponseModel) {
                 val events = result.conversation?.events ?: listOf()

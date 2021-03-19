@@ -20,7 +20,6 @@ class ConversationViewModel : ViewModel() {
     // should be injected
     private val client = NexmoClient.get()
     private val apiRepository = ApiRepository
-    private val navManager = NavManager
 
     private var conversations = mutableListOf<Conversation>()
     private var allUsers = listOf<User>()
