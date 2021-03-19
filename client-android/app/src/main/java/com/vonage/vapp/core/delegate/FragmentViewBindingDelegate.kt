@@ -1,4 +1,4 @@
-package com.vonage.vapp.utils
+package com.vonage.vapp.core.delegate
 
 import android.view.View
 import androidx.fragment.app.Fragment
