@@ -142,11 +142,11 @@ class ChatViewController: UIViewController, LoadingViewController {
     func showMemberEvent(event: NXMMemberEvent) {
         switch event.state {
         case .invited:
-            addConversationLine("\(event.member.user.name) was invited.")
+            addConversationLine("\(event.member.user.displayName) was invited.")
         case .joined:
-            addConversationLine("\(event.member.user.name) joined.")
+            addConversationLine("\(event.member.user.displayName) joined.")
         case .left:
-            addConversationLine("\(event.member.user.name) left.")
+            addConversationLine("\(event.member.user.displayName) left.")
         @unknown default:
             fatalError("Unknown member event state.")
         }
@@ -154,7 +154,7 @@ class ChatViewController: UIViewController, LoadingViewController {
     
     func showTextEvent(event: NXMTextEvent) {
         if let message = event.text {
-            addConversationLine("\(event.fromMember?.user.name ?? "A user") said: '\(message)'")
+            addConversationLine("\(event.fromMember?.user.displayName ?? "A user") said: '\(message)'")
         }
     }
     

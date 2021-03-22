@@ -55,13 +55,6 @@ class LoginViewController: UIViewController, LoadingViewController {
         ])
     }
     
-    //TODO: Delete
-    private func skipLogin() {
-        ClientManager.shared.delegate = self
-        toggleLoading()
-        ClientManager.shared.auth(username: "abdul", password: "password", displayName: nil, url: Auth.loginPath)
-    }
-    
     @objc func loginButtonTapped() {
         if let username = usernameField.text, let password = passwordField.text {
             ClientManager.shared.delegate = self
