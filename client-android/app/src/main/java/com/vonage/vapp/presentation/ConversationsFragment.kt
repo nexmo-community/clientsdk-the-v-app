@@ -4,31 +4,40 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.nexmo.client.NexmoClient
-import com.nexmo.client.request_listener.NexmoConnectionListener
 import com.vonage.vapp.R
-import com.vonage.vapp.data.ApiRepository
-import com.vonage.vapp.data.model.Conversation
-import com.vonage.vapp.data.model.CreateConversationResponseModel
-import com.vonage.vapp.data.model.ErrorResponseModel
-import com.vonage.vapp.data.model.GetConversationsResponseModel
+import com.vonage.vapp.core.delegate.viewBinding
+import com.vonage.vapp.core.ext.observe
+import com.vonage.vapp.core.ext.toast
 import com.vonage.vapp.data.model.User
 import com.vonage.vapp.databinding.FragmentConversationsBinding
-import com.vonage.vapp.utils.toast
-import com.vonage.vapp.utils.viewBinding
-import kotlinx.coroutines.launch
+import com.vonage.vapp.presentation.ConversationViewModel.Action
 
 class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
 
-    private val binding: FragmentConversationsBinding by viewBinding()
-    private val navArgs: ConversationsFragmentArgs by navArgs()
+    private val binding by viewBinding<FragmentConversationsBinding>()
+    private val navArgs by navArgs<ConversationsFragmentArgs>()
+    private val viewModel by viewModels<ConversationViewModel>()
+
     private val conversationAdapter = ConversationAdapter()
-    private val client get() = NexmoClient.get()
-    private val conversations by lazy { navArgs.conversations.toMutableList() }
+
+    private val actionObserver = Observer<Action> {
+        binding.progressBar.visibility = View.INVISIBLE
+        binding.contentContainer.visibility = View.INVISIBLE
+
+        when (it) {
+            is Action.ShowContent -> {
+                conversationAdapter.setConversations(it.conversations)
+                binding.contentContainer.visibility = View.VISIBLE
+            }
+            is Action.SelectUsers -> showUserSelectionDialog()
+            Action.ShowLoading -> binding.progressBar.visibility = View.VISIBLE
+            is Action.ShowError -> toast { it.message }
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -41,39 +50,20 @@ class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
         }
 
         conversationAdapter.setOnClickListener {
-            navigateToConversation(it)
+            viewModel.navigateToConversation(it)
         }
 
         binding.addFab.setOnClickListener {
-            showUserSelectionDialog()
+            viewModel.createConversation()
         }
 
         binding.swipeRefreshLayout.setOnRefreshListener {
             binding.swipeRefreshLayout.isRefreshing = false
-            loadConversations()
+            viewModel.loadConversations()
         }
 
-        initClient()
-    }
-
-    private fun initClient() {
-        if (!client.isConnected) {
-            binding.progressBar.visibility = View.VISIBLE
-
-            client.setConnectionListener { newConnectionStatus, _ ->
-
-                if (newConnectionStatus == NexmoConnectionListener.ConnectionStatus.CONNECTED) {
-                    activity?.runOnUiThread {
-                        conversationAdapter.setConversations(conversations)
-                        binding.progressBar.visibility = View.GONE
-                    }
-
-                    return@setConnectionListener
-                }
-            }
-
-            client.login(navArgs.token)
-        }
+        observe(viewModel.viewStateLiveData, actionObserver)
+        viewModel.initClient(navArgs)
     }
 
     private fun showUserSelectionDialog() {
@@ -95,52 +85,12 @@ class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
             }
 
             builder.setPositiveButton("OK") { _, _ ->
-                createConversation(selectedUsers)
+                viewModel.createConversation(selectedUsers)
             }
 
             builder.setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
 
             builder.show()
-        }
-    }
-
-    private fun navigateToConversation(conversation: Conversation) {
-        val navDirections =
-            ConversationsFragmentDirections.actionConversationsFragmentToConversationDetailFragment(
-                conversation,
-                navArgs.users + navArgs.user
-            )
-        findNavController().navigate(navDirections)
-    }
-
-    private fun createConversation(users: Set<User>) {
-        lifecycleScope.launch {
-            val userIds = users.map { it.id }.toSet()
-            val result = ApiRepository.createConversation(userIds)
-
-            if (result is CreateConversationResponseModel) {
-                conversationAdapter.addConversation(result.conversation)
-                navigateToConversation(result.conversation)
-            } else if (result is ErrorResponseModel) {
-                toast { "${result.title + result.detail}" }
-            }
-        }
-    }
-
-    private fun loadConversations() {
-        binding.progressBar.visibility = View.VISIBLE
-        binding.contentContainer.visibility = View.INVISIBLE
-
-        lifecycleScope.launch {
-            val result = ApiRepository.getConversations()
-
-            if (result is GetConversationsResponseModel) {
-                conversationAdapter.setConversations(result.conversations)
-                binding.progressBar.visibility = View.GONE
-                binding.contentContainer.visibility = View.VISIBLE
-            } else if (result is ErrorResponseModel) {
-                toast { "${result.title + result.detail}" }
-            }
         }
     }
 }

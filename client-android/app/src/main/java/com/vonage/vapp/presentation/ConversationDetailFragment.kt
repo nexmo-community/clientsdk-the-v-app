@@ -3,143 +3,55 @@ package com.vonage.vapp.presentation
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
-import com.nexmo.client.NexmoAttachmentEvent
 import com.nexmo.client.NexmoClient
-import com.nexmo.client.NexmoConversation
-import com.nexmo.client.NexmoDeletedEvent
-import com.nexmo.client.NexmoDeliveredEvent
-import com.nexmo.client.NexmoMessageEventListener
-import com.nexmo.client.NexmoSeenEvent
-import com.nexmo.client.NexmoTextEvent
-import com.nexmo.client.NexmoTypingEvent
-import com.nexmo.client.request_listener.NexmoApiError
-import com.nexmo.client.request_listener.NexmoRequestListener
 import com.vonage.vapp.R
-import com.vonage.vapp.data.ApiRepository
-import com.vonage.vapp.data.model.ErrorResponseModel
-import com.vonage.vapp.data.model.Event
-import com.vonage.vapp.data.model.GetConversationResponseModel
+import com.vonage.vapp.core.delegate.viewBinding
+import com.vonage.vapp.core.ext.observe
+import com.vonage.vapp.core.ext.toast
 import com.vonage.vapp.databinding.FragmentConversationDetailBinding
-import com.vonage.vapp.utils.toast
-import com.vonage.vapp.utils.viewBinding
-import kotlinx.coroutines.launch
 
 class ConversationDetailFragment : Fragment(R.layout.fragment_conversation_detail) {
     private val client: NexmoClient = NexmoClient.get()
 
-    private var nexmoConversation: NexmoConversation? = null
+    private val binding by viewBinding<FragmentConversationDetailBinding>()
+    private val navArgs by navArgs<ConversationDetailFragmentArgs>()
+    private val viewModel by viewModels<ConversationDetailViewModel>()
 
-    private val binding: FragmentConversationDetailBinding by viewBinding()
-    private val navArgs: ConversationDetailFragmentArgs by navArgs()
+    private val actionObserver = Observer<ConversationDetailViewModel.Action> {
+        binding.progressBar.visibility = View.INVISIBLE
+        binding.contentContainer.visibility = View.INVISIBLE
 
-    private val messageListener = object : NexmoMessageEventListener {
-        override fun onTypingEvent(typingEvent: NexmoTypingEvent) {}
-
-        override fun onAttachmentEvent(attachmentEvent: NexmoAttachmentEvent) {}
-
-        override fun onTextEvent(textEvent: NexmoTextEvent) {
-            val line = getConversationLine(textEvent)
-            displayConversationLine(line)
+        when (it) {
+            is ConversationDetailViewModel.Action.Error -> toast { it.message }
+            is ConversationDetailViewModel.Action.Loading -> binding.progressBar.visibility = View.VISIBLE
+            is ConversationDetailViewModel.Action.AddConversationLine -> {
+                binding.contentContainer.visibility = View.VISIBLE
+                binding.conversationEventsTextView.append(it.line)
+            }
+            is ConversationDetailViewModel.Action.SetConversation -> {
+                binding.contentContainer.visibility = View.VISIBLE
+                binding.conversationEventsTextView.text = it.conversation
+            }
         }
-
-        override fun onSeenReceipt(seenEvent: NexmoSeenEvent) {}
-
-        override fun onEventDeleted(deletedEvent: NexmoDeletedEvent) {}
-
-        override fun onDeliveredReceipt(deliveredEvent: NexmoDeliveredEvent) {}
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        getConversation()
-        getNexmoConversation()
+        observe(viewModel.viewStateLiveData, actionObserver)
+        viewModel.initClient(navArgs)
 
         binding.sendMessageButton.setOnClickListener {
             val message = binding.messageEditText.text.toString()
 
             if (message.isNotBlank()) {
-                nexmoConversation?.sendText(message, object : NexmoRequestListener<Void> {
-                    override fun onSuccess(p0: Void?) {
-                    }
-
-                    override fun onError(apiError: NexmoApiError) {
-                        toast { "Message send error" }
-                    }
-                })
+                viewModel.sendMessage(message)
             }
 
             binding.messageEditText.setText("")
         }
-    }
-
-    private fun getNexmoConversation() {
-        binding.progressBar.visibility = View.VISIBLE
-        binding.contentContainer.visibility = View.INVISIBLE
-
-        client.getConversation(navArgs.conversaion.id, object : NexmoRequestListener<NexmoConversation> {
-            override fun onSuccess(conversation: NexmoConversation?) {
-                conversation?.addMessageEventListener(messageListener)
-
-                this@ConversationDetailFragment.nexmoConversation = conversation
-            }
-
-            override fun onError(apiError: NexmoApiError) {
-                this@ConversationDetailFragment.nexmoConversation = null
-                toast { "NexmoConversation load error" }
-            }
-        })
-    }
-
-    private fun getConversation() {
-        binding.progressBar.visibility = View.VISIBLE
-        binding.contentContainer.visibility = View.INVISIBLE
-
-        lifecycleScope.launch {
-            val result = ApiRepository.getConversation(navArgs.conversaion.id)
-
-            if (result is GetConversationResponseModel) {
-                val events = result.conversation?.events ?: listOf<Event>()
-
-                displayConversationEvents(events)
-                binding.progressBar.visibility = View.INVISIBLE
-                binding.contentContainer.visibility = View.VISIBLE
-            } else if (result is ErrorResponseModel) {
-                toast { "${result.title + result.detail}" }
-            }
-        }
-    }
-
-    private fun displayConversationEvents(events: List<Event>?) {
-
-        events
-            ?.distinctBy { it.id } // Remove duplicated events
-            ?.sortedBy { it.timestamp } // Sort events
-            ?.forEach {
-                val userDisplayName = getUserDisplayName(it.from)
-
-                val line = when (it.type) {
-                    "text" -> "$userDisplayName: ${it.content}"
-                    "member:joined" -> "$userDisplayName joined"
-                    else -> "${it.type} ${it.content}"
-                }
-
-                displayConversationLine(line)
-            }
-    }
-
-    private fun getUserDisplayName(userId: String): String {
-        return navArgs.users.firstOrNull { it.id == userId }?.displayName ?: "Unknown"
-    }
-
-    private fun getConversationLine(textEvent: NexmoTextEvent): String {
-        val user = textEvent.fromMember.user.name
-        return "$user said: ${textEvent.text}"
-    }
-
-    private fun displayConversationLine(line: String?) {
-        line?.let { binding.conversationEventsTextView.append(it + System.lineSeparator()) }
     }
 }

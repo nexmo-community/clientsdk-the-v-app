@@ -4,20 +4,25 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import com.vonage.vapp.R
-import com.vonage.vapp.data.ApiRepository
-import com.vonage.vapp.data.model.ErrorResponseModel
-import com.vonage.vapp.data.model.SignupResponseModel
+import com.vonage.vapp.core.delegate.viewBinding
+import com.vonage.vapp.core.ext.observe
+import com.vonage.vapp.core.ext.toast
 import com.vonage.vapp.databinding.FragmentSignupBinding
-import com.vonage.vapp.utils.toast
-import com.vonage.vapp.utils.viewBinding
-import kotlinx.coroutines.launch
+import com.vonage.vapp.presentation.SignupViewModel.Action
 
 class SignupFragment : Fragment(R.layout.fragment_signup) {
 
-    private val binding: FragmentSignupBinding by viewBinding()
+    private val binding by viewBinding<FragmentSignupBinding>()
+    private val viewModel by viewModels<SignupViewModel>()
+
+    private val actionObserver = Observer<Action> {
+        when (it) {
+            is Action.Error -> toast { it.message }
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -25,6 +30,8 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
         binding.signUpButton.setOnClickListener {
             signUp()
         }
+
+        observe(viewModel.viewStateLiveData, actionObserver)
     }
 
     private fun signUp() {
@@ -40,26 +47,11 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
             return
         }
 
-        lifecycleScope.launch {
-            val result = ApiRepository.signup(
-                binding.nameTextView.text.toString(),
-                binding.displayNameTextView.text.toString(),
-                binding.passwordTextView.text.toString()
-            )
-
-            if (result is SignupResponseModel) {
-                val navDirections = SignupFragmentDirections.actionSignupFragmentToConversationsFragment(
-                    result.user,
-                    result.users.toTypedArray(),
-                    result.conversations.toTypedArray(),
-                    result.token
-                )
-
-                findNavController().navigate(navDirections)
-            } else if (result is ErrorResponseModel) {
-                toast { "${result.title + result.detail}" }
-            }
-        }
+        viewModel.signUp(
+            binding.nameTextView.text.toString(),
+            binding.displayNameTextView.text.toString(),
+            binding.passwordTextView.text.toString()
+        )
     }
 
     private fun updateTextView(textView: TextView, errorMessage: String) {

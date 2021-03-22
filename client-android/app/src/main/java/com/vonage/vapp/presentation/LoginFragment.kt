@@ -4,19 +4,24 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import com.vonage.vapp.R
-import com.vonage.vapp.data.ApiRepository
-import com.vonage.vapp.data.model.ErrorResponseModel
-import com.vonage.vapp.data.model.LoginResponseModel
+import com.vonage.vapp.core.delegate.viewBinding
+import com.vonage.vapp.core.ext.observe
+import com.vonage.vapp.core.ext.toast
 import com.vonage.vapp.databinding.FragmentLoginBinding
-import com.vonage.vapp.utils.toast
-import com.vonage.vapp.utils.viewBinding
-import kotlinx.coroutines.launch
+import com.vonage.vapp.presentation.LoginViewModel.Action
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
-    private val binding: FragmentLoginBinding by viewBinding()
+    private val binding by viewBinding<FragmentLoginBinding>()
+    private val viewModel by viewModels<LoginViewModel>()
+
+    private val actionObserver = Observer<Action> {
+        when (it) {
+            is Action.Error -> toast { it.message }
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -24,15 +29,12 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         binding.loginButton.setOnClickListener {
             login()
         }
-        binding.loginButton.setOnClickListener {
-            login()
-        }
 
         binding.signupButton.setOnClickListener {
-            findNavController().navigate(R.id.action_loginFragment_to_SignupFragment)
+            viewModel.navigateToSignup()
         }
 
-        login()
+        observe(viewModel.viewStateLiveData, actionObserver)
     }
 
     private fun login() {
@@ -43,25 +45,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             return
         }
 
-        lifecycleScope.launch {
-            val result = ApiRepository.login(
-                binding.nameTextView.text.toString(),
-                binding.passwordTextView.text.toString()
-            )
-
-            if (result is LoginResponseModel) {
-                val navDirections = LoginFragmentDirections.actionLoginFragmentToConversationsFragment(
-                    result.user,
-                    result.users.toTypedArray(),
-                    result.conversations.toTypedArray(),
-                    result.token
-                )
-
-                findNavController().navigate(navDirections)
-            } else if (result is ErrorResponseModel) {
-                toast { "${result.title + result.detail}" }
-            }
-        }
+        viewModel.login(binding.nameTextView.text.toString(), binding.passwordTextView.text.toString())
     }
 
     private fun updateTextView(textView: TextView, errorMessage: String) {
