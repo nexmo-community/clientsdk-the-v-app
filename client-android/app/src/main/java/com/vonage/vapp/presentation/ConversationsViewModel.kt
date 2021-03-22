@@ -15,7 +15,7 @@ import com.vonage.vapp.data.model.GetConversationsResponseModel
 import com.vonage.vapp.data.model.User
 import kotlinx.coroutines.launch
 
-class ConversationViewModel : ViewModel() {
+class ConversationsViewModel : ViewModel() {
 
     // should be injected
     private val client = NexmoClient.get()
@@ -88,7 +88,7 @@ class ConversationViewModel : ViewModel() {
             val result = apiRepository.getConversations()
 
             if (result is GetConversationsResponseModel) {
-                this@ConversationViewModel.conversations = result.conversations.toMutableList()
+                this@ConversationsViewModel.conversations = result.conversations.toMutableList()
                 val conversation = Action.ShowContent(conversations)
                 viewStateMutableLiveData.postValue(conversation)
             } else if (result is ErrorResponseModel) {

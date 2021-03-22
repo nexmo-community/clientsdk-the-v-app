@@ -14,13 +14,13 @@ import com.vonage.vapp.core.ext.observe
 import com.vonage.vapp.core.ext.toast
 import com.vonage.vapp.data.model.User
 import com.vonage.vapp.databinding.FragmentConversationsBinding
-import com.vonage.vapp.presentation.ConversationViewModel.Action
+import com.vonage.vapp.presentation.ConversationsViewModel.Action
 
 class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
 
     private val binding by viewBinding<FragmentConversationsBinding>()
     private val navArgs by navArgs<ConversationsFragmentArgs>()
-    private val viewModel by viewModels<ConversationViewModel>()
+    private val viewModel by viewModels<ConversationsViewModel>()
 
     private val conversationAdapter = ConversationAdapter()
 
