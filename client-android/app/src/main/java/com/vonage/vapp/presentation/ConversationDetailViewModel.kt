@@ -115,7 +115,7 @@ class ConversationDetailViewModel : ViewModel() {
     }
 
     private fun getConversationLine(textEvent: NexmoTextEvent): String {
-        val user = textEvent.fromMember.user.name
+        val user = textEvent.fromMember.user.displayName
         return "$user said: ${textEvent.text}"
     }
 
