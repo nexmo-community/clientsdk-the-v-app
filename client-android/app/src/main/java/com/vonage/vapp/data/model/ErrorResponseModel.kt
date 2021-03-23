@@ -7,5 +7,5 @@ data class ErrorResponseModel(
     @field:Json(name = "title") val title: String,
     @field:Json(name = "detail") val detail: String,
 ) {
-    val fullMessage = "$title - $detail"
+    val fullMessage get() = "$title - $detail"
 }
