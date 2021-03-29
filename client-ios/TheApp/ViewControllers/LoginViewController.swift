@@ -35,7 +35,6 @@ class LoginViewController: UIViewController, LoadingViewController {
         title = "The V App"
         setUpView()
         setUpConstraints()
-        skipLogin()
     }
     
     private func setUpView() {

@@ -15,6 +15,7 @@ class ChatViewController: UIViewController, LoadingViewController {
         let textView = UITextView()
         textView.backgroundColor = .gray
         textView.translatesAutoresizingMaskIntoConstraints = false
+        textView.isEditable = false
         return textView
     }()
     
