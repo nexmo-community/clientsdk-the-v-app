@@ -107,7 +107,8 @@ class ConversationDetailViewModel : ViewModel() {
                 line
             } ?: listOf()
 
-        viewStateMutableLiveData.postValue(Action.SetConversation(lines.joinToString(separator = System.lineSeparator())))
+        val linesString = lines.joinToString(separator = System.lineSeparator(), postfix = System.lineSeparator())
+        viewStateMutableLiveData.postValue(Action.SetConversation(linesString))
     }
 
     private fun getUserDisplayName(userId: String): String {
@@ -115,7 +116,7 @@ class ConversationDetailViewModel : ViewModel() {
     }
 
     private fun getConversationLine(textEvent: NexmoTextEvent): String {
-        val user = textEvent.fromMember.user.name
+        val user = textEvent.fromMember.user.displayName
         return "$user said: ${textEvent.text}"
     }
 

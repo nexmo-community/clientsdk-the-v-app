@@ -6,7 +6,7 @@
         app:startDestination="@id/loginFragment">
 
     <fragment
-            android:id="@+id/SignupFragment"
+            android:id="@+id/signupFragment"
             android:name="com.vonage.vapp.presentation.SignupFragment"
             tools:layout="@layout/fragment_signup">
 
@@ -46,6 +46,19 @@
         <argument
                 android:name="token"
                 app:argType="string" />
+    </fragment>
+    <fragment
+            android:id="@+id/loginFragment"
+            android:name="com.vonage.vapp.presentation.LoginFragment"
+            android:label="LoginFragment"
+            tools:layout="@layout/fragment_login">
+        <action
+                android:id="@+id/action_loginFragment_to_conversationsFragment"
+                app:destination="@id/conversationsFragment" />
+
+        <action
+                android:id="@+id/action_loginFragment_to_SignupFragment"
+                app:destination="@id/signupFragment" />
     </fragment>
     <fragment
             android:id="@+id/loginFragment"

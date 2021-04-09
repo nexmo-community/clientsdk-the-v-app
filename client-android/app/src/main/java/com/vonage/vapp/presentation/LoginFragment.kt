@@ -35,8 +35,6 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         }
 
         observe(viewModel.viewStateLiveData, actionObserver)
-
-//        login()
     }
 
     private fun login() {

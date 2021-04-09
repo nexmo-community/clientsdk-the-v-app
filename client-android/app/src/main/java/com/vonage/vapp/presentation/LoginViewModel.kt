@@ -31,7 +31,7 @@ class LoginViewModel : ViewModel() {
                 val navDirections = LoginFragmentDirections.actionLoginFragmentToConversationsFragment(
                     result.user,
                     result.users.toTypedArray(),
-                    result.conversations.filterNotNull().toTypedArray(),
+                    result.conversations.toTypedArray(),
                     result.token
                 )
 
