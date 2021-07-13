@@ -108,6 +108,8 @@ object ApiRepository {
         }
     }
 
-    private suspend fun getErrorResponseModel(response: Response<*>): ErrorResponseModel? =
-        moshi.adapter(ErrorResponseModel::class.java).fromJson(response.errorBody()?.source())
+    private suspend fun getErrorResponseModel(response: Response<*>): ErrorResponseModel? {
+        val source = response.errorBody()?.source() ?: return null
+        return moshi.adapter(ErrorResponseModel::class.java).fromJson(source)
+    }
 }
