@@ -31,7 +31,8 @@ class LoginViewModel : ViewModel() {
                 val navDirections = LoginFragmentDirections.actionLoginFragmentToMainFragment(
                     result.user,
                     result.users.toTypedArray(),
-                    result.conversations.toTypedArray(),
+                    // filterNotNull() is used due to API bug
+                    result.conversations.filterNotNull().toTypedArray(),
                     result.token
                 )
 

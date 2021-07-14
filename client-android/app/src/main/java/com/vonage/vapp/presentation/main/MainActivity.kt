@@ -3,6 +3,7 @@ package com.vonage.vapp.presentation.main
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.nexmo.client.NexmoClient
+import com.squareup.moshi.Moshi
 import com.vonage.vapp.R
 import com.vonage.vapp.core.NavManager
 import com.vonage.vapp.core.ext.navigateSafe
