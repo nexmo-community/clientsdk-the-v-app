@@ -1,9 +1,8 @@
-package com.vonage.vapp.presentation
+package com.vonage.vapp.presentation.converstion
 
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -15,7 +14,7 @@ import com.vonage.vapp.core.ext.observe
 import com.vonage.vapp.core.ext.toast
 import com.vonage.vapp.data.model.User
 import com.vonage.vapp.databinding.FragmentConversationsBinding
-import com.vonage.vapp.presentation.ConversationsViewModel.Action
+import com.vonage.vapp.presentation.converstion.ConversationsViewModel.Action
 
 class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
 
@@ -35,7 +34,7 @@ class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
                 binding.contentContainer.visibility = View.VISIBLE
             }
             is Action.SelectUsers -> showUserSelectionDialog()
-            Action.ShowLoading -> binding.progressBar.visibility = View.VISIBLE
+            is Action.ShowLoading -> binding.progressBar.visibility = View.VISIBLE
             is Action.ShowError -> toast { it.message }
         }
     }
@@ -51,7 +50,7 @@ class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
         }
 
         conversationAdapter.setOnClickListener {
-            viewModel.navigateToConversation(it)
+            viewModel.navigateToConversationDetail(it)
         }
 
         binding.addFab.setOnClickListener {
@@ -63,7 +62,7 @@ class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
             viewModel.loadConversations()
         }
 
-        observe(viewModel.viewStateLiveData, actionObserver)
+        observe(viewModel.viewActionLiveData, actionObserver)
         viewModel.initClient(navArgs)
     }
 
@@ -82,10 +81,6 @@ class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
                 } else {
                     selectedUsers.remove(user)
                 }
-            }
-
-            builder.setOnDismissListener {
-                binding.addFab.isVisible = true
             }
 
             builder.setPositiveButton("OK") { _, _ ->

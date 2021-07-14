@@ -1,11 +1,10 @@
-package com.vonage.vapp.presentation
+package com.vonage.vapp.presentation.converstion
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexmo.client.NexmoClient
 import com.nexmo.client.request_listener.NexmoConnectionListener
-import com.vonage.vapp.core.NavManager
 import com.vonage.vapp.core.ext.asLiveData
 import com.vonage.vapp.data.ApiRepository
 import com.vonage.vapp.data.model.Conversation
@@ -24,38 +23,22 @@ class ConversationsViewModel : ViewModel() {
     private var conversations = mutableListOf<Conversation>()
     private var allUsers = listOf<User>()
 
-    private val viewStateMutableLiveData = MutableLiveData<Action>()
-    val viewStateLiveData = viewStateMutableLiveData.asLiveData()
+    private val viewActionMutableLiveData = MutableLiveData<Action>()
+    val viewActionLiveData = viewActionMutableLiveData.asLiveData()
 
     fun initClient(navArgs: ConversationsFragmentArgs) {
+        this.conversations = navArgs.conversaions.toMutableList()
+        this.allUsers = navArgs.allUsers.toList()
 
-        this.conversations = navArgs.conversations.toMutableList()
-        this.allUsers = (navArgs.users + navArgs.user).toList()
-
-
-        if (!client.isConnected) {
-            viewStateMutableLiveData.postValue(Action.ShowLoading)
-
-            client.setConnectionListener { newConnectionStatus, _ ->
-
-                if (newConnectionStatus == NexmoConnectionListener.ConnectionStatus.CONNECTED) {
-                    val conversation = Action.ShowContent(navArgs.conversations.toList())
-                    viewStateMutableLiveData.postValue(conversation)
-                }
-
-                return@setConnectionListener
-            }
-        }
-
-        client.login(navArgs.token)
+        viewActionMutableLiveData.postValue(Action.ShowContent(conversations))
     }
 
     fun createConversation() {
-        viewStateMutableLiveData.postValue(Action.SelectUsers)
+        viewActionMutableLiveData.postValue(Action.SelectUsers)
     }
 
     fun createConversation(users: Set<User>) {
-        viewStateMutableLiveData.postValue(Action.ShowLoading)
+        viewActionMutableLiveData.postValue(Action.ShowLoading)
 
         viewModelScope.launch {
             val userIds = users.map { it.id }.toSet()
@@ -63,26 +46,26 @@ class ConversationsViewModel : ViewModel() {
 
             if (result is CreateConversationResponseModel) {
                 conversations.add(result.conversation)
-                viewStateMutableLiveData.postValue(Action.ShowContent(conversations))
+                viewActionMutableLiveData.postValue(Action.ShowContent(conversations))
 
-                navigateToConversation(result.conversation)
+                navigateToConversationDetail(result.conversation)
             } else if (result is ErrorResponseModel) {
-                viewStateMutableLiveData.postValue(Action.ShowError(result.fullMessage))
+                viewActionMutableLiveData.postValue(Action.ShowError(result.fullMessage))
             }
         }
     }
 
-    fun navigateToConversation(conversation: Conversation) {
-        val navDirections =
-            ConversationsFragmentDirections.actionConversationsFragmentToConversationDetailFragment(
-                conversation,
-                allUsers.toTypedArray()
-            )
-        NavManager.navigate(navDirections)
+    fun navigateToConversationDetail(conversation: Conversation) {
+//        val navDirections =
+//            ConversationsFragmentDirections.actionConversationsFragmentToConversationDetailFragment(
+//                conversation,
+//                allUsers.toTypedArray()
+//            )
+//        NavManager.navigate(navDirections)
     }
 
     fun loadConversations() {
-        viewStateMutableLiveData.postValue(Action.ShowLoading)
+        viewActionMutableLiveData.postValue(Action.ShowLoading)
 
         viewModelScope.launch {
             val result = apiRepository.getConversations()
@@ -90,9 +73,9 @@ class ConversationsViewModel : ViewModel() {
             if (result is GetConversationsResponseModel) {
                 this@ConversationsViewModel.conversations = result.conversations.toMutableList()
                 val conversation = Action.ShowContent(conversations)
-                viewStateMutableLiveData.postValue(conversation)
+                viewActionMutableLiveData.postValue(conversation)
             } else if (result is ErrorResponseModel) {
-                viewStateMutableLiveData.postValue(Action.ShowError(result.fullMessage))
+                viewActionMutableLiveData.postValue(Action.ShowError(result.fullMessage))
             }
         }
     }

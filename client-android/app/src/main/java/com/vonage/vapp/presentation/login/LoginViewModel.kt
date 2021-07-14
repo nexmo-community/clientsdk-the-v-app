@@ -1,4 +1,4 @@
-package com.vonage.vapp.presentation
+package com.vonage.vapp.presentation.login
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,8 +15,8 @@ class LoginViewModel : ViewModel() {
     private val apiRepository = ApiRepository
     private val navManager = NavManager
 
-    private val viewStateMutableLiveData = MutableLiveData<Action>()
-    val viewStateLiveData = viewStateMutableLiveData.asLiveData()
+    private val viewActionMutableLiveData = MutableLiveData<Action>()
+    val viewActionLiveData = viewActionMutableLiveData.asLiveData()
 
     fun navigateToSignup() {
         val navDirections = LoginFragmentDirections.actionLoginFragmentToSignupFragment()
@@ -28,7 +28,7 @@ class LoginViewModel : ViewModel() {
             val result = apiRepository.login(name, password)
 
             if (result is LoginResponseModel) {
-                val navDirections = LoginFragmentDirections.actionLoginFragmentToConversationsFragment(
+                val navDirections = LoginFragmentDirections.actionLoginFragmentToMainFragment(
                     result.user,
                     result.users.toTypedArray(),
                     result.conversations.toTypedArray(),
@@ -37,7 +37,7 @@ class LoginViewModel : ViewModel() {
 
                 navManager.navigate(navDirections)
             } else if (result is ErrorResponseModel) {
-                viewStateMutableLiveData.postValue(Action.Error(result.fullMessage))
+                viewActionMutableLiveData.postValue(Action.Error(result.fullMessage))
             }
         }
     }

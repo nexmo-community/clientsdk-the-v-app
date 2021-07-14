@@ -1,4 +1,4 @@
-package com.vonage.vapp.presentation
+package com.vonage.vapp.presentation.main
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
