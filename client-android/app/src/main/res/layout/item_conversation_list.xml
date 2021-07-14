@@ -7,7 +7,7 @@
         android:clickable="true"
         android:focusable="true"
         android:gravity="center_horizontal"
-        android:background="@android:color/transparent"
+        android:background="#CCFFCC"
         android:layout_marginBottom="10dp"
         android:orientation="vertical">
 

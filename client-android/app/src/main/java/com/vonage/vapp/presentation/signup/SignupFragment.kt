@@ -1,4 +1,4 @@
-package com.vonage.vapp.presentation
+package com.vonage.vapp.presentation.signup
 
 import android.os.Bundle
 import android.view.View
@@ -10,12 +10,13 @@ import com.vonage.vapp.R
 import com.vonage.vapp.core.delegate.viewBinding
 import com.vonage.vapp.core.ext.observe
 import com.vonage.vapp.core.ext.toast
-import com.vonage.vapp.databinding.FragmentLoginBinding
-import com.vonage.vapp.presentation.LoginViewModel.Action
+import com.vonage.vapp.databinding.FragmentSignupBinding
+import com.vonage.vapp.presentation.signup.SignupViewModel.Action
 
-class LoginFragment : Fragment(R.layout.fragment_login) {
-    private val binding by viewBinding<FragmentLoginBinding>()
-    private val viewModel by viewModels<LoginViewModel>()
+class SignupFragment : Fragment(R.layout.fragment_signup) {
+
+    private val binding by viewBinding<FragmentSignupBinding>()
+    private val viewModel by viewModels<SignupViewModel>()
 
     private val actionObserver = Observer<Action> {
         when (it) {
@@ -26,26 +27,31 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.loginButton.setOnClickListener {
-            login()
+        binding.signUpButton.setOnClickListener {
+            signUp()
         }
 
-        binding.signupButton.setOnClickListener {
-            viewModel.navigateToSignup()
-        }
-
-        observe(viewModel.viewStateLiveData, actionObserver)
+        observe(viewModel.viewActionLiveData, actionObserver)
     }
 
-    private fun login() {
+    private fun signUp() {
+
         updateTextView(binding.nameTextView, "Enter name")
+        updateTextView(binding.displayNameTextView, "Enter display name")
         updateTextView(binding.passwordTextView, "Enter password")
 
-        if (binding.nameTextView.error != null || binding.passwordTextView.error != null) {
+        if (binding.nameTextView.error != null
+            || binding.displayNameTextView.error != null
+            || binding.passwordTextView.error != null
+        ) {
             return
         }
 
-        viewModel.login(binding.nameTextView.text.toString(), binding.passwordTextView.text.toString())
+        viewModel.signUp(
+            binding.nameTextView.text.toString(),
+            binding.displayNameTextView.text.toString(),
+            binding.passwordTextView.text.toString()
+        )
     }
 
     private fun updateTextView(textView: TextView, errorMessage: String) {

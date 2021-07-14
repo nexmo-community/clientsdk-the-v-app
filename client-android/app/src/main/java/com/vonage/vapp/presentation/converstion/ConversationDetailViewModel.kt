@@ -1,4 +1,4 @@
-package com.vonage.vapp.presentation
+package com.vonage.vapp.presentation.converstion
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -28,8 +28,8 @@ class ConversationDetailViewModel : ViewModel() {
     private val client = NexmoClient.get()
     private val adiRepository = ApiRepository
 
-    private val viewStateMutableLiveData = MutableLiveData<Action>()
-    val viewStateLiveData = viewStateMutableLiveData.asLiveData()
+    private val viewActionMutableLiveData = MutableLiveData<Action>()
+    val viewActionLiveData = viewActionMutableLiveData.asLiveData()
 
     private var nexmoConversation: NexmoConversation? = null
     private var users = listOf<User>()
@@ -51,15 +51,15 @@ class ConversationDetailViewModel : ViewModel() {
         override fun onDeliveredReceipt(deliveredEvent: NexmoDeliveredEvent) {}
     }
 
-    fun initClient(navArgs: ConversationDetailFragmentArgs) {
-        this.users = navArgs.users.toList()
-
-        getConversation(navArgs.conversaion.id)
-        getNexmoConversation(navArgs.conversaion.id)
-    }
+//    fun initClient(navArgs: ConversationDetailFragmentArgs) {
+//        this.users = navArgs.users.toList()
+//
+//        getConversation(navArgs.conversaion.id)
+//        getNexmoConversation(navArgs.conversaion.id)
+//    }
 
     private fun getNexmoConversation(conversationId: String) {
-        viewStateMutableLiveData.postValue(Action.Loading)
+        viewActionMutableLiveData.postValue(Action.Loading)
 
         client.getConversation(conversationId, object : NexmoRequestListener<NexmoConversation> {
             override fun onSuccess(conversation: NexmoConversation?) {
@@ -70,13 +70,13 @@ class ConversationDetailViewModel : ViewModel() {
 
             override fun onError(apiError: NexmoApiError) {
                 this@ConversationDetailViewModel.nexmoConversation = null
-                viewStateMutableLiveData.postValue(Action.Error("NexmoConversation load error"))
+                viewActionMutableLiveData.postValue(Action.Error("NexmoConversation load error"))
             }
         })
     }
 
     private fun getConversation(conversationId: String) {
-        viewStateMutableLiveData.postValue(Action.Loading)
+        viewActionMutableLiveData.postValue(Action.Loading)
 
         viewModelScope.launch {
             val result = adiRepository.getConversation(conversationId)
@@ -85,7 +85,7 @@ class ConversationDetailViewModel : ViewModel() {
                 val events = result.conversation?.events ?: listOf()
                 displayConversationEvents(events)
             } else if (result is ErrorResponseModel) {
-                viewStateMutableLiveData.postValue(Action.Error(result.fullMessage))
+                viewActionMutableLiveData.postValue(Action.Error(result.fullMessage))
             }
         }
     }
@@ -108,7 +108,7 @@ class ConversationDetailViewModel : ViewModel() {
             } ?: listOf()
 
         val linesString = lines.joinToString(separator = System.lineSeparator(), postfix = System.lineSeparator())
-        viewStateMutableLiveData.postValue(Action.SetConversation(linesString))
+        viewActionMutableLiveData.postValue(Action.SetConversation(linesString))
     }
 
     private fun getUserDisplayName(userId: String): String {
@@ -121,7 +121,7 @@ class ConversationDetailViewModel : ViewModel() {
     }
 
     private fun addConversationLine(line: String?) {
-        viewStateMutableLiveData.postValue(Action.AddConversationLine(line + System.lineSeparator()))
+        viewActionMutableLiveData.postValue(Action.AddConversationLine(line + System.lineSeparator()))
     }
 
     fun sendMessage(message: String) {
@@ -130,7 +130,7 @@ class ConversationDetailViewModel : ViewModel() {
             }
 
             override fun onError(apiError: NexmoApiError) {
-                viewStateMutableLiveData.postValue(Action.Error(apiError.message))
+                viewActionMutableLiveData.postValue(Action.Error(apiError.message))
             }
         })
     }
