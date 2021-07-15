@@ -11,6 +11,10 @@ import com.vonage.vapp.core.delegate.viewBinding
 import com.vonage.vapp.core.ext.observe
 import com.vonage.vapp.core.ext.toast
 import com.vonage.vapp.databinding.FragmentConversationDetailBinding
+import com.vonage.vapp.presentation.converstion.ConversationDetailViewModel.Action.AddConversationLine
+import com.vonage.vapp.presentation.converstion.ConversationDetailViewModel.Action.Error
+import com.vonage.vapp.presentation.converstion.ConversationDetailViewModel.Action.Loading
+import com.vonage.vapp.presentation.converstion.ConversationDetailViewModel.Action.SetConversation
 
 class ConversationDetailFragment : Fragment(R.layout.fragment_conversation_detail) {
     private val client: NexmoClient = NexmoClient.get()
@@ -24,13 +28,13 @@ class ConversationDetailFragment : Fragment(R.layout.fragment_conversation_detai
         binding.contentContainer.visibility = View.INVISIBLE
 
         when (it) {
-            is ConversationDetailViewModel.Action.Error -> toast { it.message }
-            is ConversationDetailViewModel.Action.Loading -> binding.progressBar.visibility = View.VISIBLE
-            is ConversationDetailViewModel.Action.AddConversationLine -> {
+            is Error -> toast { it.message }
+            is Loading -> binding.progressBar.visibility = View.VISIBLE
+            is AddConversationLine -> {
                 binding.contentContainer.visibility = View.VISIBLE
                 binding.conversationEventsTextView.append(it.line)
             }
-            is ConversationDetailViewModel.Action.SetConversation -> {
+            is SetConversation -> {
                 binding.contentContainer.visibility = View.VISIBLE
                 binding.conversationEventsTextView.text = it.conversation
             }

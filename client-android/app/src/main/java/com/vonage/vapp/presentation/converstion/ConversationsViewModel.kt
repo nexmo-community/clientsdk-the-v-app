@@ -4,7 +4,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexmo.client.NexmoClient
-import com.nexmo.client.request_listener.NexmoConnectionListener
 import com.vonage.vapp.core.ext.asLiveData
 import com.vonage.vapp.data.ApiRepository
 import com.vonage.vapp.data.model.Conversation
@@ -26,7 +25,7 @@ class ConversationsViewModel : ViewModel() {
     private val viewActionMutableLiveData = MutableLiveData<Action>()
     val viewActionLiveData = viewActionMutableLiveData.asLiveData()
 
-    fun initClient(navArgs: ConversationsFragmentArgs) {
+    fun init(navArgs: ConversationsFragmentArgs) {
         this.conversations = navArgs.conversaions.toMutableList()
         this.allUsers = navArgs.allUsers.toList()
 

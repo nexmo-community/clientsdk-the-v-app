@@ -15,6 +15,10 @@ import com.vonage.vapp.core.ext.toast
 import com.vonage.vapp.data.model.User
 import com.vonage.vapp.databinding.FragmentConversationsBinding
 import com.vonage.vapp.presentation.converstion.ConversationsViewModel.Action
+import com.vonage.vapp.presentation.converstion.ConversationsViewModel.Action.SelectUsers
+import com.vonage.vapp.presentation.converstion.ConversationsViewModel.Action.ShowContent
+import com.vonage.vapp.presentation.converstion.ConversationsViewModel.Action.ShowError
+import com.vonage.vapp.presentation.converstion.ConversationsViewModel.Action.ShowLoading
 
 class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
 
@@ -29,18 +33,21 @@ class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
         binding.contentContainer.visibility = View.INVISIBLE
 
         when (it) {
-            is Action.ShowContent -> {
+            is ShowContent -> {
                 conversationAdapter.setConversations(it.conversations)
                 binding.contentContainer.visibility = View.VISIBLE
             }
-            is Action.SelectUsers -> showUserSelectionDialog()
-            is Action.ShowLoading -> binding.progressBar.visibility = View.VISIBLE
-            is Action.ShowError -> toast { it.message }
+            is SelectUsers -> showUserSelectionDialog()
+            is ShowLoading -> binding.progressBar.visibility = View.VISIBLE
+            is ShowError -> toast { it.message }
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        observe(viewModel.viewActionLiveData, actionObserver)
+        viewModel.init(navArgs)
 
         binding.recyclerView.apply {
             setHasFixedSize(true)
@@ -61,9 +68,6 @@ class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
             binding.swipeRefreshLayout.isRefreshing = false
             viewModel.loadConversations()
         }
-
-        observe(viewModel.viewActionLiveData, actionObserver)
-        viewModel.initClient(navArgs)
     }
 
     private fun showUserSelectionDialog() {
