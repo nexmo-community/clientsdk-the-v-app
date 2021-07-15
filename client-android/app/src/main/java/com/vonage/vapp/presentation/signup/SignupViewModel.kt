@@ -25,9 +25,8 @@ class SignupViewModel : ViewModel() {
             if (result is SignupResponseModel) {
                 val navDirections = SignupFragmentDirections.actionSignupFragmentToMainFragment(
                     result.user,
-                    result.users.toTypedArray(),
-                    // filterNotNull() is used due to API bug
-                    result.conversations.filterNotNull().toTypedArray(),
+                    result.otherUsers.toTypedArray(),
+                    result.conversations.toTypedArray(),
                     result.token
                 )
 

@@ -25,10 +25,8 @@ class MainViewModel : ViewModel() {
 
     fun initClient(navArgs: MainFragmentArgs) {
 
-        // distinctBy is used because of API bug where duplicated items are returned
-        this.conversations = navArgs.conversations.distinctBy { it.id }.toMutableList()
-        this.allUsers = (navArgs.otherUsers + navArgs.user).distinctBy { it.id }.toList()
-        this.otherUsers = navArgs.otherUsers.distinctBy { it.id }.toList()
+        this.conversations = navArgs.conversations.toMutableList()
+        this.otherUsers = navArgs.otherUsers.toList()
 
         if (!client.isConnected) {
             viewActionMutableLiveData.postValue(Action.ShowLoading)
