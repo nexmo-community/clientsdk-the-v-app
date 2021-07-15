@@ -4,58 +4,51 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
+import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.vonage.vapp.R
 import com.vonage.vapp.core.delegate.viewBinding
+import com.vonage.vapp.core.ext.observe
 import com.vonage.vapp.databinding.FragmentUsersBinding
-import com.vonage.vapp.presentation.converstion.ConversationAdapter
+import com.vonage.vapp.presentation.user.UsersViewModel.Action
+import com.vonage.vapp.presentation.user.UsersViewModel.Action.ShowContent
 
 class UsersFragment : Fragment(R.layout.fragment_users) {
 
     private val binding by viewBinding<FragmentUsersBinding>()
-//    private val navArgs by navArgs<UsersFragmentArgs>()
+    private val navArgs by navArgs<UsersFragmentArgs>()
     private val viewModel by viewModels<UsersViewModel>()
 
-    private val conversationAdapter = ConversationAdapter()
+    private val userAdapter = UserAdapter()
 
-//    private val actionObserver = Observer<Action> {
-//        binding.progressBar.visibility = View.INVISIBLE
-//        binding.contentContainer.visibility = View.INVISIBLE
-//
-//        when (it) {
-//            is Action.ShowContent -> {
-//                conversationAdapter.setConversations(it.conversations)
-//                binding.contentContainer.visibility = View.VISIBLE
-//            }
-//            is Action.SelectUsers -> showUserSelectionDialog()
-//            Action.ShowLoading -> binding.progressBar.visibility = View.VISIBLE
-//            is Action.ShowError -> toast { it.message }
-//        }
-//    }
+    private val actionObserver = Observer<Action> {
+        binding.progressBar.visibility = View.INVISIBLE
+        binding.contentContainer.visibility = View.INVISIBLE
+
+        when (it) {
+            is ShowContent -> {
+                userAdapter.setUsers(it.users)
+                binding.contentContainer.visibility = View.VISIBLE
+            }
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        binding.recyclerView.apply {
-//            setHasFixedSize(true)
-//
-//            layoutManager = LinearLayoutManager(this.context)
-//            adapter = conversationAdapter
-//        }
-//
-//        conversationAdapter.setOnClickListener {
-//            viewModel.navigateToConversation(it)
-//        }
-//
-//        binding.addFab.setOnClickListener {
-//            viewModel.createConversation()
-//        }
-//
-//        binding.swipeRefreshLayout.setOnRefreshListener {
-//            binding.swipeRefreshLayout.isRefreshing = false
-//            viewModel.loadConversations()
-//        }
-//
-//        observe(viewModel.viewActionLiveData, actionObserver)
-//        viewModel.initClient(navArgs)
+        observe(viewModel.viewActionLiveData, actionObserver)
+        viewModel.init(navArgs)
+
+        binding.recyclerView.apply {
+            setHasFixedSize(true)
+
+            layoutManager = LinearLayoutManager(this.context)
+            adapter = userAdapter
+        }
+
+        userAdapter.setOnClickListener {
+            viewModel.navigateToUserDetail(it)
+        }
     }
 }

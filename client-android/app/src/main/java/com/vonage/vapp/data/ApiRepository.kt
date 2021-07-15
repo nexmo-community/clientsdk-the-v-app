@@ -9,6 +9,7 @@ import com.vonage.vapp.data.model.GetConversationResponseModel
 import com.vonage.vapp.data.model.GetConversationsResponseModel
 import com.vonage.vapp.data.model.LoginRequestModel
 import com.vonage.vapp.data.model.SignupRequestModel
+import com.vonage.vapp.data.model.User
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
@@ -49,9 +50,9 @@ object ApiRepository {
             var body = response.body()?.let {
                 it.copy(
                     // filterNotNull() is used due to API bug
-                    conversations = it.conversations.filterNotNull().toMutableList(),
+                    conversations = it.conversations.filterNotNull(),
                     // distinctBy is used because of API bug where duplicated items are returned
-                    otherUsers = it.otherUsers.distinctBy { it.id }.toList()
+                    otherUsers = it.otherUsers.distinctBy { it.id }
                 )
             }
 
@@ -69,11 +70,14 @@ object ApiRepository {
 
         return if (response.isSuccessful) {
             var body = response.body()?.let {
+                val addedUsers = it.otherUsers.distinctBy { it.id }.toMutableList()
+                addedUsers.add(User("Jan DN", "if", "Jan"))
+
                 it.copy(
                     // filterNotNull() is used due to API bug
-                    conversations = it.conversations.filterNotNull().toMutableList(),
+                    conversations = it.conversations.filterNotNull(),
                     // distinctBy is used because of API bug where duplicated items are returned
-                    otherUsers = it.otherUsers.distinctBy { it.id }.toList()
+                    otherUsers = addedUsers
                 )
             }
 
