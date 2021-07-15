@@ -68,13 +68,13 @@ class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
 
     private fun showUserSelectionDialog() {
         context?.let { context ->
-            val userNames = navArgs.users.map { it.displayName }.toTypedArray()
+            val userNames = navArgs.otherUsers.map { it.displayName }.toTypedArray()
             val selectedUsers = mutableSetOf<User>()
 
             val builder: AlertDialog.Builder = AlertDialog.Builder(context)
             builder.setTitle("Select users")
             builder.setMultiChoiceItems(userNames, null) { _, index, checked ->
-                val user = navArgs.users[index]
+                val user = navArgs.otherUsers[index]
 
                 if (checked) {
                     selectedUsers.add(user)

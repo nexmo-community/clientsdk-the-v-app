@@ -60,7 +60,7 @@
                 app:argType="com.vonage.vapp.data.model.Conversation[]" />
 
         <argument
-                android:name="users"
+                android:name="otherUsers"
                 app:argType="com.vonage.vapp.data.model.User[]" />
 
         <argument
