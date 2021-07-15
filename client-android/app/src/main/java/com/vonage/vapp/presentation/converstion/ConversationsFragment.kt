@@ -9,7 +9,6 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.vonage.vapp.R
-import com.vonage.vapp.core.delegate.viewBinding
 import com.vonage.vapp.core.ext.observe
 import com.vonage.vapp.core.ext.toast
 import com.vonage.vapp.data.model.User
@@ -19,6 +18,7 @@ import com.vonage.vapp.presentation.converstion.ConversationsViewModel.Action.Se
 import com.vonage.vapp.presentation.converstion.ConversationsViewModel.Action.ShowContent
 import com.vonage.vapp.presentation.converstion.ConversationsViewModel.Action.ShowError
 import com.vonage.vapp.presentation.converstion.ConversationsViewModel.Action.ShowLoading
+import com.vonage.vapp.utils.viewBinding
 
 class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
 
