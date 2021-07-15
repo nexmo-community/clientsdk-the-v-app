@@ -66,11 +66,26 @@
         <argument
                 android:name="allUsers"
                 app:argType="com.vonage.vapp.data.model.User[]" />
+        <action
+                android:id="@+id/action_conversationsFragment_to_conversationDetailFragment"
+                app:destination="@id/conversationDetailFragment" />
 
     </fragment>
     <fragment
             android:id="@+id/usersFragment"
             android:name="com.vonage.vapp.presentation.user.UsersFragment"
-            android:label="UsersFragment" />
+            android:label="UsersFragment" >
+        <action
+                android:id="@+id/action_usersFragment_to_userDetailFragment"
+                app:destination="@id/userDetailFragment" />
+    </fragment>
+    <fragment
+            android:id="@+id/conversationDetailFragment"
+            android:name="com.vonage.vapp.presentation.converstion.ConversationDetailFragment"
+            android:label="ConversationDetailFragment" />
+    <fragment
+            android:id="@+id/userDetailFragment"
+            android:name="com.vonage.vapp.presentation.user.UserDetailFragment"
+            android:label="UserDetailFragment" />
 
 </navigation>
