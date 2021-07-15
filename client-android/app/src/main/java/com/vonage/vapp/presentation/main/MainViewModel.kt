@@ -56,12 +56,8 @@ class MainViewModel : ViewModel() {
     }
 
     fun navigateToUsers() {
-//        val navDirections =
-//            MainFragmentDirections.actionMainFragmentToConversationsFragment(
-//                conversation,
-//                allUsers.toTypedArray()
-//            )
-//        NavManager.navigate(navDirections)
+        val navDirections = MainFragmentDirections.actionMainFragmentToUsersFragment(otherUsers.toTypedArray())
+        NavManager.navigate(navDirections)
     }
 
     sealed class Action {
