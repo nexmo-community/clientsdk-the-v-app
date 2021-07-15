@@ -86,7 +86,16 @@
     <fragment
             android:id="@+id/conversationDetailFragment"
             android:name="com.vonage.vapp.presentation.converstion.ConversationDetailFragment"
-            android:label="ConversationDetailFragment" />
+            android:label="ConversationDetailFragment">
+
+        <argument
+                android:name="conversaion"
+                app:argType="com.vonage.vapp.data.model.Conversation" />
+
+        <argument
+                android:name="allUsers"
+                app:argType="com.vonage.vapp.data.model.User[]" />
+    </fragment>
     <fragment
             android:id="@+id/userDetailFragment"
             android:name="com.vonage.vapp.presentation.user.UserDetailFragment"

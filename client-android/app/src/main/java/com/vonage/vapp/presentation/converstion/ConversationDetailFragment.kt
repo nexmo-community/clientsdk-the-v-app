@@ -5,6 +5,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.navArgs
 import com.nexmo.client.NexmoClient
 import com.vonage.vapp.R
 import com.vonage.vapp.core.delegate.viewBinding
@@ -20,7 +21,7 @@ class ConversationDetailFragment : Fragment(R.layout.fragment_conversation_detai
     private val client: NexmoClient = NexmoClient.get()
 
     private val binding by viewBinding<FragmentConversationDetailBinding>()
-//    private val navArgs by navArgs<ConversationDetailFragmentArgs>()
+    private val navArgs by navArgs<ConversationDetailFragmentArgs>()
     private val viewModel by viewModels<ConversationDetailViewModel>()
 
     private val actionObserver = Observer<ConversationDetailViewModel.Action> {
@@ -45,7 +46,7 @@ class ConversationDetailFragment : Fragment(R.layout.fragment_conversation_detai
         super.onViewCreated(view, savedInstanceState)
 
         observe(viewModel.viewActionLiveData, actionObserver)
-//        viewModel.initClient(navArgs)
+        viewModel.init(navArgs)
 
         binding.sendMessageButton.setOnClickListener {
             val message = binding.messageEditText.text.toString()
