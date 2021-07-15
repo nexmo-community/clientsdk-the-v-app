@@ -91,7 +91,6 @@ class ConversationDetailViewModel : ViewModel() {
     }
 
     private fun displayConversationEvents(events: List<Event>?) {
-
         val lines = events
             ?.distinctBy { it.id } // Remove duplicated events
             ?.sortedBy { it.timestamp } // Sort events

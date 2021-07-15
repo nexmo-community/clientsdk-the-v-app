@@ -7,13 +7,14 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
 import com.vonage.vapp.R
+import com.vonage.vapp.core.BackPressHandler
 import com.vonage.vapp.core.delegate.viewBinding
 import com.vonage.vapp.core.ext.observe
 import com.vonage.vapp.core.ext.toast
 import com.vonage.vapp.databinding.FragmentMainBinding
-import com.vonage.vapp.presentation.main.MainViewModel.*
+import com.vonage.vapp.presentation.main.MainViewModel.Action
 
-class MainFragment : Fragment(R.layout.fragment_main) {
+class MainFragment : Fragment(R.layout.fragment_main), BackPressHandler {
 
     private val binding by viewBinding<FragmentMainBinding>()
     private val navArgs by navArgs<MainFragmentArgs>()
@@ -38,5 +39,9 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
         binding.usersButton.setOnClickListener { viewModel.navigateToUsers() }
         binding.conversationsButton.setOnClickListener { viewModel.navigateToConversations() }
+    }
+
+    override fun onBackPressed() {
+        viewModel.onBackPressed()
     }
 }

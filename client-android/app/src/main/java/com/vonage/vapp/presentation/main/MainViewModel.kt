@@ -65,4 +65,8 @@ class MainViewModel : ViewModel() {
         object ShowContent : Action()
         data class ShowError(val message: String) : Action()
     }
+
+    fun onBackPressed() {
+        client.logout()
+    }
 }
