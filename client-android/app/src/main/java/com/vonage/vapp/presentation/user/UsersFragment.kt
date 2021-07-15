@@ -8,11 +8,11 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.vonage.vapp.R
-import com.vonage.vapp.core.delegate.viewBinding
 import com.vonage.vapp.core.ext.observe
 import com.vonage.vapp.databinding.FragmentUsersBinding
 import com.vonage.vapp.presentation.user.UsersViewModel.Action
 import com.vonage.vapp.presentation.user.UsersViewModel.Action.ShowContent
+import com.vonage.vapp.utils.viewBinding
 
 class UsersFragment : Fragment(R.layout.fragment_users) {
 

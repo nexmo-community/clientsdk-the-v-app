@@ -8,7 +8,6 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
 import com.nexmo.client.NexmoClient
 import com.vonage.vapp.R
-import com.vonage.vapp.core.delegate.viewBinding
 import com.vonage.vapp.core.ext.observe
 import com.vonage.vapp.core.ext.toast
 import com.vonage.vapp.databinding.FragmentConversationDetailBinding
@@ -16,6 +15,7 @@ import com.vonage.vapp.presentation.converstion.ConversationDetailViewModel.Acti
 import com.vonage.vapp.presentation.converstion.ConversationDetailViewModel.Action.Error
 import com.vonage.vapp.presentation.converstion.ConversationDetailViewModel.Action.Loading
 import com.vonage.vapp.presentation.converstion.ConversationDetailViewModel.Action.SetConversation
+import com.vonage.vapp.utils.viewBinding
 
 class ConversationDetailFragment : Fragment(R.layout.fragment_conversation_detail) {
     private val client: NexmoClient = NexmoClient.get()

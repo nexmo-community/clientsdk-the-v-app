@@ -2,18 +2,18 @@ package com.vonage.tutorial.voice
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.vonage.vapp.R
 import com.vonage.vapp.core.BackPressHandler
+import com.vonage.vapp.databinding.FragmentOnCallBinding
+import com.vonage.vapp.utils.viewBinding
 
 class OnCallFragment : Fragment(R.layout.fragment_on_call), BackPressHandler {
 
-    private lateinit var endCall: Button
-
+    private val binding by viewBinding<FragmentOnCallBinding>()
     private val viewModel by viewModels<OnCallViewModel>()
 
     private val toastObserver = Observer<String> {
@@ -25,9 +25,7 @@ class OnCallFragment : Fragment(R.layout.fragment_on_call), BackPressHandler {
 
         viewModel.toast.observe(viewLifecycleOwner, toastObserver)
 
-        endCall = view.findViewById(R.id.endCall)
-
-        endCall.setOnClickListener {
+        binding.endCall.setOnClickListener {
             viewModel.hangup()
         }
     }

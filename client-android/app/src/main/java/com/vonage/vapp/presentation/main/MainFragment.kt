@@ -8,11 +8,11 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
 import com.vonage.vapp.R
 import com.vonage.vapp.core.BackPressHandler
-import com.vonage.vapp.core.delegate.viewBinding
 import com.vonage.vapp.core.ext.observe
 import com.vonage.vapp.core.ext.toast
 import com.vonage.vapp.databinding.FragmentMainBinding
 import com.vonage.vapp.presentation.main.MainViewModel.Action
+import com.vonage.vapp.utils.viewBinding
 
 class MainFragment : Fragment(R.layout.fragment_main), BackPressHandler {
 
