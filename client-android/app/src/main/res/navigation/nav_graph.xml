@@ -99,11 +99,18 @@
     <fragment
             android:id="@+id/userDetailFragment"
             android:name="com.vonage.vapp.presentation.user.UserDetailFragment"
-            android:label="UserDetailFragment" >
+            android:label="UserDetailFragment">
 
         <argument
                 android:name="user"
                 app:argType="com.vonage.vapp.data.model.User" />
+        <action
+                android:id="@+id/action_userDetailFragment_to_onCallFragment"
+                app:destination="@id/onCallFragment" />
     </fragment>
+    <fragment
+            android:id="@+id/onCallFragment"
+            android:name="com.vonage.tutorial.voice.OnCallFragment"
+            android:label="OnCallFragment" />
 
 </navigation>
