@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexmo.client.NexmoClient
+import com.vonage.vapp.core.NavManager
 import com.vonage.vapp.core.ext.asLiveData
 import com.vonage.vapp.data.ApiRepository
 import com.vonage.vapp.data.model.Conversation
@@ -55,12 +56,12 @@ class ConversationsViewModel : ViewModel() {
     }
 
     fun navigateToConversationDetail(conversation: Conversation) {
-//        val navDirections =
-//            ConversationsFragmentDirections.actionConversationsFragmentToConversationDetailFragment(
-//                conversation,
-//                allUsers.toTypedArray()
-//            )
-//        NavManager.navigate(navDirections)
+        val navDirections =
+            ConversationsFragmentDirections.actionConversationsFragmentToConversationDetailFragment(
+                conversation,
+                allUsers.toTypedArray()
+            )
+        NavManager.navigate(navDirections)
     }
 
     fun loadConversations() {

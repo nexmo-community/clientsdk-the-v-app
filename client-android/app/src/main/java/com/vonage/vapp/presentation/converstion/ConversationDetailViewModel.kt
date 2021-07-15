@@ -32,7 +32,7 @@ class ConversationDetailViewModel : ViewModel() {
     val viewActionLiveData = viewActionMutableLiveData.asLiveData()
 
     private var nexmoConversation: NexmoConversation? = null
-    private var users = listOf<User>()
+    private var allUsers = listOf<User>()
 
     private val messageListener = object : NexmoMessageEventListener {
         override fun onTypingEvent(typingEvent: NexmoTypingEvent) {}
@@ -51,12 +51,12 @@ class ConversationDetailViewModel : ViewModel() {
         override fun onDeliveredReceipt(deliveredEvent: NexmoDeliveredEvent) {}
     }
 
-//    fun initClient(navArgs: ConversationDetailFragmentArgs) {
-//        this.users = navArgs.users.toList()
-//
-//        getConversation(navArgs.conversaion.id)
-//        getNexmoConversation(navArgs.conversaion.id)
-//    }
+    fun init(navArgs: ConversationDetailFragmentArgs) {
+        this.allUsers = navArgs.allUsers.toList()
+
+        getConversation(navArgs.conversaion.id)
+        getNexmoConversation(navArgs.conversaion.id)
+    }
 
     private fun getNexmoConversation(conversationId: String) {
         viewActionMutableLiveData.postValue(Action.Loading)
@@ -112,7 +112,7 @@ class ConversationDetailViewModel : ViewModel() {
     }
 
     private fun getUserDisplayName(userId: String): String {
-        return users.firstOrNull { it.id == userId }?.displayName ?: "Unknown"
+        return allUsers.firstOrNull { it.id == userId }?.displayName ?: "Unknown"
     }
 
     private fun getConversationLine(textEvent: NexmoTextEvent): String {
