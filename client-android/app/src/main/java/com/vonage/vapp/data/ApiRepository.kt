@@ -46,7 +46,15 @@ object ApiRepository {
         val response = apiService.signup(requestModel)
 
         return if (response.isSuccessful) {
-            val body = response.body()
+            var body = response.body()?.let {
+                it.copy(
+                    // filterNotNull() is used due to API bug
+                    conversations = it.conversations.filterNotNull().toMutableList(),
+                    // distinctBy is used because of API bug where duplicated items are returned
+                    otherUsers = it.otherUsers.distinctBy { it.id }.toList()
+                )
+            }
+
             token = body?.token
             body
         } else {
@@ -60,7 +68,15 @@ object ApiRepository {
         val response = apiService.login(requestModel)
 
         return if (response.isSuccessful) {
-            val body = response.body()
+            var body = response.body()?.let {
+                it.copy(
+                    // filterNotNull() is used due to API bug
+                    conversations = it.conversations.filterNotNull().toMutableList(),
+                    // distinctBy is used because of API bug where duplicated items are returned
+                    otherUsers = it.otherUsers.distinctBy { it.id }.toList()
+                )
+            }
+
             token = body?.token
             body
         } else {
