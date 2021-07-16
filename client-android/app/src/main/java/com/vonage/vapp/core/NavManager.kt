@@ -2,26 +2,26 @@ package com.vonage.vapp.core
 
 import android.os.Handler
 import android.os.Looper
+import androidx.annotation.IdRes
 import androidx.navigation.NavDirections
 
 object NavManager {
 
     private var navEventListener: ((navDirections: NavDirections) -> Unit)? = null
-    private var popBackListener: (() -> Unit)? = null
+    private var popBackListener: ((destinationId: Int?, inclusive: Boolean?) -> Unit)? = null
 
     fun navigate(navDirections: NavDirections) {
         navEventListener?.invoke(navDirections)
 }
-
-    fun popBackStack() {
-        popBackListener?.invoke()
+    fun popBackStack(@IdRes destinationId: Int? = null, inclusive: Boolean? = null) {
+        popBackListener?.invoke(destinationId, inclusive);
     }
 
     fun setOnNavEvent(listener: (navDirections: NavDirections) -> Unit) {
         this.navEventListener = listener
     }
 
-    fun setOnPopBack(listener: () -> Unit) {
+    fun setOnPopBack(listener: (destinationId: Int?, inclusive: Boolean?) -> Unit) {
         this.popBackListener = listener
     }
 

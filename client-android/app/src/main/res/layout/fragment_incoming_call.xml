@@ -15,7 +15,7 @@
             android:layout_marginTop="50dp"
             android:gravity="center"
             android:singleLine="true"
-            android:text="Incoming call from Alice"
+            android:text="Incoming call"
             android:textSize="40sp" />
 
     <Button
