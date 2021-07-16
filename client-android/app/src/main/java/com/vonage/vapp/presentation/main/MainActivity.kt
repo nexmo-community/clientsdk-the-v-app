@@ -2,6 +2,7 @@ package com.vonage.vapp.presentation.main
 
 import android.Manifest
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.navigation.Navigation
@@ -49,7 +50,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         }
 
         navController.addOnDestinationChangedListener { controller, destination, arguments ->
-            val a = 2
+            Log.d("MainActivity", "NavDestination us ${destination.label}")
         }
 
         runOnUiThread { }
