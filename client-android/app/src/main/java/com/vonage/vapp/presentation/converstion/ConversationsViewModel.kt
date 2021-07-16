@@ -3,7 +3,6 @@ package com.vonage.vapp.presentation.converstion
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nexmo.client.NexmoClient
 import com.vonage.vapp.core.NavManager
 import com.vonage.vapp.core.ext.asLiveData
 import com.vonage.vapp.data.ApiRepository
@@ -17,7 +16,6 @@ import kotlinx.coroutines.launch
 class ConversationsViewModel : ViewModel() {
 
     // should be injected
-    private val client = NexmoClient.get()
     private val apiRepository = ApiRepository
 
     private var conversations = mutableListOf<Conversation>()
