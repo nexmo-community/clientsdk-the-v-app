@@ -4,7 +4,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="20dp"
-        android:background="#CCFFCC"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <androidx.constraintlayout.widget.ConstraintLayout
