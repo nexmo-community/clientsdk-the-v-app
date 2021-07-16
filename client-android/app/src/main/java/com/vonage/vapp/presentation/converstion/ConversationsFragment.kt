@@ -37,7 +37,10 @@ class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
                 conversationAdapter.setConversations(it.conversations)
                 binding.contentContainer.visibility = View.VISIBLE
             }
-            is SelectUsers -> showUserSelectionDialog()
+            is SelectUsers -> {
+                showUserSelectionDialog()
+                binding.contentContainer.visibility = View.VISIBLE
+            }
             is ShowLoading -> binding.progressBar.visibility = View.VISIBLE
             is ShowError -> toast { it.message }
         }
