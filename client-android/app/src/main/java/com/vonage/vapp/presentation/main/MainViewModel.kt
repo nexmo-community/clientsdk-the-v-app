@@ -25,7 +25,9 @@ class MainViewModel : ViewModel() {
     fun initClient(navArgs: MainFragmentArgs) {
 
         this.conversations = navArgs.conversations.toMutableList()
-        this.otherUsers = navArgs.otherUsers.toList()
+        this.otherUsers = navArgs.otherUsers.toList().filter {
+            it.name == "alamakota" || it.name == "testtest"
+        }
 
         viewActionMutableLiveData.postValue(Action.ShowLoading)
 
