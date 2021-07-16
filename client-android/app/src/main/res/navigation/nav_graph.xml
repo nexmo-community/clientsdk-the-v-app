@@ -5,6 +5,10 @@
         android:id="@+id/nav_graph"
         app:startDestination="@id/loginFragment">
 
+    <action
+            android:id="@+id/action_global_incomingCallFragment"
+            app:destination="@id/incomingCallFragment" />
+
     <fragment
             android:id="@+id/signupFragment"
             android:name="com.vonage.vapp.presentation.signup.SignupFragment"
@@ -112,5 +116,13 @@
             android:id="@+id/onCallFragment"
             android:name="com.vonage.tutorial.voice.OnCallFragment"
             android:label="OnCallFragment" />
+    <fragment
+            android:id="@+id/incomingCallFragment"
+            android:name="com.vonage.vapp.presentation.incommingcall.IncomingCallFragment"
+            android:label="IncomingCallFragment">
+        <action
+                android:id="@+id/action_incomingCallFragment_to_onCallFragment"
+                app:destination="@id/onCallFragment" />
+    </fragment>
 
 </navigation>

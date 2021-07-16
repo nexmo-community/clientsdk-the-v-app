@@ -3,10 +3,9 @@ package com.vonage.vapp.presentation.main
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.nexmo.client.NexmoClient
-import com.nexmo.client.request_listener.NexmoConnectionListener
+import com.nexmo.client.request_listener.NexmoConnectionListener.ConnectionStatus.*
 import com.vonage.vapp.core.NavManager
 import com.vonage.vapp.core.ext.asLiveData
-import com.vonage.vapp.data.ApiRepository
 import com.vonage.vapp.data.model.Conversation
 import com.vonage.vapp.data.model.User
 
@@ -14,7 +13,7 @@ class MainViewModel : ViewModel() {
 
     // should be injected
     private val client = NexmoClient.get()
-    private val apiRepository = ApiRepository
+    private val navManager = NavManager
 
     private var conversations = mutableListOf<Conversation>()
     private var allUsers = listOf<User>()
@@ -28,21 +27,24 @@ class MainViewModel : ViewModel() {
         this.conversations = navArgs.conversations.toMutableList()
         this.otherUsers = navArgs.otherUsers.toList()
 
-        if (!client.isConnected) {
+        if (client.isConnected) {
+            viewActionMutableLiveData.postValue(Action.ShowContent)
+        } else {
             viewActionMutableLiveData.postValue(Action.ShowLoading)
+            client.login(navArgs.token)
+        }
 
-            client.setConnectionListener { newConnectionStatus, _ ->
-
-                if (newConnectionStatus == NexmoConnectionListener.ConnectionStatus.CONNECTED) {
+        client.setConnectionListener { newConnectionStatus, _ ->
+            when (newConnectionStatus) {
+                CONNECTED -> {
                     viewActionMutableLiveData.postValue(Action.ShowContent)
                 }
-
-                return@setConnectionListener
+                DISCONNECTED -> {
+                    navManager.popBackStack()
+                }
             }
 
-            client.login(navArgs.token)
-        } else {
-            viewActionMutableLiveData.postValue(Action.ShowContent)
+            return@setConnectionListener
         }
     }
 
@@ -67,6 +69,15 @@ class MainViewModel : ViewModel() {
     }
 
     fun onBackPressed() {
+//        dispose()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        dispose()
+    }
+
+    private fun dispose() {
         client.logout()
     }
 }

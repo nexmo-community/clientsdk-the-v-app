@@ -1,8 +1,10 @@
 package com.vonage.vapp.presentation.user
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.nexmo.client.NexmoCall
+import com.nexmo.client.NexmoCallHandler
 import com.nexmo.client.NexmoClient
 import com.nexmo.client.request_listener.NexmoApiError
 import com.nexmo.client.request_listener.NexmoRequestListener
@@ -43,8 +45,10 @@ class UserDetailViewModel : ViewModel() {
         }
     }
 
+    @SuppressLint("MissingPermission")
     fun startCall() {
         viewActionMutableLiveData.postValue(Action.ShowLoading)
+        client.call(user.name, NexmoCallHandler.IN_APP, callListener)
     }
 
     fun startConversation() {
