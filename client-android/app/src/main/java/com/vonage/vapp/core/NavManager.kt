@@ -10,11 +10,11 @@ object NavManager {
     private var popBackListener: (() -> Unit)? = null
 
     fun navigate(navDirections: NavDirections) {
-        runOnUiThread { navEventListener?.invoke(navDirections) }
-    }
+        navEventListener?.invoke(navDirections)
+}
 
     fun popBackStack() {
-        runOnUiThread { popBackListener?.invoke() }
+        popBackListener?.invoke()
     }
 
     fun setOnNavEvent(listener: (navDirections: NavDirections) -> Unit) {

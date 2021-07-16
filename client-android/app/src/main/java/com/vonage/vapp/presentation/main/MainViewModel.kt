@@ -27,25 +27,19 @@ class MainViewModel : ViewModel() {
         this.conversations = navArgs.conversations.toMutableList()
         this.otherUsers = navArgs.otherUsers.toList()
 
-        if (client.isConnected) {
-            viewActionMutableLiveData.postValue(Action.ShowContent)
-        } else {
-            viewActionMutableLiveData.postValue(Action.ShowLoading)
-            client.login(navArgs.token)
-        }
+        viewActionMutableLiveData.postValue(Action.ShowLoading)
 
         client.setConnectionListener { newConnectionStatus, _ ->
             when (newConnectionStatus) {
                 CONNECTED -> {
                     viewActionMutableLiveData.postValue(Action.ShowContent)
                 }
-                DISCONNECTED -> {
-                    navManager.popBackStack()
-                }
             }
 
             return@setConnectionListener
         }
+
+        client.login(navArgs.token)
     }
 
     fun navigateToConversations() {
@@ -68,16 +62,8 @@ class MainViewModel : ViewModel() {
         data class ShowError(val message: String) : Action()
     }
 
-    fun onBackPressed() {
-//        dispose()
-    }
-
     override fun onCleared() {
         super.onCleared()
-        dispose()
-    }
-
-    private fun dispose() {
         client.logout()
     }
 }
