@@ -15,22 +15,20 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     private val navController by lazy { Navigation.findNavController(this, R.id.navHostFragment) }
 
+    // Client initialized in the VApplication class
+    private val client = NexmoClient.get()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        initClient()
-        initNavManager()
         requestPermissions()
+        initNavManager()
+        iniClientListeners()
     }
 
     private fun requestPermissions() {
         val callsPermissions = arrayOf(Manifest.permission.RECORD_AUDIO)
         ActivityCompat.requestPermissions(this, callsPermissions, 123)
-    }
-
-    private fun initClient() {
-        // Init the client, so it can le latter accessed by calling NexmoClient.get()
-        NexmoClient.Builder().build(this)
     }
 
     private fun initNavManager() {
@@ -40,8 +38,16 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             currentFragment?.navigateSafe(it)
         }
 
-        NavManager.setOnPopBack { destinationId: Int, inclusive: Boolean ->
-            navController.popBackStack(destinationId, inclusive)
+        NavManager.setOnPopBack {
+            navController.popBackStack()
+        }
+
+        runOnUiThread { }
+    }
+
+    private fun iniClientListeners() {
+        client.addIncomingCallListener {
+            navController.navigate(R.id.action_global_incomingCallFragment)
         }
     }
 
