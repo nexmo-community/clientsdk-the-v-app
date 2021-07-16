@@ -26,22 +26,26 @@ class MainViewModel : ViewModel() {
 
         this.conversations = navArgs.conversations.toMutableList()
         this.otherUsers = navArgs.otherUsers.toList().filter {
-            it.name == "alamakota" || it.name == "testtest"
+            it.name == "alamakota2" || it.name == "testtest"
         }
 
-        viewActionMutableLiveData.postValue(Action.ShowLoading)
+        if(client.isConnected) {
+            viewActionMutableLiveData.postValue(Action.ShowContent)
+        } else {
+            viewActionMutableLiveData.postValue(Action.ShowLoading)
 
-        client.setConnectionListener { newConnectionStatus, _ ->
-            when (newConnectionStatus) {
-                CONNECTED -> {
-                    viewActionMutableLiveData.postValue(Action.ShowContent)
+            client.setConnectionListener { newConnectionStatus, _ ->
+                when (newConnectionStatus) {
+                    CONNECTED -> {
+                        viewActionMutableLiveData.postValue(Action.ShowContent)
+                    }
                 }
+
+                return@setConnectionListener
             }
 
-            return@setConnectionListener
+            client.login(navArgs.token)
         }
-
-        client.login(navArgs.token)
     }
 
     fun navigateToConversations() {

@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.nexmo.client.NexmoCall
 import com.nexmo.client.request_listener.NexmoApiError
 import com.nexmo.client.request_listener.NexmoRequestListener
+import com.vonage.vapp.R
 import com.vonage.vapp.core.CallManager
 import com.vonage.vapp.core.NavManager
 

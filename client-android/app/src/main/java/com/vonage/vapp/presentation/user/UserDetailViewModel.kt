@@ -26,7 +26,6 @@ class UserDetailViewModel : ViewModel() {
 
     fun init(navArgs: UserDetailFragmentArgs) {
         user = navArgs.user
-
         viewActionMutableLiveData.postValue(Action.ShowContent(navArgs.user))
     }
 

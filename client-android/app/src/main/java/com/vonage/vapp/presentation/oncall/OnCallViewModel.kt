@@ -10,6 +10,7 @@ import com.nexmo.client.NexmoMediaActionState
 import com.nexmo.client.NexmoMember
 import com.nexmo.client.request_listener.NexmoApiError
 import com.nexmo.client.request_listener.NexmoRequestListener
+import com.vonage.vapp.R
 import com.vonage.vapp.core.CallManager
 import com.vonage.vapp.core.NavManager
 
@@ -24,7 +25,7 @@ class OnCallViewModel : ViewModel() {
         override fun onMemberStatusUpdated(nexmoCallStatus: NexmoCallMemberStatus, callMember: NexmoMember) {
             if (nexmoCallStatus == NexmoCallMemberStatus.COMPLETED || nexmoCallStatus == NexmoCallMemberStatus.CANCELLED) {
                 callManager.onGoingCall = null
-                navManager.popBackStack()
+                navManager.popBackStack(R.id.mainFragment, false)
             }
         }
 

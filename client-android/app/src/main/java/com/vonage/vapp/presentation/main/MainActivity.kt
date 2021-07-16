@@ -9,11 +9,13 @@ import androidx.navigation.fragment.findNavController
 import com.nexmo.client.NexmoClient
 import com.vonage.vapp.R
 import com.vonage.vapp.core.BackPressHandler
+import com.vonage.vapp.core.CallManager
 import com.vonage.vapp.core.NavManager
 
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     private val navController by lazy { Navigation.findNavController(this, R.id.navHostFragment) }
+    private val callManager: CallManager = CallManager
 
     // Client initialized in the VApplication class
     private val client = NexmoClient.get()
@@ -38,8 +40,16 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             currentFragment?.findNavController()?.navigate(it)
         }
 
-        NavManager.setOnPopBack {
-            navController.popBackStack()
+        NavManager.setOnPopBack { destinationId , inclusive ->
+            if(destinationId != null && inclusive != null) {
+                navController.popBackStack(destinationId, inclusive)
+            } else {
+                navController.popBackStack()
+            }
+        }
+
+        navController.addOnDestinationChangedListener { controller, destination, arguments ->
+            val a = 2
         }
 
         runOnUiThread { }
@@ -47,6 +57,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     private fun iniClientListeners() {
         client.addIncomingCallListener {
+            callManager.onGoingCall = it
             navController.navigate(R.id.action_global_incomingCallFragment)
         }
     }
