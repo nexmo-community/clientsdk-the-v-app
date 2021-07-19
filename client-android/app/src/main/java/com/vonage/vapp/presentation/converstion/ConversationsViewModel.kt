@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.vonage.vapp.core.NavManager
 import com.vonage.vapp.core.ext.asLiveData
 import com.vonage.vapp.data.ApiRepository
+import com.vonage.vapp.data.MemoryRepository
 import com.vonage.vapp.data.model.Conversation
 import com.vonage.vapp.data.model.CreateConversationResponseModel
 import com.vonage.vapp.data.model.ErrorResponseModel
@@ -17,18 +18,13 @@ class ConversationsViewModel : ViewModel() {
 
     // should be injected
     private val apiRepository = ApiRepository
-
-    private var conversations = mutableListOf<Conversation>()
-    private var allUsers = listOf<User>()
+    private val memoryRepository = MemoryRepository
 
     private val viewActionMutableLiveData = MutableLiveData<Action>()
     val viewActionLiveData = viewActionMutableLiveData.asLiveData()
 
-    fun init(navArgs: ConversationsFragmentArgs) {
-        this.conversations = navArgs.conversaions.toMutableList()
-        this.allUsers = navArgs.allUsers.toList()
-
-        viewActionMutableLiveData.postValue(Action.ShowContent(conversations))
+    fun init() {
+        viewActionMutableLiveData.postValue(Action.ShowContent(memoryRepository.conversations))
     }
 
     fun createConversation() {
@@ -43,9 +39,7 @@ class ConversationsViewModel : ViewModel() {
             val result = apiRepository.createConversation(userIds)
 
             if (result is CreateConversationResponseModel) {
-                conversations.add(result.conversation)
-                viewActionMutableLiveData.postValue(Action.ShowContent(conversations))
-
+                viewActionMutableLiveData.postValue(Action.ShowContent(memoryRepository.conversations))
                 navigateToConversationDetail(result.conversation)
             } else if (result is ErrorResponseModel) {
                 viewActionMutableLiveData.postValue(Action.ShowError(result.fullMessage))
@@ -54,11 +48,7 @@ class ConversationsViewModel : ViewModel() {
     }
 
     fun navigateToConversationDetail(conversation: Conversation) {
-        val navDirections =
-            ConversationsFragmentDirections.actionConversationsFragmentToConversationDetailFragment(
-                conversation,
-                allUsers.toTypedArray()
-            )
+        val navDirections = ConversationsFragmentDirections.actionConversationsFragmentToConversationDetailFragment(conversation)
         NavManager.navigate(navDirections)
     }
 
@@ -69,8 +59,7 @@ class ConversationsViewModel : ViewModel() {
             val result = apiRepository.getConversations()
 
             if (result is GetConversationsResponseModel) {
-                this@ConversationsViewModel.conversations = result.conversations.toMutableList()
-                val conversation = Action.ShowContent(conversations)
+                val conversation = Action.ShowContent(result.conversations)
                 viewActionMutableLiveData.postValue(conversation)
             } else if (result is ErrorResponseModel) {
                 viewActionMutableLiveData.postValue(Action.ShowError(result.fullMessage))

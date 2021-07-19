@@ -5,7 +5,6 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.navArgs
 import com.vonage.vapp.R
 import com.vonage.vapp.core.ext.observe
 import com.vonage.vapp.core.ext.toast
@@ -16,7 +15,6 @@ import com.vonage.vapp.utils.viewBinding
 class MainFragment : Fragment(R.layout.fragment_main) {
 
     private val binding by viewBinding<FragmentMainBinding>()
-    private val navArgs by navArgs<MainFragmentArgs>()
     private val viewModel by viewModels<MainViewModel>()
 
     private val actionObserver = Observer<Action> {
@@ -34,7 +32,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         super.onViewCreated(view, savedInstanceState)
 
         observe(viewModel.viewActionLiveData, actionObserver)
-        viewModel.initClient(navArgs)
+        viewModel.init()
 
         binding.usersButton.setOnClickListener { viewModel.navigateToUsers() }
         binding.conversationsButton.setOnClickListener { viewModel.navigateToConversations() }

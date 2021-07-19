@@ -4,14 +4,17 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.vonage.vapp.core.NavManager
 import com.vonage.vapp.core.ext.asLiveData
+import com.vonage.vapp.data.MemoryRepository
 import com.vonage.vapp.data.model.User
 
 class UsersViewModel : ViewModel() {
     private val viewActionMutableLiveData = MutableLiveData<Action>()
     val viewActionLiveData = viewActionMutableLiveData.asLiveData()
 
-    fun init(navArgs: UsersFragmentArgs) {
-        viewActionMutableLiveData.postValue(Action.ShowContent(navArgs.otherUsers.toList()))
+    private val memoryRepository = MemoryRepository
+
+    fun init() {
+        viewActionMutableLiveData.postValue(Action.ShowContent(memoryRepository.otherUsers.toList()))
     }
 
     fun navigateToUserDetail(user: User) {

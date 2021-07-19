@@ -40,7 +40,7 @@ object ApiRepository {
 
     private val apiService: ApiService = retrofit.create(ApiService::class.java)
 
-    private var token: String? = null
+    private val memoryRepository = MemoryRepository
 
     suspend fun signup(name: String, displayName: String, password: String): Any? {
         val requestModel = SignupRequestModel(name, displayName, password)
@@ -56,7 +56,7 @@ object ApiRepository {
                 )
             }
 
-            token = body?.token
+            body?.let { memoryRepository.update(it) }
             body
         } else {
             getErrorResponseModel(response)
@@ -81,7 +81,7 @@ object ApiRepository {
                 )
             }
 
-            token = body?.token
+            body?.let { memoryRepository.update(it) }
             body
         } else {
             getErrorResponseModel(response)
@@ -89,12 +89,11 @@ object ApiRepository {
     }
 
     suspend fun getConversations(): Any? {
-        checkNotNull(token)
-
-        val response = apiService.getConversations("Bearer $token")
+        val response = apiService.getConversations("Bearer ${memoryRepository.token}")
 
         return if (response.isSuccessful) {
             val conversations = response.body() ?: listOf()
+            memoryRepository.setConversations(conversations)
             GetConversationsResponseModel(conversations)
         } else {
             getErrorResponseModel(response)
@@ -102,9 +101,7 @@ object ApiRepository {
     }
 
     suspend fun getConversation(conversationId: String): Any? {
-        checkNotNull(token)
-
-        val response = apiService.getConversation("Bearer $token", conversationId)
+        val response = apiService.getConversation("Bearer ${memoryRepository.token}", conversationId)
 
         return if (response.isSuccessful) {
             val conversations = response.body()
@@ -115,14 +112,13 @@ object ApiRepository {
     }
 
     suspend fun createConversation(userIds: Set<String>): Any? {
-        checkNotNull(token)
-
         val requestModel = CreateConversationRequestModel(userIds)
-        val response = apiService.createConversation("Bearer $token", requestModel)
+        val response = apiService.createConversation("Bearer ${memoryRepository.token}", requestModel)
 
         return if (response.isSuccessful) {
-            val conversations = response.body() as Conversation
-            CreateConversationResponseModel(conversations)
+            val conversation = response.body() as Conversation
+            memoryRepository.addConversation(conversation)
+            CreateConversationResponseModel(conversation)
         } else {
             getErrorResponseModel(response)
         }

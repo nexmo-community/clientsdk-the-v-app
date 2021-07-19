@@ -3,6 +3,7 @@ package com.vonage.vapp.presentation.user
 import android.annotation.SuppressLint
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.nexmo.client.NexmoCall
 import com.nexmo.client.NexmoCallHandler
 import com.nexmo.client.NexmoClient
@@ -11,7 +12,12 @@ import com.nexmo.client.request_listener.NexmoRequestListener
 import com.vonage.vapp.core.CallManager
 import com.vonage.vapp.core.NavManager
 import com.vonage.vapp.core.ext.asLiveData
+import com.vonage.vapp.data.ApiRepository
+import com.vonage.vapp.data.model.CreateConversationResponseModel
+import com.vonage.vapp.data.model.ErrorResponseModel
 import com.vonage.vapp.data.model.User
+import com.vonage.vapp.presentation.user.UserDetailViewModel.Action.ShowError
+import kotlinx.coroutines.launch
 
 class UserDetailViewModel : ViewModel() {
     private lateinit var user: User
@@ -23,6 +29,8 @@ class UserDetailViewModel : ViewModel() {
 
     private val viewActionMutableLiveData = MutableLiveData<Action>()
     val viewActionLiveData = viewActionMutableLiveData.asLiveData()
+
+    private val apiRepository = ApiRepository
 
     fun init(navArgs: UserDetailFragmentArgs) {
         user = navArgs.user
@@ -40,7 +48,23 @@ class UserDetailViewModel : ViewModel() {
         }
 
         override fun onError(apiError: NexmoApiError) {
-            viewActionMutableLiveData.postValue(Action.ShowError(apiError.message))
+            viewActionMutableLiveData.postValue(ShowError(apiError.message))
+        }
+    }
+
+    private fun createConversation(user: User) {
+        viewActionMutableLiveData.postValue(Action.ShowLoading)
+
+        viewModelScope.launch {
+            val userIds = setOf(user.id)
+            val result = apiRepository.createConversation(userIds)
+
+            if (result is CreateConversationResponseModel) {
+                val navDirections = UserDetailFragmentDirections.actionUserDetailFragmentToConversationDetailFragment(result.conversation)
+                NavManager.navigate(navDirections)
+            } else if (result is ErrorResponseModel) {
+                viewActionMutableLiveData.postValue(ShowError(result.fullMessage))
+            }
         }
     }
 
@@ -51,7 +75,7 @@ class UserDetailViewModel : ViewModel() {
     }
 
     fun startConversation() {
-        TODO("not implemented")
+        createConversation(user)
     }
 
     sealed class Action {
