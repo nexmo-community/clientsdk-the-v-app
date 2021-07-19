@@ -1,7 +1,7 @@
 import UIKit
 import NexmoClient
 
-protocol CreateConversationViewControllerDelegate: class {
+protocol CreateConversationViewControllerDelegate: AnyObject {
     func createConversationViewController(_ createConversationViewController: CreateConversationViewController,
                                           didCreateConversation conversation: Conversations.Conversation)
 }

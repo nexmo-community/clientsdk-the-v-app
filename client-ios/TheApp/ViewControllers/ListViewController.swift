@@ -1,6 +1,6 @@
 import UIKit
 
-protocol ListViewControllerDelegate: class {
+protocol ListViewControllerDelegate: AnyObject {
     func listViewControllerDelegate<T>(_: ListViewController<T>, didSelectRow data: T)
     func listViewControllerDelegateDidRefresh<T>(_: ListViewController<T>)
 }

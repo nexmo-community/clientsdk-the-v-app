@@ -1,6 +1,6 @@
 import NexmoClient
 
-protocol ClientManagerDelegate: class {
+protocol ClientManagerDelegate: AnyObject {
     func clientManager(_ clientManager: ClientManager, responseForAuth response: Auth.Response)
     func clientManager(_ clientManager: ClientManager, authDidFail errorMessage: String?)
 }
