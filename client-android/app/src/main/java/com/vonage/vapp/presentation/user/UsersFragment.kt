@@ -17,7 +17,6 @@ import com.vonage.vapp.utils.viewBinding
 class UsersFragment : Fragment(R.layout.fragment_users) {
 
     private val binding by viewBinding<FragmentUsersBinding>()
-    private val navArgs by navArgs<UsersFragmentArgs>()
     private val viewModel by viewModels<UsersViewModel>()
 
     private val userAdapter = UserAdapter()
@@ -38,7 +37,7 @@ class UsersFragment : Fragment(R.layout.fragment_users) {
         super.onViewCreated(view, savedInstanceState)
 
         observe(viewModel.viewActionLiveData, actionObserver)
-        viewModel.init(navArgs)
+        viewModel.init()
 
         binding.recyclerView.apply {
             setHasFixedSize(true)

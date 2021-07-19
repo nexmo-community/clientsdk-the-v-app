@@ -16,10 +16,10 @@ import com.nexmo.client.request_listener.NexmoApiError
 import com.nexmo.client.request_listener.NexmoRequestListener
 import com.vonage.vapp.core.ext.asLiveData
 import com.vonage.vapp.data.ApiRepository
+import com.vonage.vapp.data.MemoryRepository
 import com.vonage.vapp.data.model.ErrorResponseModel
 import com.vonage.vapp.data.model.Event
 import com.vonage.vapp.data.model.GetConversationResponseModel
-import com.vonage.vapp.data.model.User
 import kotlinx.coroutines.launch
 
 class ConversationDetailViewModel : ViewModel() {
@@ -32,7 +32,8 @@ class ConversationDetailViewModel : ViewModel() {
     val viewActionLiveData = viewActionMutableLiveData.asLiveData()
 
     private var nexmoConversation: NexmoConversation? = null
-    private var allUsers = listOf<User>()
+
+    private val memoryRepository = MemoryRepository
 
     private val messageListener = object : NexmoMessageEventListener {
         override fun onTypingEvent(typingEvent: NexmoTypingEvent) {}
@@ -52,8 +53,6 @@ class ConversationDetailViewModel : ViewModel() {
     }
 
     fun init(navArgs: ConversationDetailFragmentArgs) {
-        this.allUsers = navArgs.allUsers.toList()
-
         getConversation(navArgs.conversaion.id)
         getNexmoConversation(navArgs.conversaion.id)
     }
@@ -111,7 +110,7 @@ class ConversationDetailViewModel : ViewModel() {
     }
 
     private fun getUserDisplayName(userId: String): String {
-        return allUsers.firstOrNull { it.id == userId }?.displayName ?: "Unknown"
+        return memoryRepository.allUsers.firstOrNull { it.id == userId }?.displayName ?: "Unknown"
     }
 
     private fun getConversationLine(textEvent: NexmoTextEvent): String {

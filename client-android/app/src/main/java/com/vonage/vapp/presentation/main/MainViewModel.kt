@@ -6,8 +6,7 @@ import com.nexmo.client.NexmoClient
 import com.nexmo.client.request_listener.NexmoConnectionListener.ConnectionStatus.*
 import com.vonage.vapp.core.NavManager
 import com.vonage.vapp.core.ext.asLiveData
-import com.vonage.vapp.data.model.Conversation
-import com.vonage.vapp.data.model.User
+import com.vonage.vapp.data.MemoryRepository
 
 class MainViewModel : ViewModel() {
 
@@ -15,50 +14,36 @@ class MainViewModel : ViewModel() {
     private val client = NexmoClient.get()
     private val navManager = NavManager
 
-    private var conversations = mutableListOf<Conversation>()
-    private var allUsers = listOf<User>()
-    private var otherUsers = listOf<User>()
-
     private val viewActionMutableLiveData = MutableLiveData<Action>()
     val viewActionLiveData = viewActionMutableLiveData.asLiveData()
 
-    fun initClient(navArgs: MainFragmentArgs) {
+    private val memoryRepository = MemoryRepository
 
-        this.conversations = navArgs.conversations.toMutableList()
-        this.otherUsers = navArgs.otherUsers.toList().filter {
-            it.name == "alamakota2" || it.name == "testtest"
-        }
-
+    fun init() {
         if(client.isConnected) {
             viewActionMutableLiveData.postValue(Action.ShowContent)
         } else {
             viewActionMutableLiveData.postValue(Action.ShowLoading)
 
             client.setConnectionListener { newConnectionStatus, _ ->
-                when (newConnectionStatus) {
-                    CONNECTED -> {
-                        viewActionMutableLiveData.postValue(Action.ShowContent)
-                    }
+                if (newConnectionStatus == CONNECTED) {
+                    viewActionMutableLiveData.postValue(Action.ShowContent)
                 }
 
                 return@setConnectionListener
             }
 
-            client.login(navArgs.token)
+            client.login(memoryRepository.token)
         }
     }
 
     fun navigateToConversations() {
-        val navDirections = MainFragmentDirections.actionMainFragmentToConversationsFragment(
-            conversations.toTypedArray(),
-            otherUsers.toTypedArray(),
-            allUsers.toTypedArray()
-        )
+        val navDirections = MainFragmentDirections.actionMainFragmentToConversationsFragment()
         NavManager.navigate(navDirections)
     }
 
     fun navigateToUsers() {
-        val navDirections = MainFragmentDirections.actionMainFragmentToUsersFragment(otherUsers.toTypedArray())
+        val navDirections = MainFragmentDirections.actionMainFragmentToUsersFragment()
         NavManager.navigate(navDirections)
     }
 

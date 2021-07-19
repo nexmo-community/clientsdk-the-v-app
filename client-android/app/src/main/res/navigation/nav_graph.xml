@@ -22,18 +22,6 @@
             android:id="@+id/mainFragment"
             android:name="com.vonage.vapp.presentation.main.MainFragment"
             android:label="MainFragment">
-        <argument
-                android:name="user"
-                app:argType="com.vonage.vapp.data.model.User" />
-        <argument
-                android:name="otherUsers"
-                app:argType="com.vonage.vapp.data.model.User[]" />
-        <argument
-                android:name="conversations"
-                app:argType="com.vonage.vapp.data.model.Conversation[]" />
-        <argument
-                android:name="token"
-                app:argType="string" />
         <action
                 android:id="@+id/action_mainFragment_to_conversationsFragment"
                 app:destination="@id/conversationsFragment" />
@@ -59,17 +47,6 @@
             android:name="com.vonage.vapp.presentation.converstion.ConversationsFragment"
             android:label="ConversationsFragment" >
 
-        <argument
-                android:name="conversaions"
-                app:argType="com.vonage.vapp.data.model.Conversation[]" />
-
-        <argument
-                android:name="otherUsers"
-                app:argType="com.vonage.vapp.data.model.User[]" />
-
-        <argument
-                android:name="allUsers"
-                app:argType="com.vonage.vapp.data.model.User[]" />
         <action
                 android:id="@+id/action_conversationsFragment_to_conversationDetailFragment"
                 app:destination="@id/conversationDetailFragment" />
@@ -82,9 +59,6 @@
         <action
                 android:id="@+id/action_usersFragment_to_userDetailFragment"
                 app:destination="@id/userDetailFragment" />
-        <argument
-                android:name="otherUsers"
-                app:argType="com.vonage.vapp.data.model.User[]" />
 
     </fragment>
     <fragment
@@ -95,10 +69,6 @@
         <argument
                 android:name="conversaion"
                 app:argType="com.vonage.vapp.data.model.Conversation" />
-
-        <argument
-                android:name="allUsers"
-                app:argType="com.vonage.vapp.data.model.User[]" />
     </fragment>
     <fragment
             android:id="@+id/userDetailFragment"
@@ -111,6 +81,9 @@
         <action
                 android:id="@+id/action_userDetailFragment_to_onCallFragment"
                 app:destination="@id/onCallFragment" />
+        <action
+                android:id="@+id/action_userDetailFragment_to_conversationDetailFragment"
+                app:destination="@id/conversationDetailFragment" />
     </fragment>
     <fragment
             android:id="@+id/onCallFragment"

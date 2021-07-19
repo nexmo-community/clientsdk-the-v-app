@@ -28,12 +28,7 @@ class LoginViewModel : ViewModel() {
             val result = apiRepository.login(name, password)
 
             if (result is LoginResponseModel) {
-                val navDirections = LoginFragmentDirections.actionLoginFragmentToMainFragment(
-                    result.user,
-                    result.otherUsers.toTypedArray(),
-                    result.conversations.toTypedArray(),
-                    result.token
-                )
+                val navDirections = LoginFragmentDirections.actionLoginFragmentToMainFragment()
 
                 navManager.navigate(navDirections)
             } else if (result is ErrorResponseModel) {
