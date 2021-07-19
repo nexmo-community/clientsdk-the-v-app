@@ -34,8 +34,11 @@ final class ClientManager: NSObject {
                 self.response = response
                 NXMClient.shared.login(withAuthToken: response.token)
             case .failure(let error):
-                if case let RemoteLoaderError.api(apiError) = error {
+                switch error {
+                case .api(error: let apiError):
                     self.delegate?.clientManager(self, authDidFail: apiError.detail)
+                default:
+                    self.delegate?.clientManager(self, authDidFail: error.localizedDescription)
                 }
             }
         }
