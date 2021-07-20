@@ -78,9 +78,9 @@ class UserDetailViewModel : ViewModel() {
         createConversation(user)
     }
 
-    sealed class Action {
-        data class ShowContent(val user: User) : Action()
-        object ShowLoading : Action()
-        data class ShowError(val message: String) : Action()
+    sealed interface Action {
+        data class ShowContent(val user: User) : Action
+        object ShowLoading : Action
+        data class ShowError(val message: String) : Action
     }
 }

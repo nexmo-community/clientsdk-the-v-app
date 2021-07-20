@@ -47,10 +47,10 @@ class MainViewModel : ViewModel() {
         NavManager.navigate(navDirections)
     }
 
-    sealed class Action {
-        object ShowLoading : Action()
-        object ShowContent : Action()
-        data class ShowError(val message: String) : Action()
+    sealed interface Action {
+        object ShowLoading : Action
+        object ShowContent : Action
+        data class ShowError(val message: String) : Action
     }
 
     override fun onCleared() {

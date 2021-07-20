@@ -31,7 +31,7 @@ class SignupViewModel : ViewModel() {
         }
     }
 
-    sealed class Action {
-        data class Error(val message: String) : Action()
+    sealed interface Action {
+        data class Error(val message: String) : Action
     }
 }

@@ -67,10 +67,10 @@ class ConversationsViewModel : ViewModel() {
         }
     }
 
-    sealed class Action {
-        object ShowLoading : Action()
-        data class ShowContent(val conversations: List<Conversation>) : Action()
-        data class SelectUsers(val users: List<User>) : Action()
-        data class ShowError(val message: String) : Action()
+    sealed interface Action {
+        object ShowLoading : Action
+        data class ShowContent(val conversations: List<Conversation>) : Action
+        data class SelectUsers(val users: List<User>) : Action
+        data class ShowError(val message: String) : Action
     }
 }

@@ -133,10 +133,10 @@ class ConversationDetailViewModel : ViewModel() {
         })
     }
 
-    sealed class Action {
-        object Loading : Action()
-        data class SetConversation(val conversation: String) : Action()
-        data class AddConversationLine(val line: String) : Action()
-        data class Error(val message: String) : Action()
+    sealed interface Action {
+        object Loading : Action
+        data class SetConversation(val conversation: String) : Action
+        data class AddConversationLine(val line: String) : Action
+        data class Error(val message: String) : Action
     }
 }

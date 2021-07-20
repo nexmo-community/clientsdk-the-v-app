@@ -22,7 +22,7 @@ class UsersViewModel : ViewModel() {
         NavManager.navigate(navDirections)
     }
 
-    sealed class Action {
-        data class ShowContent(val users: List<User>) : Action()
+    sealed interface Action {
+        data class ShowContent(val users: List<User>) : Action
     }
 }
