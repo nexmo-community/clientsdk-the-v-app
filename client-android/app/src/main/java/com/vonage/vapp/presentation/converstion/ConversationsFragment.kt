@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.vonage.vapp.R
 import com.vonage.vapp.core.ext.observe
 import com.vonage.vapp.core.ext.toast
-import com.vonage.vapp.data.MemoryRepository
 import com.vonage.vapp.data.model.User
 import com.vonage.vapp.databinding.FragmentConversationsBinding
 import com.vonage.vapp.presentation.converstion.ConversationsViewModel.Action
@@ -26,7 +25,6 @@ class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
     private val viewModel by viewModels<ConversationsViewModel>()
 
     private val conversationAdapter = ConversationAdapter()
-    private val memoryRepository = MemoryRepository
 
     private val actionObserver = Observer<Action> {
         binding.progressBar.visibility = View.INVISIBLE
@@ -38,7 +36,7 @@ class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
                 binding.contentContainer.visibility = View.VISIBLE
             }
             is SelectUsers -> {
-                showUserSelectionDialog()
+                showUserSelectionDialog(it.users)
                 binding.contentContainer.visibility = View.VISIBLE
             }
             is ShowLoading -> binding.progressBar.visibility = View.VISIBLE
@@ -73,15 +71,15 @@ class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
         }
     }
 
-    private fun showUserSelectionDialog() {
+    private fun showUserSelectionDialog(users: List<User>) {
         context?.let { context ->
-            val userNames = memoryRepository.otherUsers.map { it.displayName }.toTypedArray()
+            val userNames = users.map { it.displayName }.toTypedArray()
             val selectedUsers = mutableSetOf<User>()
 
             val builder: AlertDialog.Builder = AlertDialog.Builder(context)
             builder.setTitle("Select users")
             builder.setMultiChoiceItems(userNames, null) { _, index, checked ->
-                val user = memoryRepository.otherUsers[index]
+                val user = users[index]
 
                 if (checked) {
                     selectedUsers.add(user)

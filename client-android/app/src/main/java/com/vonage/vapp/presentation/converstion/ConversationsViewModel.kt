@@ -28,7 +28,7 @@ class ConversationsViewModel : ViewModel() {
     }
 
     fun createConversation() {
-        viewActionMutableLiveData.postValue(Action.SelectUsers)
+        viewActionMutableLiveData.postValue(Action.SelectUsers(memoryRepository.otherUsers))
     }
 
     fun createConversation(users: Set<User>) {
@@ -70,7 +70,7 @@ class ConversationsViewModel : ViewModel() {
     sealed class Action {
         object ShowLoading : Action()
         data class ShowContent(val conversations: List<Conversation>) : Action()
-        object SelectUsers : Action()
+        data class SelectUsers(val users: List<User>) : Action()
         data class ShowError(val message: String) : Action()
     }
 }
