@@ -5,12 +5,12 @@ const Events = require('./events');
 const Users = require('./users');
 
 
-const getAllForUser = async function (userId) {
+const getAllForUser = async function (client, userId) {
   try {
-    const res = await pool.query('SELECT conversations.vonage_id, conversations.state, conversations.created_at FROM conversations JOIN members ON conversations.vonage_id = members.conversation_id WHERE user_id=$1', [userId]);
+    const res = await client.query('SELECT conversations.vonage_id, conversations.state, conversations.created_at FROM conversations JOIN members ON conversations.vonage_id = members.conversation_id WHERE user_id=$1', [userId]);
     if (res.rowCount > 0 ) {
       let conversations = await Promise.all(res.rows.map(async (conv) => {
-        return await buildConversation(conv, userId);
+        return await buildConversation(client, conv, userId);
       }));
       return conversations;
     }
@@ -45,11 +45,11 @@ const getConversationForUser = async function (conversationId, userId) {
   return null;
 }
 
-async function buildConversation(conv, userId) {
+async function buildConversation(client, conv, userId) {
   conv.id = conv.vonage_id;
   delete conv.vonage_id;
 
-  const members = await getMembers(conv.id);
+  const members = await getMembers(client, conv.id);
   const myMember = members.find(m => m.user_id == userId);
   conv.users = members.filter(m => m.user_id != userId).map(m => {
     return {
@@ -64,7 +64,7 @@ async function buildConversation(conv, userId) {
 
   if(!myMember) { return; }
 
-  let events = await getEvents(conv.id);
+  let events = await getEvents(client, conv.id);
 
   let invitedEvent = events.find(e => e.vonage_type == 'member:invited' && e.from_member_id == myMember.member_id);
   if(invitedEvent) { 
@@ -82,13 +82,13 @@ async function buildConversation(conv, userId) {
 }
 
 
-const getMembers = async function (conversationId) {
+const getMembers = async function (client, conversationId) {
   try {
-    const res = await pool.query('SELECT vonage_id as member_id, conversation_id, user_id, state FROM members where conversation_id=$1', [conversationId]);
+    const res = await client.query('SELECT vonage_id as member_id, conversation_id, user_id, state FROM members where conversation_id=$1', [conversationId]);
     if (res.rowCount > 0 ) {
       let members = res.rows;
       let membersWithUsers = await Promise.all(members.map(async (member) => {
-        user = await Users.getByVonageId(member.user_id);
+        user = await Users.getByVonageId(client, member.user_id);
         member.name = user.name;
         member.display_name = user.display_name;
         return member;
@@ -101,9 +101,9 @@ const getMembers = async function (conversationId) {
   return [];
 }
 
-const getEvents = async function (conversationId) {
+const getEvents = async function (client, conversationId) {
   try {
-    const res = await pool.query('SELECT events.vonage_id, events.conversation_id, events.from_member_id, events.to_member_id, events.vonage_type, events.content, events.created_at, members.user_id FROM events JOIN members ON events.from_member_id = members.vonage_id WHERE events.conversation_id=$1', [conversationId]);
+    const res = await client.query('SELECT events.vonage_id, events.conversation_id, events.from_member_id, events.to_member_id, events.vonage_type, events.content, events.created_at, members.user_id FROM events JOIN members ON events.from_member_id = members.vonage_id WHERE events.conversation_id=$1', [conversationId]);
     if (res.rowCount > 0 ) {
       let events = res.rows;
       return events;

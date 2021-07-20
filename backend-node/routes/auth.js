@@ -1,4 +1,5 @@
 const express = require('express');
+const { Pool } = require('pg');
 
 const Data = require('../data');
 const JWT = require('../jwt');
@@ -23,79 +24,53 @@ authRoutes.post('/signup', async (req, res) => {
     return;
   }
 
-  // Check if a Vonage User exists in the local Data
-  let user = await Data.users.getByName(name);
-  if (user) {
-    if(user.password_digest) {
-      res.status(409).send({
-        "type": "data:validation",
-        "title": "Bad Request",
-        "detail": "User already exists.",
-        "invalid_parameters": [
-          {
-            "name": "name",
-            "reason": "must be unique"
-          }
-        ]
-      });
-    } else {
-      await Data.users.addPassword(name, password);
-      const token = JWT.getUserJWT(user.name, user.vonage_id);
-      res.status(201).send({
-        user,
-        token
-      });
-    }
-    return;
-  }
+  const pool = new Pool({ connectionString: process.env.postgresDatabaseUrl });
+  pool.connect(async (err, client, done) => {
+    if (err) throw err
 
-  // Create Vonage User
-  const { vonageUser, error } = await Vonage.users.create(name, display_name);
-
-  if (error) {
-    if(error.code != 'user:error:duplicate-name') {
-      res.status(500).send({
-        "type": "system:error",
-        "title": "System Failure",
-        "detail": error.detail
-      });
-      return;
-    }
     // retrieve all users from Vonage into Data
-    await Data.users.sync();
-    // find user in Data
-    user = await Data.users.getByName(name);
-    // console.log(user);
-    // no user in the Data - THIS SHOULD NEVER HAPPEN
-    if(!user) {
-      res.status(500).send({
-        "type": "system:error",
-        "title": "System Failure",
-        "detail": "There was an issue with the database.",
-      });
-      return
+    await Data.users.syncAll();
+
+    let user = await Data.users.getByName(client, name);
+    // Check if a Vonage User exists in the local Data
+    if (user) {
+      await signupExistingUser(res, client, user, name, password);
+    } else {
+      // Create Vonage User (also does a sync of all users from Vonage)
+      const { vonageUser, error } = await Vonage.users.create(name, display_name);
+      if (error) {
+        await signupCreateVonageUserError(res, client, error, name, password);
+      } else {
+        let user = await Data.users.create(client, vonageUser.id, name, display_name, password);
+        if (!user) {
+          // Error creating New User
+          res.status(500).send({
+            "type": "system:error",
+            "title": "System Failure",
+            "detail": "There was an issue with the database.",
+          });
+        } else {
+          // New User created successfully
+          const token = JWT.getUserJWT(user.name, user.vonage_id);
+          let users = await Data.users.getInterlocutorsFor(client, user.name);
+          const conversations = await Data.conversations.getAllForUser(client, user.vonage_id);
+          res.status(201).send({
+            user,
+            token,
+            users,
+            conversations
+          });
+        }
+      }
     }
-    await Data.users.addPassword(name, password);
-    const token = JWT.getUserJWT(user.name, user.vonage_id);
-    res.status(201).send({
-      user,
-      token
-    });
-    return
-  }
+    client.release();
+  });
+  pool.end();
+});
 
-  user = await Data.users.create(name, password, display_name, vonageUser.id);
 
-  if (!user) {
-    res.status(500).send({
-      "type": "system:error",
-      "title": "System Failure",
-      "detail": "There was an issue with the database.",
-    });
-    return;
-  }
-
-  if (user.status === 'existed') {
+const signupExistingUser = async function (res, client, user, name, password) {
+  if(user.password_digest) {
     res.status(409).send({
       "type": "data:validation",
       "title": "Bad Request",
@@ -107,37 +82,53 @@ authRoutes.post('/signup', async (req, res) => {
         }
       ]
     });
+  } else {
+    await Data.users.addPassword(client, name, password);
+    const token = JWT.getUserJWT(user.name, user.vonage_id);
+    res.status(201).send({
+      user,
+      token
+    });
+  }
+};
+
+const signupCreateVonageUserError = async function(res, client, error, name, password) {
+  // return any error apart from user name duplicate
+  if(error.code != 'user:error:duplicate-name') {
+    res.status(500).send({
+      "type": "system:error",
+      "title": "System Failure",
+      "detail": error.detail
+    });
     return;
   }
-
-  // Create JWT
+  // find local user
+  user = await Data.users.getByName(client, name);
+  // console.log(user);
+  // no local user - THIS SHOULD NEVER HAPPEN
+  if(!user) {
+    res.status(500).send({
+      "type": "system:error",
+      "title": "System Failure",
+      "detail": "There was an issue with the database.",
+    });
+    return
+  }
+  // The user existed on the Vonage server - we'll add the password
+  await Data.users.addPassword(client, name, password);
   const token = JWT.getUserJWT(user.name, user.vonage_id);
-
-  // All other users
-  let users = await Data.users.getInterlocutorsFor(user.name);
-
-  // All conversations for this user
-  const conversations = await Data.conversations.getAllForUser(user.vonage_id);
-
   res.status(201).send({
     user,
-    token,
-    users,
-    conversations
+    token
   });
-});
-
+};
 
 
 
 
 authRoutes.post('/login', async (req, res) => {
-
   const { name, password } = req.body;
-
-  // validate that they done passed everything in
   const invalid_parameters = Validation.validateLoginParameters(name, password);
-
   if (invalid_parameters.length > 0) {
     res.status(400).send({
       "type": "data:validation",
@@ -148,32 +139,32 @@ authRoutes.post('/login', async (req, res) => {
     return;
   }
 
-  const user = await Data.users.authenticate(name, password);
+  const pool = new Pool({ connectionString: process.env.postgresDatabaseUrl });
+  pool.connect(async (err, client, done) => {
+    if (err) throw err
+    const user = await Data.users.authenticate(client, name, password);
 
-  if (!user) {
-    res.status(403).send({
-      "type": "auth:unauthorized",
-      "title": "Bad Request",
-      "detail": "The request failed due to invalid credentials"
-    });
-    return;
-  }
-
-  // Create JWT
-  const token = JWT.getUserJWT(user.name, user.vonage_id);
-
-  // All other users
-  let users = await Data.users.getInterlocutorsFor(user.name);
-
-  // All conversations for this user
-  const conversations = await Data.conversations.getAllForUser(user.vonage_id);
-
-  res.status(201).send({
-    user,
-    token,
-    users,
-    conversations
+    if (!user) {
+      res.status(403).send({
+        "type": "auth:unauthorized",
+        "title": "Bad Request",
+        "detail": "The request failed due to invalid credentials"
+      });
+    } else {
+      const token = JWT.getUserJWT(user.name, user.vonage_id);
+      let users = await Data.users.getInterlocutorsFor(client, user.name);
+      const conversations = await Data.conversations.getAllForUser(client, user.vonage_id);
+      res.status(201).send({
+        user,
+        token,
+        users,
+        conversations
+      });
+    }
+    client.release();
   });
+  pool.end();
 });
+
 
 module.exports = authRoutes

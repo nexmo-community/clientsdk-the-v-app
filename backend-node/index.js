@@ -6,6 +6,7 @@ const port = 3000;
 
 app.use(express.json());
 
+app.use('/', require('./routes/general'));
 app.use('/', require('./routes/auth'));
 app.use('/', require('./routes/vonage'));
 app.use('/', require('./routes/webhooks'));

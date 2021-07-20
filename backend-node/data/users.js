@@ -26,10 +26,9 @@ const getInterlocutorsFor = async function (client, user_name) {
 
 const create = async function (client, vonage_id, name, display_name, password) {
   let user;
-  name = name.toLowerCase();
-  user = await getByName(name);
+  user = await getByName(client, name);
+  puts (user);
   if (user) {
-    user.status = 'existed';
     return user;
   }
   try {
@@ -42,7 +41,6 @@ const create = async function (client, vonage_id, name, display_name, password) 
     const res = await client.query('INSERT INTO users(vonage_id, name, display_name, password_digest) VALUES($1, $2, $3, $4) RETURNING vonage_id, name, display_name', [vonage_id, name, display_name, passwordHash]);
     if (res.rowCount === 1) {
       user = res.rows[0];
-      user.status = 'created';
     }
     console.log(`USER CREATED - ${user.vonage_id}\t${user.name} \t ${user.display_name}`);
   } catch (err) {
@@ -53,17 +51,16 @@ const create = async function (client, vonage_id, name, display_name, password) 
 
 
 const addPassword = async function (client, name, password) {
-  let user;
-  name = name.toLowerCase();
-  user = await getByName(name);
-  if (user) {
+  try {
     let passwordHash = '';
     if(password) {
       passwordHash = crypto.createHash('sha256', process.env.salt)
         .update(password)
         .digest('hex');
     }
-    const res = await client.query('UPDATE users SET password_digest=$1 WHERE name=$2', [passwordHash, name]);
+    const res = await client.query('UPDATE users SET password_digest=$1, updated_at=NOW() WHERE name=$2', [passwordHash, name]);
+  } catch (err) {
+    console.log(err);
   }
 }
 
@@ -71,7 +68,6 @@ const addPassword = async function (client, name, password) {
 const authenticate = async function (client, name, password) {
   let user;
   try {
-    name = name.toLowerCase();
     const passwordHash = crypto.createHash('sha256', process.env.salt)
       .update(password)
       .digest('hex');
@@ -80,7 +76,6 @@ const authenticate = async function (client, name, password) {
     if (res.rowCount === 1) {
       user = res.rows[0];
     }
-
   } catch (err) {
     console.log(err);
   }
@@ -91,7 +86,6 @@ const authenticate = async function (client, name, password) {
 const getByName = async function (client, name) {
   let user;
   try {
-    name = name.toLowerCase();
     const res = await client.query('SELECT vonage_id, name, display_name, password_digest from users where name=$1', [name]);
     if (res.rowCount === 1) {
       user = res.rows[0];
@@ -137,9 +131,11 @@ const syncAll = async function () {
 }
 
 const syncUser = async function (client, vonageUser) {
+  // console.log(vonageUser);
+  // console.log(vonageUser.name);
   // find user in DB (use name as key)
-  vonageUserName = vonageUser.name.toLowerCase();
-  let user = await getByName(client, vonageUserName);
+  let user = await getByName(client, vonageUser.name);
+  // console.log("user", user);
   if(!user) {
     // if not present (insert)
     const res = await client.query('INSERT INTO users(vonage_id, name, display_name, created_at, updated_at) VALUES($1, $2, $3, NOW(), NOW()) RETURNING vonage_id, name, display_name', [vonageUser.vonage_id, vonageUser.name, vonageUser.display_name]);
@@ -148,7 +144,7 @@ const syncUser = async function (client, vonageUser) {
     }
   } else {
     // if present (update)
-    const res = await client.query('UPDATE users SET vonage_id=$1, display_name=$2, updated_at=NOW() WHERE name=$3 RETURNING vonage_id, name, display_name', [vonageUser.vonage_id, vonageUser.display_name, vonageUserName]);
+    const res = await client.query('UPDATE users SET vonage_id=$1, display_name=$2, updated_at=NOW() WHERE name=$3 RETURNING vonage_id, name, display_name', [vonageUser.vonage_id, vonageUser.display_name, vonageUser.name]);
     // console.log(res);
     if (res.rowCount === 1) {
       user = res.rows[0];

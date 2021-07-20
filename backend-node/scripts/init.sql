@@ -1,7 +1,7 @@
 CREATE TABLE users (
-    id integer PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     vonage_id character varying UNIQUE,
-    name character varying NOT NULL,
+    name character varying NOT NULL UNIQUE,
     display_name character varying,
     password_digest character varying,
     is_active boolean DEFAULT true,
