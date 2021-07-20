@@ -18,7 +18,7 @@ const getAll = async () => {
   console.log(`VONAGE: Retrieving conversations`);
   try {
     const config = getConfig(JWT.getAdminJWT());
-    const response = await axios.get(`${vonageAPIUrl}/conversations`, config);
+    const response = await axios.get(`${vonageAPIUrl}/conversations?page_size=100`, config);
     if (response && response.status === 200 && response.data && response.data._embedded) {
       vonageConversations = response.data._embedded.conversations;
     } else {
@@ -38,7 +38,7 @@ const getAll = async () => {
 const get = async (conversationId) => {
   let vonageConversation;
   let error;
-  console.log(`VONAGE: Retrieving conversation ${JSON.stringify(conversationId)}`);
+  // console.log(`VONAGE: Retrieving conversation ${JSON.stringify(conversationId)}`);
   try {
     const config = getConfig(JWT.getAdminJWT());
     const response = await axios.get(`${vonageAPIUrl}/conversations/${conversationId}`, config);
@@ -80,7 +80,7 @@ const create = async (ownerId, usersIds) => {
 const getMembers = async (conversationId) => {
   let vonageMembers;
   let error;
-  console.log(`VONAGE: Retrieving conversation members ${JSON.stringify(conversationId)}`);
+  // console.log(`VONAGE: Retrieving conversation members ${JSON.stringify(conversationId)}`);
   try {
     const config = getConfig(JWT.getAdminJWT());
     const response = await axios.get(`${vonageAPIUrl}/conversations/${conversationId}/members`, config);
@@ -127,7 +127,7 @@ const createMember = async (conversationId, userId) => {
 const getEvents = async (conversationId) => {
   let vonageEvents;
   let error;
-  console.log(`VONAGE: Retrieving conversation events ${JSON.stringify(conversationId)}`);
+  // console.log(`VONAGE: Retrieving conversation events ${JSON.stringify(conversationId)}`);
   try {
     const config = getConfig(JWT.getAdminJWT());
     const response = await axios.get(`${vonageAPIUrl}/conversations/${conversationId}/events`, config);

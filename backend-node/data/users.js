@@ -1,10 +1,6 @@
 const crypto = require('crypto');
-const { Pool, Client } = require('pg');
-
-const passwordSalt = process.env.salt;
-
+const { Pool } = require('pg');
 const Vonage = require('../vonage');
-
 
 
 const getAll = async function (client) {
@@ -39,7 +35,7 @@ const create = async function (client, vonage_id, name, display_name, password) 
   try {
     let passwordHash = '';
     if(password) {
-      passwordHash = crypto.createHash('sha256', passwordSalt)
+      passwordHash = crypto.createHash('sha256', process.env.salt)
         .update(password)
         .digest('hex');
     }
@@ -63,7 +59,7 @@ const addPassword = async function (client, name, password) {
   if (user) {
     let passwordHash = '';
     if(password) {
-      passwordHash = crypto.createHash('sha256', passwordSalt)
+      passwordHash = crypto.createHash('sha256', process.env.salt)
         .update(password)
         .digest('hex');
     }
@@ -76,7 +72,7 @@ const authenticate = async function (client, name, password) {
   let user;
   try {
     name = name.toLowerCase();
-    const passwordHash = crypto.createHash('sha256', passwordSalt)
+    const passwordHash = crypto.createHash('sha256', process.env.salt)
       .update(password)
       .digest('hex');
     const res = await client.query('SELECT vonage_id, name, display_name from users where name=$1::text and password_digest=$2::text', [name, passwordHash]);
@@ -128,8 +124,7 @@ const syncAll = async function () {
     let vonageUsers = await Vonage.users.getAll();
     console.log("retrieved " + vonageUsers.length + " vonage users");
 
-    for(let i = 0; i < vonageUsers.length; i++) {
-      let vonageUser = vonageUsers[i];
+    for (const vonageUser of vonageUsers) {
       if(!vonageUser || !vonageUser.vonage_id || !vonageUser.name || !vonageUser.display_name) {
         return;
       }
