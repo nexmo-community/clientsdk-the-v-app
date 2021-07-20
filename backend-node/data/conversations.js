@@ -20,14 +20,15 @@ const getAllForUser = async function (client, userId) {
   return [];
 }
 
-const getConversationForUser = async function (conversationId, userId) {
+const getConversationForUser = async function (client, conversationId, userId) {
   try {
-    const res = await pool.query('SELECT conversations.vonage_id, conversations.state, conversations.created_at FROM conversations JOIN members ON conversations.vonage_id = members.conversation_id WHERE conversations.vonage_id=$1 AND user_id=$2', [conversationId, userId]);
+    const res = await client.query('SELECT conversations.vonage_id, conversations.state, conversations.created_at FROM conversations JOIN members ON conversations.vonage_id = members.conversation_id WHERE conversations.vonage_id=$1 AND user_id=$2', [conversationId, userId]);
+    console.log(res);
     if(res.rowCount != 1) {
       return null;
     }
-    let conv = await buildConversation(res.rows[0], userId);
-    let events = await getEvents(conv.id);
+    let conv = await buildConversation(client, res.rows[0], userId);
+    let events = await getEvents(client, conv.id);
     console.dir(events);
     conv.events = events.filter( event => ['text','member:joined','member:left'].includes(event.vonage_type)).map( event => {
       return {
@@ -150,24 +151,24 @@ const create = async (client, vonage_id, name, display_name, state, createdAt) =
 }
 
 
-const createConversationForUserWithInterlocutors  = async (userId, users) => {
+const createConversationForUserWithInterlocutors  = async (client, userId, users) => {
   const newConversation = await Vonage.conversations.create(userId, users);
   console.dir(newConversation);
   if(!newConversation) { return }
-  await create(newConversation.id, newConversation.name, newConversation.display_name, newConversation.state, newConversation.timestamp.created);
+  await create(client, newConversation.id, newConversation.name, newConversation.display_name, newConversation.state, newConversation.timestamp.created);
 
   // add the members
   users.push(userId);
   for(let i = 0; i < users.length; i++) {
     let user = users[i];
     const member = await Vonage.conversations.createMember(newConversation.id, user);
-    console.dir(member);
+    // console.dir(member);
     if(member) {
-      await Members.create(member.id, newConversation.id, user, member.state);
+      await Members.createOrUpdate(client, newConversation.id, member.id, user, member.state);
     }
   };
 
-  const conv = await getConversationForUser(newConversation.id, userId);
+  const conv = await getConversationForUser(client, newConversation.id, userId);
   return conv;
 }
 
