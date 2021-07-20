@@ -1,6 +1,6 @@
 const Data = require('../../data');
 
-async function invited(reqBody) {
+async function invited(client, reqBody) {
   const { body, conversation_id } = reqBody;
   console.log(JSON.stringify(conversation_id));
   if(!conversation_id || !body) {
@@ -14,23 +14,23 @@ async function invited(reqBody) {
   }
 
   // already present
-  let member = await Data.members.get(user['member_id']);
+  let member = await Data.members.get(client, user['member_id']);
   if(member) {
     return `create member with body: ${member.vonage_id} [ALREADY EXISTS]`;
   }
 
-  let conversation = await Data.conversations.get(conversation_id, true);
+  let conversation = await Data.conversations.get(client, conversation_id);
   if(!conversation) {
     return 'Could not find the conversation';
   }
 
-  let localUser = await Data.users.getByVonageId(user['user_id'], true);
+  let localUser = await Data.users.getByVonageId(client, user['user_id'], true);
   if(!localUser) {
     return 'Could not find the user';
   }
 
   // new member
-  member = await Data.members.invited(user['member_id'], conversation_id, user['user_id']);
+  member = await Data.members.invited(client, user['member_id'], conversation_id, user['user_id']);
   if(member) {
     return `create member with body: ${member.vonage_id}`;
   } else {

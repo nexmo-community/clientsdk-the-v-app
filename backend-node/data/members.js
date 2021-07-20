@@ -23,7 +23,7 @@ const get = async function (client, member_id) {
 }
 
 
-const invited = async function (vonage_id, conversation_id, user_id) {
+const invited = async function (client, vonage_id, conversation_id, user_id) {
   let member = await get(vonage_id);
   if(member) {
     return member;
@@ -39,7 +39,7 @@ const invited = async function (vonage_id, conversation_id, user_id) {
   //   return member;
   // }
   try {
-    const res = await pool.query('INSERT INTO members(vonage_id, conversation_id, user_id, state) VALUES($1, $2, $3, $4) RETURNING vonage_id, conversation_id, user_id, state', [vonage_id, conversation_id, user_id, 'INVITED']);
+    const res = await client.query('INSERT INTO members(vonage_id, conversation_id, user_id, state) VALUES($1, $2, $3, $4) RETURNING vonage_id, conversation_id, user_id, state', [vonage_id, conversation_id, user_id, 'INVITED']);
     if (res.rowCount === 1) {
       member = res.rows[0];
     }

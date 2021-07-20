@@ -23,13 +23,12 @@ const getAllForUser = async function (client, userId) {
 const getConversationForUser = async function (client, conversationId, userId) {
   try {
     const res = await client.query('SELECT conversations.vonage_id, conversations.state, conversations.created_at FROM conversations JOIN members ON conversations.vonage_id = members.conversation_id WHERE conversations.vonage_id=$1 AND user_id=$2', [conversationId, userId]);
-    console.log(res);
     if(res.rowCount != 1) {
       return null;
     }
     let conv = await buildConversation(client, res.rows[0], userId);
     let events = await getEvents(client, conv.id);
-    console.dir(events);
+    // console.dir(events);
     conv.events = events.filter( event => ['text','member:joined','member:left'].includes(event.vonage_type)).map( event => {
       return {
         id: event.vonage_id,
@@ -192,14 +191,14 @@ const update = async (client, vonage_id, name, display_name, state, createdAt) =
 }
 
 
-const destroy = async (vonage_id) => {
+const destroy = async (client, vonage_id) => {
   let conversation = await get(vonage_id);
   // console.log(conversation);
   if(!conversation) {
     return;
   }
   try {
-    const res = await pool.query('UPDATE conversations SET deleted_at=NOW() WHERE vonage_id=$1', [vonage_id]);
+    const res = await client.query('UPDATE conversations SET deleted_at=NOW() WHERE vonage_id=$1', [vonage_id]);
     console.log(`CONVERSATION MARKED AS DELETED: ${vonage_id}`);
   } catch (err) {
     console.log(err);
