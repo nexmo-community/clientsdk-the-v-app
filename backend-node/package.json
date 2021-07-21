@@ -4,7 +4,7 @@
   "description": "The backend fo that good node/Vonage stuff",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --trace-warnings index.js",
+    "start": "node index.js",
     "sync-users": "node scripts/sync-users.js",
     "sync-conversations": "node scripts/sync-conversations.js"
   },
