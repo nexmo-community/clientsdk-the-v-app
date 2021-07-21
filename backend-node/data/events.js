@@ -20,22 +20,20 @@ const get = async (conversation_id, vonage_id) => {
   return event;
 }
 
-const create = async (conversation_id, from_member_id, to_member_id, vonage_id, vonage_type, content, created_at) => {
-  let event = await get(conversation_id, vonage_id);
-  if(event) {
-    return event;
-  }
+const create = async (client, event_id, event_type, conversation_id, from_member_id, to_member_id, content, created_at) => {
+  let event;
   try {
-    const res = await pool.query('INSERT INTO events(conversation_id, from_member_id, to_member_id, vonage_id, vonage_type, content, created_at) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING conversation_id, from_member_id, to_member_id, vonage_id, vonage_type, content, created_at', [conversation_id, from_member_id, to_member_id, vonage_id, vonage_type, content, created_at]);
+    const res = await client.query('INSERT INTO events(vonage_id, vonage_type, conversation_id, from_member_id, to_member_id, content, created_at) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING vonage_id, vonage_type, conversation_id, from_member_id, to_member_id, content, created_at', [event_id, event_type, conversation_id, from_member_id, to_member_id, content, created_at]);
     if (res.rowCount === 1) {
       event = res.rows[0];
     }
-    console.log(`EVENT CREATED:
-  - id:           ${event.vonage_id}
-  - type:         ${event.vonage_type}
-  - content:      ${event.content}`);
+    console.log(`      | - EVENT CREATED: #${event.vonage_id} [${event.vonage_type}]: ${event.content}`);
+  //   console.log(`EVENT CREATED:
+  // - id:           ${event.vonage_id}
+  // - type:         ${event.vonage_type}
+  // - content:      ${event.content}`);
   } catch (err) {
-    console.log(err);
+    // console.log(err);
   }
   return event;
 }

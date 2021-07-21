@@ -1,6 +1,6 @@
 const Data = require('../../data');
 
-async function invited(reqBody) {
+async function invited(client, reqBody) {
   const { body, conversation_id } = reqBody;
   console.log(JSON.stringify(conversation_id));
   if(!conversation_id || !body) {
@@ -14,23 +14,23 @@ async function invited(reqBody) {
   }
 
   // already present
-  let member = await Data.members.get(user['member_id']);
+  let member = await Data.members.get(client, user['member_id']);
   if(member) {
     return `create member with body: ${member.vonage_id} [ALREADY EXISTS]`;
   }
 
-  let conversation = await Data.conversations.get(conversation_id, true);
+  let conversation = await Data.conversations.get(client, conversation_id);
   if(!conversation) {
     return 'Could not find the conversation';
   }
 
-  let localUser = await Data.users.getByVonageId(user['user_id'], true);
+  let localUser = await Data.users.getByVonageId(client, user['user_id'], true);
   if(!localUser) {
     return 'Could not find the user';
   }
 
   // new member
-  member = await Data.members.invited(user['member_id'], conversation_id, user['user_id']);
+  member = await Data.members.invited(client, user['member_id'], conversation_id, user['user_id']);
   if(member) {
     return `create member with body: ${member.vonage_id}`;
   } else {
@@ -38,13 +38,14 @@ async function invited(reqBody) {
   }
 }
 
-async function statusUpdate(newStatus, reqBody) {
+async function statusUpdate(client, newStatus, reqBody) {
   const { from, conversation_id, body } = reqBody;
   console.log(JSON.stringify(conversation_id));
   if(!conversation_id || !body) {
     return 'Missing data';
   }
-  const { user } = body;
+  console.log(body);
+  const { member_id, user } = body;
   console.log(JSON.stringify(user));
 
   if(!user || !user['id']) {
@@ -52,11 +53,11 @@ async function statusUpdate(newStatus, reqBody) {
   }
 
   // already present
-  let member = await Data.members.get(from);
+  let member = await Data.members.createOrUpdate(client, conversation_id, member_id, user['id'], newStatus);
   if(!member) {
     return `ERROR: member doesn't exist: ${from}`;
   }
-  member = await Data.members.statusUpdate(from, newStatus);
+  member = await Data.members.statusUpdate(client, from, newStatus);
   if(member) {
     return `member: ${member.vonage_id} - JOINED`;
   } else {
