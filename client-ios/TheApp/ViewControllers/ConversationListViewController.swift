@@ -1,6 +1,10 @@
 import UIKit
 import NexmoClient
 
+protocol ConversationListViewControllerDelegate: AnyObject {
+    func conversationListViewControllerDelegateDidRefreshList(_ conversationListViewController: ConversationListViewController)
+}
+
 class ConversationListViewController: UIViewController {
     
     private lazy var listViewController: ListViewController<Conversations.Conversation> = {
@@ -10,12 +14,12 @@ class ConversationListViewController: UIViewController {
         return vc
     }()
     
-    private let data: Auth.Response
     private var conversations: [Conversations.Conversation]
     
-    init(data: Auth.Response) {
-        self.data = data
-        self.conversations = data.conversations
+    weak var delegate: ConversationListViewControllerDelegate?
+    
+    init(conversations: [Conversations.Conversation]) {
+        self.conversations = conversations
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -27,16 +31,13 @@ class ConversationListViewController: UIViewController {
         super.viewDidLoad()
         setUpView()
         setUpConstraints()
+        guard let homeViewController = tabBarController as? HomeViewController else { return }
+        homeViewController.homeDelegate = self
     }
     
     private func setUpView() {
-        title = "The V app"
         view.backgroundColor = .white
         view.addSubview(listViewController.view)
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add,
-                                                            target: self,
-                                                            action: #selector(newConversationButtonTapped))
-        self.navigationItem.hidesBackButton = true
     }
     
     private func setUpConstraints() {
@@ -47,50 +48,32 @@ class ConversationListViewController: UIViewController {
             listViewController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
     }
-    
-    private func loadConversations() {
-        let token = NXMClient.shared.authToken
-        
-        RemoteLoader.load(path: Conversations.path,
-                          authToken: token,
-                          body: Optional<String>.none,
-                          responseType: Conversations.List.Response.self) { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success(let conversations):
-                self.listViewController.triggerUpdate(with: conversations)
-            case .failure(let error):
-                self.showErrorAlert(message: error.localizedDescription)
-            }
-        }
-    }
-    
-    @objc func newConversationButtonTapped() {
-        let createConversationViewController = CreateConversationViewController(users: data.users)
-        createConversationViewController.delegate = self
-        navigationController?.present(createConversationViewController, animated: true, completion: nil)
-    }
-}
-
-extension ConversationListViewController: CreateConversationViewControllerDelegate {
-    func createConversationViewController(_ createConversationViewController: CreateConversationViewController, didCreateConversation conversation: Conversations.Conversation) {
-        DispatchQueue.main.async {
-            self.dismiss(animated: true, completion: nil)
-            self.conversations.append(conversation)
-            self.listViewController.triggerUpdate(with: self.conversations)
-            self.navigationController?.pushViewController(ChatViewController(conversation: conversation), animated: true)
-        }
-    }
 }
 
 extension ConversationListViewController: ListViewControllerDelegate {
     func listViewControllerDelegateDidRefresh<T>(_: ListViewController<T>) where T : Hashable, T : ListViewPresentable {
-        self.loadConversations()
+        delegate?.conversationListViewControllerDelegateDidRefreshList(self)
     }
     
     func listViewControllerDelegate<T>(_: ListViewController<T>, didSelectRow data: T) where T : Hashable, T : ListViewPresentable {
         if let conversation = data as? Conversations.Conversation {
             navigationController?.pushViewController(ChatViewController(conversation: conversation), animated: true)
         }
+    }
+}
+
+extension ConversationListViewController: HomeViewControllerDelegate {
+    func homeViewControllerDelegate(_ HomeViewController: HomeViewController, didCreateConversation conversation: Conversations.Conversation, conversations: [Conversations.Conversation]) {
+        DispatchQueue.main.async {
+            self.dismiss(animated: true, completion: nil)
+            self.conversations = conversations
+            self.listViewController.triggerUpdate(with: self.conversations)
+            self.navigationController?.pushViewController(ChatViewController(conversation: conversation), animated: true)
+        }
+    }
+    
+    func homeViewControllerDelegate(_ HomeViewController: HomeViewController, didLoadConversations conversations: [Conversations.Conversation]) {
+        self.conversations = conversations
+        self.listViewController.triggerUpdate(with: self.conversations)
     }
 }

@@ -96,10 +96,22 @@ struct APIError: Codable {
     let type: String?
     let title: String?
     let detail: String?
-    let invalidParameters: [String: String]?
+    let invalidParameters: [[String: String]]?
     
     enum CodingKeys: String, CodingKey {
         case type, title, detail
         case invalidParameters = "invalid_parameters"
+    }
+    
+    var description: String {
+        var descriptionString: String = self.detail ?? ""
+        
+        if let invalidParameters = invalidParameters {
+            for invalidParameter in invalidParameters {
+                descriptionString += "\n \(invalidParameter.description)"
+            }
+        }
+        
+        return descriptionString
     }
 }

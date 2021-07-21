@@ -36,7 +36,7 @@ final class ClientManager: NSObject {
             case .failure(let error):
                 switch error {
                 case .api(error: let apiError):
-                    self.delegate?.clientManager(self, authDidFail: apiError.detail)
+                    self.delegate?.clientManager(self, authDidFail: apiError.description)
                 default:
                     self.delegate?.clientManager(self, authDidFail: error.localizedDescription)
                 }

@@ -68,7 +68,7 @@ class SignUpViewController: UIViewController, LoadingViewController {
 extension SignUpViewController: ClientManagerDelegate {
     func clientManager(_ clientManager: ClientManager, responseForAuth response: Auth.Response) {
         toggleLoading()
-        navigationController?.pushViewController(ConversationListViewController(data: response), animated: true)
+        navigationController?.pushViewController(HomeViewController(data: response), animated: true)
     }
     
     func clientManager(_ clientManager: ClientManager, authDidFail errorMessage: String?) {

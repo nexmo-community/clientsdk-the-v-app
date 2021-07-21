@@ -9,7 +9,11 @@
 /* Begin PBXBuildFile section */
 		121D9D9225FA764200C36658 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 121D9D9125FA764200C36658 /* Models.swift */; };
 		121D9D9525FA772200C36658 /* RemoteLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 121D9D9425FA772200C36658 /* RemoteLoader.swift */; };
+		122D6F6B26A83C0E00028418 /* ContactsViewController.swift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122D6F6926A83C0E00028418 /* ContactsViewController.swift.swift */; };
+		122D6F6C26A83C0E00028418 /* SettingsViewController.swift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122D6F6A26A83C0E00028418 /* SettingsViewController.swift.swift */; };
 		1248413925FB8A93009DBEB9 /* ClientManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1248413825FB8A93009DBEB9 /* ClientManager.swift */; };
+		127E728C26A5D0CF00737906 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 127E728B26A5D0CF00737906 /* HomeViewController.swift */; };
+		127E729026A5D60100737906 /* VTabBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 127E728F26A5D60100737906 /* VTabBarItem.swift */; };
 		1297BDDD2601227F00025D12 /* CreateConversationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1297BDDC2601227F00025D12 /* CreateConversationViewController.swift */; };
 		1297BDE0260123AB00025D12 /* ListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1297BDDF260123AB00025D12 /* ListViewController.swift */; };
 		1297BDE426026A4E00025D12 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1297BDE326026A4E00025D12 /* ChatViewController.swift */; };
@@ -29,7 +33,11 @@
 /* Begin PBXFileReference section */
 		121D9D9125FA764200C36658 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		121D9D9425FA772200C36658 /* RemoteLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteLoader.swift; sourceTree = "<group>"; };
+		122D6F6926A83C0E00028418 /* ContactsViewController.swift.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactsViewController.swift.swift; sourceTree = "<group>"; };
+		122D6F6A26A83C0E00028418 /* SettingsViewController.swift.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift.swift; sourceTree = "<group>"; };
 		1248413825FB8A93009DBEB9 /* ClientManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientManager.swift; sourceTree = "<group>"; };
+		127E728B26A5D0CF00737906 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
+		127E728F26A5D60100737906 /* VTabBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VTabBarItem.swift; sourceTree = "<group>"; };
 		1297BDDC2601227F00025D12 /* CreateConversationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateConversationViewController.swift; sourceTree = "<group>"; };
 		1297BDDF260123AB00025D12 /* ListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListViewController.swift; sourceTree = "<group>"; };
 		1297BDE326026A4E00025D12 /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
@@ -105,6 +113,9 @@
 				12D2386D2600F371004D1FC6 /* ConversationListViewController.swift */,
 				1297BDDC2601227F00025D12 /* CreateConversationViewController.swift */,
 				1297BDDF260123AB00025D12 /* ListViewController.swift */,
+				127E728B26A5D0CF00737906 /* HomeViewController.swift */,
+				122D6F6926A83C0E00028418 /* ContactsViewController.swift.swift */,
+				122D6F6A26A83C0E00028418 /* SettingsViewController.swift.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -132,6 +143,7 @@
 			children = (
 				1248413825FB8A93009DBEB9 /* ClientManager.swift */,
 				121D9D9125FA764200C36658 /* Models.swift */,
+				127E728F26A5D60100737906 /* VTabBarItem.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -272,8 +284,12 @@
 				12D2385625FFE409004D1FC6 /* Extensions.swift in Sources */,
 				12B77902250FA8BE0081D8AF /* AppDelegate.swift in Sources */,
 				12FABB3425FFBF9F00B61567 /* SignupViewController.swift in Sources */,
+				127E728C26A5D0CF00737906 /* HomeViewController.swift in Sources */,
+				127E729026A5D60100737906 /* VTabBarItem.swift in Sources */,
 				1248413925FB8A93009DBEB9 /* ClientManager.swift in Sources */,
 				1297BDE0260123AB00025D12 /* ListViewController.swift in Sources */,
+				122D6F6B26A83C0E00028418 /* ContactsViewController.swift.swift in Sources */,
+				122D6F6C26A83C0E00028418 /* SettingsViewController.swift.swift in Sources */,
 				1297BDDD2601227F00025D12 /* CreateConversationViewController.swift in Sources */,
 				12B77904250FA8BE0081D8AF /* SceneDelegate.swift in Sources */,
 				12D2385925FFE42A004D1FC6 /* SpinnerView.swift in Sources */,

@@ -38,3 +38,22 @@ extension UIStackView {
         }
     }
 }
+
+extension UIBarButtonItem {
+    var isHidden: Bool {
+        get {
+            return !self.isEnabled
+        }
+        set {
+            if newValue {
+                self.tintColor = .clear
+                self.isEnabled = false
+                self.isAccessibilityElement = false
+            } else {
+                self.tintColor = .systemBlue
+                self.isEnabled = true
+                self.isAccessibilityElement = true
+            }
+        }
+    }
+}
