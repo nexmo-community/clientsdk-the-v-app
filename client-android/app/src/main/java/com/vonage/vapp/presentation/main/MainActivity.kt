@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             }
         }
 
-        navController.addOnDestinationChangedListener { controller, destination, arguments ->
+        navController.addOnDestinationChangedListener { _, destination, _ ->
             Log.d("MainActivity", "NavDestination us ${destination.label}")
         }
 

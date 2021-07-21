@@ -2,13 +2,17 @@ package com.vonage.vapp.presentation.converstion
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.nexmo.client.NexmoAttachmentEvent
 import com.nexmo.client.NexmoClient
 import com.nexmo.client.NexmoConversation
 import com.nexmo.client.NexmoDeletedEvent
 import com.nexmo.client.NexmoDeliveredEvent
+import com.nexmo.client.NexmoEvent
+import com.nexmo.client.NexmoEventsPage
+import com.nexmo.client.NexmoMemberEvent
+import com.nexmo.client.NexmoMemberState
 import com.nexmo.client.NexmoMessageEventListener
+import com.nexmo.client.NexmoPageOrder
 import com.nexmo.client.NexmoSeenEvent
 import com.nexmo.client.NexmoTextEvent
 import com.nexmo.client.NexmoTypingEvent
@@ -17,10 +21,6 @@ import com.nexmo.client.request_listener.NexmoRequestListener
 import com.vonage.vapp.core.ext.asLiveData
 import com.vonage.vapp.data.ApiRepository
 import com.vonage.vapp.data.MemoryRepository
-import com.vonage.vapp.data.model.ErrorResponseModel
-import com.vonage.vapp.data.model.Event
-import com.vonage.vapp.data.model.GetConversationResponseModel
-import kotlinx.coroutines.launch
 
 class ConversationDetailViewModel : ViewModel() {
 
@@ -31,9 +31,8 @@ class ConversationDetailViewModel : ViewModel() {
     private val viewActionMutableLiveData = MutableLiveData<Action>()
     val viewActionLiveData = viewActionMutableLiveData.asLiveData()
 
-    private var nexmoConversation: NexmoConversation? = null
-
     private val memoryRepository = MemoryRepository
+    private var conversation: NexmoConversation? = null
 
     private val messageListener = object : NexmoMessageEventListener {
         override fun onTypingEvent(typingEvent: NexmoTypingEvent) {}
@@ -54,63 +53,89 @@ class ConversationDetailViewModel : ViewModel() {
 
     fun init(navArgs: ConversationDetailFragmentArgs) {
         getConversation(navArgs.conversaion.id)
-        getNexmoConversation(navArgs.conversaion.id)
-    }
-
-    private fun getNexmoConversation(conversationId: String) {
-        viewActionMutableLiveData.postValue(Action.Loading)
-
-        client.getConversation(conversationId, object : NexmoRequestListener<NexmoConversation> {
-            override fun onSuccess(conversation: NexmoConversation?) {
-                conversation?.addMessageEventListener(messageListener)
-
-                this@ConversationDetailViewModel.nexmoConversation = conversation
-            }
-
-            override fun onError(apiError: NexmoApiError) {
-                this@ConversationDetailViewModel.nexmoConversation = null
-                viewActionMutableLiveData.postValue(Action.Error("NexmoConversation load error"))
-            }
-        })
     }
 
     private fun getConversation(conversationId: String) {
         viewActionMutableLiveData.postValue(Action.Loading)
 
-        viewModelScope.launch {
-            val result = adiRepository.getConversation(conversationId)
-
-            if (result is GetConversationResponseModel) {
-                val events = result.conversation?.events ?: listOf()
-                displayConversationEvents(events)
-            } else if (result is ErrorResponseModel) {
-                viewActionMutableLiveData.postValue(Action.Error(result.fullMessage))
+        client.getConversation(conversationId, object : NexmoRequestListener<NexmoConversation> {
+            override fun onSuccess(conversation: NexmoConversation?) {
+                conversation?.addMessageEventListener(messageListener)
+                this@ConversationDetailViewModel.conversation = conversation
+                conversation?.let { getConversationEvents(it) }
             }
-        }
+
+            override fun onError(apiError: NexmoApiError) {
+                this@ConversationDetailViewModel.conversation = null
+                viewActionMutableLiveData.postValue(Action.Error("NexmoConversation load error"))
+            }
+        })
     }
 
-    private fun displayConversationEvents(events: List<Event>?) {
-        val lines = events
-            ?.distinctBy { it.id } // Remove duplicated events
-            ?.sortedBy { it.timestamp } // Sort events
-            ?.map {
-                val userDisplayName = getUserDisplayName(it.from)
-
-                val line = when (it.type) {
-                    "text" -> "$userDisplayName: ${it.content}"
-                    "member:joined" -> "$userDisplayName joined"
-                    else -> "${it.type} ${it.content}"
+    private fun getConversationEvents(conversation: NexmoConversation) {
+        conversation.getEvents(100, NexmoPageOrder.NexmoMPageOrderAsc, null,
+            object : NexmoRequestListener<NexmoEventsPage> {
+                override fun onSuccess(nexmoEventsPage: NexmoEventsPage?) {
+                    nexmoEventsPage?.pageResponse?.data?.let {
+                        displayConversationEvents(it.toList())
+                    }
                 }
 
-                line
-            } ?: listOf()
+                override fun onError(apiError: NexmoApiError) {
+                    viewActionMutableLiveData.postValue(
+                        Action.Error("Error: Unable to load conversation events ${apiError.message}")
+                    )
+                }
+            })
+    }
 
-        val linesString = lines.joinToString(separator = System.lineSeparator(), postfix = System.lineSeparator())
+    private fun displayConversationEvents(events: List<NexmoEvent>) {
+        val lines = ArrayList<String>()
+
+        for (event in events) {
+            var line = ""
+
+            when (event) {
+                is NexmoMemberEvent -> {
+                    val userName = event.embeddedInfo.user.name
+
+                    line = when (event.state) {
+                        NexmoMemberState.JOINED -> "$userName joined"
+                        NexmoMemberState.INVITED -> "$userName invited"
+                        NexmoMemberState.LEFT -> "$userName left"
+                        NexmoMemberState.UNKNOWN -> "Error: Unknown member event state"
+                    }
+                }
+                is NexmoTextEvent -> {
+                    line = "${event.embeddedInfo.user.name} said: ${event.text}"
+                }
+            }
+            lines.add(line)
+        }
+
+        // Production application should utilise RecyclerView to provide better UX
+        val linesString = if (lines.isNullOrEmpty()) {
+            "Conversation has No messages"
+        } else {
+            lines.joinToString(separator = System.lineSeparator(), postfix = System.lineSeparator())
+        }
+
         viewActionMutableLiveData.postValue(Action.SetConversation(linesString))
     }
 
     private fun getUserDisplayName(userId: String): String {
         return memoryRepository.allUsers.firstOrNull { it.id == userId }?.displayName ?: "Unknown"
+    }
+
+    private fun getConversationLine(memberEvent: NexmoMemberEvent): String {
+        val user = memberEvent.embeddedInfo.user.name
+
+        return when (memberEvent.state) {
+            NexmoMemberState.JOINED -> "$user joined"
+            NexmoMemberState.INVITED -> "$user invited"
+            NexmoMemberState.LEFT -> "$user left"
+            else -> "Error: Unknown member event state"
+        }
     }
 
     private fun getConversationLine(textEvent: NexmoTextEvent): String {
@@ -123,7 +148,7 @@ class ConversationDetailViewModel : ViewModel() {
     }
 
     fun sendMessage(message: String) {
-        nexmoConversation?.sendText(message, object : NexmoRequestListener<Void> {
+        conversation?.sendText(message, object : NexmoRequestListener<Void> {
             override fun onSuccess(p0: Void?) {
             }
 
