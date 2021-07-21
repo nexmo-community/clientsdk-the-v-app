@@ -1,20 +1,20 @@
-###  CONVERSATION CREATE
+###  CONVERSATION CREATED
 post http://localhost:3000/rtc/events HTTP/1.1
 Content-Type: application/json
 
+
 {
-  "type": "conversation:created",
-  "body": {
-      "id": "CON-b273a8fc-c4f3-45bf-a059-139e925ce5d7",
-      "name": "NAM-ec666b5d-10f4-4b02-94a3-faf50e46e591",
-      "timestamp": {
-          "created": "2020-12-14T14:35:24.457Z"
+  "body":{
+    "id":"CON-f6d1b8f9-e2fa-46a9-8ec2-b7f7ea0526cb",
+    "name":"NAM-16e5063a-0027-445b-8b0d-40d5fc42fecd",
+    "timestamp":{
+      "created":"2021-07-21T10:20:47.607Z"
       },
-      "display_name": "twitch 20201214-001",
-      "state": "ACTIVE"
+    "state":"ACTIVE"
   },
-  "application_id": "19e0465b-7cd9-4e7e-96d8-c7942a9bdb87",
-  "timestamp": "2020-12-14T14:35:24.463Z"
+  "application_id":"96e38dc4-5681-4b80-aa82-670fdbf55932",
+  "timestamp":"2021-07-21T10:20:47.612Z",
+  "type":"conversation:created"
 }
 
 

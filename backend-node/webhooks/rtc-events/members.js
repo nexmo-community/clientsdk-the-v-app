@@ -38,13 +38,14 @@ async function invited(client, reqBody) {
   }
 }
 
-async function statusUpdate(newStatus, reqBody) {
+async function statusUpdate(client, newStatus, reqBody) {
   const { from, conversation_id, body } = reqBody;
   console.log(JSON.stringify(conversation_id));
   if(!conversation_id || !body) {
     return 'Missing data';
   }
-  const { user } = body;
+  console.log(body);
+  const { member_id, user } = body;
   console.log(JSON.stringify(user));
 
   if(!user || !user['id']) {
@@ -52,11 +53,11 @@ async function statusUpdate(newStatus, reqBody) {
   }
 
   // already present
-  let member = await Data.members.get(from);
+  let member = await Data.members.createOrUpdate(client, conversation_id, member_id, user['id'], newStatus);
   if(!member) {
     return `ERROR: member doesn't exist: ${from}`;
   }
-  member = await Data.members.statusUpdate(from, newStatus);
+  member = await Data.members.statusUpdate(client, from, newStatus);
   if(member) {
     return `member: ${member.vonage_id} - JOINED`;
   } else {
