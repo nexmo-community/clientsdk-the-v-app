@@ -10,6 +10,29 @@ This is "The V-app", a messaging multi-platform application that lets uses chat 
 ## Installation Guide
 
 
+### Server
+
+Change directory into `backend-node` and install dependencies:
+
+```sh
+cd backend-node
+npm install
+```
+
+Create a new Vonage app:
+
+```sh
+nexmo app:create "v-app-test" --capabilities=voice,rtc --voice-answer-url=https://example.com/voice/answer --voice-event-url=https://example.com/voice/events --rtc-event-url=https://example.com/rtc/events --keyfile=private.key
+```
+
+Create an `.env` file and add the app id and private key:
+
+```sh
+cp .env-sample .env
+less .nexmo-app
+```
+
+
 ### Web Client
 
 Change Directory into client-web
@@ -52,14 +75,11 @@ We love to receive contributions from the community and hear your opinions! We w
 
 To get started:
 
-•	Ensure you go through the [README.md](https://github.com/nexmo-community/clientsdk-v-app
-/README.md) document so you can get familiar with the project.
+•	Ensure you go through the [README.md](https://github.com/nexmo-community/clientsdk-the-v-app/blob/main/README.md) document so you can get familiar with the project.
 
-•	Check the [Issues](https://github.com/nexmo-community/clientsdk-v-app
-/issues) for open tickets.
+•	Check the [Issues](https://github.com/nexmo-community/clientsdk-the-v-app/issues) for open tickets.
 
-•	Create a pull request [here](https://github.com/nexmo-community/clientsdk-v-app
-/pulls). [See this page for a guide on making pull request](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request)
+•	Create a pull request [here](https://github.com/nexmo-community/clientsdk-the-v-app/pulls). [See this page for a guide on making pull request](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request).
 
 
 ## License
