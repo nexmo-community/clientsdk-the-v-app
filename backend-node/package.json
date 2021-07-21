@@ -1,7 +1,7 @@
 {
   "name": "v-app-backend",
-  "version": "1.0.0",
-  "description": "The backend fo that good node/Vonage stuff",
+  "version": "1.1.0",
+  "description": "The V-App node.js backend",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -19,5 +19,8 @@
     "nodemon": "^2.0.12",
     "pg": "^8.6.0",
     "uuid": "^8.3.1"
+  },
+  "engines": {
+    "node": "14.x"
   }
 }
