@@ -114,6 +114,9 @@ const signupCreateVonageUserError = async function(res, client, error, name, pas
     });
     return
   }
+  user.id = user.vonage_id;
+  delete user.vonage_id;
+  
   // The user existed on the Vonage server - we'll add the password
   await Data.users.addPassword(client, name, password);
   const token = JWT.getUserJWT(user.name, user.vonage_id);
@@ -151,6 +154,8 @@ authRoutes.post('/login', async (req, res) => {
         "detail": "The request failed due to invalid credentials"
       });
     } else {
+      user.id = user.vonage_id;
+      delete user.vonage_id;
       const token = JWT.getUserJWT(user.name, user.vonage_id);
       let users = await Data.users.getInterlocutorsFor(client, user.name);
       const conversations = await Data.conversations.getAllForUser(client, user.vonage_id);
