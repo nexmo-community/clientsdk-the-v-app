@@ -154,7 +154,7 @@ authRoutes.post('/login', async (req, res) => {
       const token = JWT.getUserJWT(user.name, user.vonage_id);
       let users = await Data.users.getInterlocutorsFor(client, user.name);
       const conversations = await Data.conversations.getAllForUser(client, user.vonage_id);
-      res.status(201).send({
+      res.status(200).send({
         user,
         token,
         users,

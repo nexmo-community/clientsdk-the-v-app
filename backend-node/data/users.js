@@ -27,7 +27,6 @@ const getInterlocutorsFor = async function (client, user_name) {
 const create = async function (client, vonage_id, name, display_name, password) {
   let user;
   user = await getByName(client, name);
-  puts (user);
   if (user) {
     return user;
   }
@@ -38,7 +37,7 @@ const create = async function (client, vonage_id, name, display_name, password) 
         .update(password)
         .digest('hex');
     }
-    const res = await client.query('INSERT INTO users(vonage_id, name, display_name, password_digest) VALUES($1, $2, $3, $4) RETURNING vonage_id, name, display_name', [vonage_id, name, display_name, passwordHash]);
+    const res = await client.query('INSERT INTO users(vonage_id, name, display_name, password_digest, created_at, updated_at) VALUES($1, $2, $3, $4, NOW(), NOW()) RETURNING vonage_id, name, display_name', [vonage_id, name, display_name, passwordHash]);
     if (res.rowCount === 1) {
       user = res.rows[0];
     }
