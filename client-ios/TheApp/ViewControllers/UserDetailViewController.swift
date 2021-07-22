@@ -60,6 +60,7 @@ class UserDetailViewController: UIViewController {
     private func setUpView() {
         view.backgroundColor = .white
         view.addSubviews(profilePicView, nameLabel, callButton)
+        ClientManager.shared.callDelegate = self
     }
     
     override func viewDidLayoutSubviews() {
@@ -83,12 +84,17 @@ class UserDetailViewController: UIViewController {
     }
     
     @objc func callButtonTapped() {
-        NXMClient.shared.call(user.name, callHandler: .inApp) { error, call in
-            if error != nil {
-                self.showErrorAlert(message: error?.localizedDescription)
-                return
-            }
-            self.call = call
-        }
+        ClientManager.shared.call(name: user.name)
+    }
+}
+
+// TODO: present call screen modally
+extension UserDetailViewController: ClientManagerCallDelegate {
+    func clientManager(_ clientManager: ClientManager, didMakeCall success: (Bool, String?)) {
+    
+    }
+    
+    func clientManager(_ clientManager: ClientManager, didReceiveCall call: NXMCall) {
+        
     }
 }

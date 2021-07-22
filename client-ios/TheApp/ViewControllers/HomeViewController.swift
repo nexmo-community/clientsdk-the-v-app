@@ -28,8 +28,6 @@ class HomeViewController: UITabBarController {
     
     private var newConversationButton: UIBarButtonItem?
     
-    private var call: NXMCall?
-    
     weak var homeDelegate: HomeViewControllerDelegate?
     
     init(data: Auth.Response) {
@@ -61,10 +59,9 @@ class HomeViewController: UITabBarController {
         delegate = self
         conversationListViewController.delegate = self
         contactsViewController.delegate = self
+        ClientManager.shared.callDelegate = self
         
         self.viewControllers = VTabBarItem.allCases.map { createTabBarViewControllers(for: $0) }
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(callReceived(_:)), name: .incomingCall, object: nil)
     }
     
     public func conversationListViewControllerDidRefresh() {
@@ -94,15 +91,7 @@ class HomeViewController: UITabBarController {
         navigationController?.present(createConversationViewController, animated: true, completion: nil)
     }
     
-    @objc func callReceived(_ notification: NSNotification) {
-        DispatchQueue.main.async { [weak self] in
-            if let call = notification.object as? NXMCall {
-                self?.call = call
-                self?.displayIncomingCallAlert(call: call)
-            }
-        }
-    }
-    
+    // TODO: present call screen modally
     func displayIncomingCallAlert(call: NXMCall) {
         var from = "Unknown"
         if let otherParty = call.allMembers.first {
@@ -179,5 +168,16 @@ extension HomeViewController: ConversationListViewControllerDelegate {
 extension HomeViewController: ContactsViewControllerDelegate {
     func contactsViewControllerDelegateDidRefreshList(_ contactsViewControllerDelegate: ContactsViewController) {
         loadUsers()
+    }
+}
+
+extension HomeViewController: ClientManagerCallDelegate {
+    func clientManager(_ clientManager: ClientManager, didMakeCall success: (Bool, String?)) {
+    }
+    
+    func clientManager(_ clientManager: ClientManager, didReceiveCall call: NXMCall) {
+        DispatchQueue.main.async {
+            self.displayIncomingCallAlert(call: call)
+        }
     }
 }
