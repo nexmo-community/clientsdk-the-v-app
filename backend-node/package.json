@@ -1,23 +1,27 @@
 {
   "name": "v-app-backend",
-  "version": "1.0.0",
-  "description": "The backend fo that good node/Vonage stuff",
+  "version": "1.1.0",
+  "description": "The V-App node.js backend",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --trace-warnings index.js",
+    "start": "node index.js",
+    "start-mon": "nodemon --trace-warnings index.js",
     "sync-users": "node scripts/sync-users.js",
-    "sync-conv": "node scripts/sync-conv.js"
+    "sync-conversations": "node scripts/sync-conversations.js"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
     "axios": "^0.21.1",
-    "dotenv": "^8.2.0",
+    "dotenv": "^8.6.0",
     "express": "^4.17.1",
     "express-jwt": "^6.0.0",
     "jsonwebtoken": "^8.5.1",
-    "nodemon": "^2.0.7",
-    "pg": "^8.4.1",
+    "nodemon": "^2.0.12",
+    "pg": "^8.6.0",
     "uuid": "^8.3.1"
+  },
+  "engines": {
+    "node": "14.x"
   }
 }

@@ -10,6 +10,29 @@ This is "The V-app", a messaging multi-platform application that lets uses chat 
 ## Installation Guide
 
 
+### Server
+
+Change directory into `backend-node` and install dependencies:
+
+```sh
+cd backend-node
+npm install
+```
+
+Create a new Vonage app:
+
+```sh
+nexmo app:create "v-app-test" --capabilities=voice,rtc --voice-answer-url=https://example.com/voice/answer --voice-event-url=https://example.com/voice/events --rtc-event-url=https://example.com/rtc/events --keyfile=private.key
+```
+
+Create an `.env` file and add the app id and private key:
+
+```sh
+cp .env-sample .env
+less .nexmo-app
+```
+
+
 ### Web Client
 
 Change Directory into client-web

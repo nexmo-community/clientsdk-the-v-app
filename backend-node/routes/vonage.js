@@ -1,4 +1,5 @@
 const express = require('express');
+const { Pool } = require('pg');
 const jwt = require('express-jwt');
 const jsonwebtoken = require('jsonwebtoken');
 const fs = require('fs');
@@ -27,50 +28,77 @@ vonageRoutes.use(jwt({
 vonageRoutes.get('/users', async (req, res) => {
   const jwt = fromHeaderOrQuerystring(req);
   if (!jwt || !req.user || !req.user.sub) {
-    return res.status(403);
+    return res.status(403).json("Unauthorised");
   }
-  let users = await Data.users.getInterlocutorsFor(req.user.sub);
-  return res.status(200).json(users);
+  const pool = new Pool({ connectionString: process.env.postgresDatabaseUrl });
+  pool.connect(async (err, client, done) => {
+    if (err) throw err
+    let users = await Data.users.getInterlocutorsFor(client, req.user.sub);
+    return res.status(200).json(users);
+    client.release();
+  });
+  pool.end();
 });
 
 vonageRoutes.get('/conversations', async (req, res) => {
   const jwt = fromHeaderOrQuerystring(req);
   if (!jwt || !req.user || !req.user.user_id) {
-    return res.status(403);
+    return res.status(403).json("Unauthorised");
   }
-  const vonageConversations = await Data.conversations.getAllForUser(req.user.user_id);
-  return res.status(200).json(vonageConversations);
+  const pool = new Pool({ connectionString: process.env.postgresDatabaseUrl });
+  pool.connect(async (err, client, done) => {
+    if (err) throw err
+    const vonageConversations = await Data.conversations.getAllForUser(client, req.user.user_id);
+    return res.status(200).json(vonageConversations);
+    client.release();
+  });
+  pool.end();
 });
 
 vonageRoutes.get('/conversations/:id', async (req, res) => {
   const jwt = fromHeaderOrQuerystring(req);
   if (!jwt || !req.user || !req.user.user_id) {
-    return res.status(403);
+    return res.status(403).json("Unauthorised");
   }
-  const vonageConversation = await Data.conversations.getConversationForUser(req.params.id, req.user.user_id);
-  if(vonageConversation) {
-    return res.status(200).json(vonageConversation);
-  } else {
-    return res.status(500);
-  }
+  const pool = new Pool({ connectionString: process.env.postgresDatabaseUrl });
+  pool.connect(async (err, client, done) => {
+    if (err) throw err
+    const vonageConversation = await Data.conversations.getConversationForUser(client, req.params.id, req.user.user_id);
+    if(vonageConversation) {
+      res.status(200).json(vonageConversation);
+    } else {
+      res.status(500).json({message: 'something went wrong'});
+    }
+    client.release();
+  });
+  pool.end();
 });
 
 vonageRoutes.post('/conversations', async (req, res) => {
   const jwt = fromHeaderOrQuerystring(req);
   if (!jwt || !req.user || !req.user.user_id) {
-    return res.status(403);
+    return res.status(403).json("Unauthorised");
   }
   const users = req.body.users;
   if (!users || users.length == 0) {
-    return res.status(400);
+    return res.status(400).json({
+      "type": "data:validation",
+      "title": "Bad Request",
+      "detail": "The request must include users"
+    });
   }
-  const vonageConversation = await Data.conversations.createConversationForUserWithInterlocutors(req.user.user_id, users);
-
-  if(vonageConversation) {
-    return res.status(200).json(vonageConversation);
-  } else {
-    return res.status(500).json("ERROR");
-  }
+  const pool = new Pool({ connectionString: process.env.postgresDatabaseUrl });
+  pool.connect(async (err, client, done) => {
+    if (err) throw err
+    const vonageConversation = await Data.conversations.createConversationForUserWithInterlocutors(client, req.user.user_id, users);
+    if(vonageConversation) {
+      res.status(200).json(vonageConversation);
+    } else {
+      res.status(500).json("ERROR");
+    }
+    client.release();
+  });
+  pool.end();
 });
 
 module.exports = vonageRoutes

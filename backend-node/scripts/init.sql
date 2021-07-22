@@ -1,48 +1,43 @@
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE users (
     id BIGSERIAL PRIMARY KEY,
-    vonage_id character varying,
-    name character varying NOT NULL,
+    vonage_id character varying UNIQUE,
+    name character varying NOT NULL UNIQUE,
     display_name character varying,
     password_digest character varying,
     is_active boolean DEFAULT true,
-    sync_at timestamp without time zone
+    sync_at timestamp without time zone,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
 );
-CREATE UNIQUE INDEX users_pkey ON users(id int8_ops);
-
 
 CREATE TABLE conversations (
     id BIGSERIAL PRIMARY KEY,
-    vonage_id character varying,
+    vonage_id character varying UNIQUE,
     name character varying NOT NULL,
     display_name character varying,
     state character varying NOT NULL,
-    created_at timestamp without time zone,
-    deleted_at timestamp without time zone
+    vonage_created_at timestamp without time zone,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
 );
-CREATE UNIQUE INDEX conversations_pkey ON conversations(id int8_ops);
-
 
 CREATE TABLE members (
     id SERIAL PRIMARY KEY,
-    vonage_id character varying NOT NULL
+    vonage_id character varying NOT NULL UNIQUE,
     user_id character varying NOT NULL,
     conversation_id character varying NOT NULL,
-    state text NOT NULL
+    state text NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
 );
-CREATE UNIQUE INDEX members_pkey ON members(id int4_ops);
-
 
 CREATE TABLE events (
     id SERIAL PRIMARY KEY,
+    vonage_id character varying NOT NULL,
+    vonage_type character varying NOT NULL,
     conversation_id character varying NOT NULL,
     from_member_id character varying NOT NULL,
     to_member_id character varying,
-    vonage_id integer NOT NULL,
-    vonage_type character varying NOT NULL,
     content text,
-    created_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL
 );
-
--- Indices -------------------------------------------------------
-
-CREATE UNIQUE INDEX events_pkey ON events(id int4_ops);
