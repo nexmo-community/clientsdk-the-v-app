@@ -19,17 +19,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/description"
-            tools:text="Name" />
-
-    <TextView
-            android:id="@+id/description"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="13sp"
-            app:layout_constraintTop_toBottomOf="@id/name"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            tools:text="Description" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:paddingVertical="10dp"
+            tools:text="User name" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

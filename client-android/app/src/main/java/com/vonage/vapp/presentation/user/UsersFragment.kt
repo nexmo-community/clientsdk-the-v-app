@@ -5,7 +5,6 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.vonage.vapp.R
 import com.vonage.vapp.core.ext.observe
@@ -37,6 +36,7 @@ class UsersFragment : Fragment(R.layout.fragment_users) {
         super.onViewCreated(view, savedInstanceState)
 
         observe(viewModel.viewActionLiveData, actionObserver)
+
         viewModel.init()
 
         binding.recyclerView.apply {

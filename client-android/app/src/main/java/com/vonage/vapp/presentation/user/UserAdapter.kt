@@ -17,11 +17,6 @@ class UserAdapter : RecyclerView.Adapter<UserAdapter.ViewHolder>() {
         notifyDataSetChanged()
     }
 
-    fun addUser(user: User) {
-        users.add(user)
-        notifyDataSetChanged()
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemUserListBinding.inflate(inflater, parent, false)
@@ -45,8 +40,7 @@ class UserAdapter : RecyclerView.Adapter<UserAdapter.ViewHolder>() {
         fun bind(user: User) {
             itemView.setOnClickListener { onClickListener?.invoke(user) }
 
-            binding.name.text = user.name
-            binding.description.text = user.displayName
+            binding.name.text = user.displayName
         }
     }
 }
