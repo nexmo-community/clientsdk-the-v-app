@@ -19,14 +19,12 @@ import com.nexmo.client.NexmoTypingEvent
 import com.nexmo.client.request_listener.NexmoApiError
 import com.nexmo.client.request_listener.NexmoRequestListener
 import com.vonage.vapp.core.ext.asLiveData
-import com.vonage.vapp.data.ApiRepository
 import com.vonage.vapp.data.MemoryRepository
 
 class ConversationDetailViewModel : ViewModel() {
 
     // should be injected
     private val client = NexmoClient.get()
-    private val adiRepository = ApiRepository
 
     private val viewActionMutableLiveData = MutableLiveData<Action>()
     val viewActionLiveData = viewActionMutableLiveData.asLiveData()
