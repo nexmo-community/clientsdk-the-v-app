@@ -116,7 +116,7 @@ class ConversationDetailViewModel : ViewModel() {
 
     private fun getConversationLine(memberEvent: NexmoMemberEvent): String {
         // Bug in SDK 3.0.1 - embeddedInfo can be null for JOINED events
-        val userName = memberEvent.embeddedInfo?.user?.name ?: ""
+        val userName = memberEvent.embeddedInfo?.user?.name ?: "Unknown"
 
         return when (memberEvent.state) {
             NexmoMemberState.JOINED -> "$userName joined"
