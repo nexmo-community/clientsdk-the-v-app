@@ -11,6 +11,7 @@
 		121D9D9525FA772200C36658 /* RemoteLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 121D9D9425FA772200C36658 /* RemoteLoader.swift */; };
 		122D6F6B26A83C0E00028418 /* ContactsViewController.swift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122D6F6926A83C0E00028418 /* ContactsViewController.swift.swift */; };
 		122D6F6C26A83C0E00028418 /* SettingsViewController.swift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122D6F6A26A83C0E00028418 /* SettingsViewController.swift.swift */; };
+		122D6F6E26A999AA00028418 /* UserDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122D6F6D26A999AA00028418 /* UserDetailViewController.swift */; };
 		1248413925FB8A93009DBEB9 /* ClientManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1248413825FB8A93009DBEB9 /* ClientManager.swift */; };
 		127E728C26A5D0CF00737906 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 127E728B26A5D0CF00737906 /* HomeViewController.swift */; };
 		127E729026A5D60100737906 /* VTabBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 127E728F26A5D60100737906 /* VTabBarItem.swift */; };
@@ -35,6 +36,7 @@
 		121D9D9425FA772200C36658 /* RemoteLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteLoader.swift; sourceTree = "<group>"; };
 		122D6F6926A83C0E00028418 /* ContactsViewController.swift.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactsViewController.swift.swift; sourceTree = "<group>"; };
 		122D6F6A26A83C0E00028418 /* SettingsViewController.swift.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift.swift; sourceTree = "<group>"; };
+		122D6F6D26A999AA00028418 /* UserDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDetailViewController.swift; sourceTree = "<group>"; };
 		1248413825FB8A93009DBEB9 /* ClientManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientManager.swift; sourceTree = "<group>"; };
 		127E728B26A5D0CF00737906 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		127E728F26A5D60100737906 /* VTabBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VTabBarItem.swift; sourceTree = "<group>"; };
@@ -116,6 +118,7 @@
 				127E728B26A5D0CF00737906 /* HomeViewController.swift */,
 				122D6F6926A83C0E00028418 /* ContactsViewController.swift.swift */,
 				122D6F6A26A83C0E00028418 /* SettingsViewController.swift.swift */,
+				122D6F6D26A999AA00028418 /* UserDetailViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -295,6 +298,7 @@
 				12D2385925FFE42A004D1FC6 /* SpinnerView.swift in Sources */,
 				12D2386E2600F371004D1FC6 /* ConversationListViewController.swift in Sources */,
 				121D9D9525FA772200C36658 /* RemoteLoader.swift in Sources */,
+				122D6F6E26A999AA00028418 /* UserDetailViewController.swift in Sources */,
 				1297BDE426026A4E00025D12 /* ChatViewController.swift in Sources */,
 				121D9D9225FA764200C36658 /* Models.swift in Sources */,
 			);
@@ -437,6 +441,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7F2B5ZSP8Q;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = TheApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -457,6 +462,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7F2B5ZSP8Q;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = TheApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
 				LD_RUNPATH_SEARCH_PATHS = (

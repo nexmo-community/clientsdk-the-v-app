@@ -75,4 +75,6 @@ extension SignUpViewController: ClientManagerDelegate {
         toggleLoading()
         showErrorAlert(message: errorMessage)
     }
+    
+    func clientManager(_ clientManager: ClientManager, didMakeCall success: (Bool, String?)) {}
 }

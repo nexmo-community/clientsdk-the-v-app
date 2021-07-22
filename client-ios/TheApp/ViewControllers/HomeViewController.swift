@@ -28,6 +28,8 @@ class HomeViewController: UITabBarController {
     
     private var newConversationButton: UIBarButtonItem?
     
+    private var call: NXMCall?
+    
     weak var homeDelegate: HomeViewControllerDelegate?
     
     init(data: Auth.Response) {
@@ -61,6 +63,8 @@ class HomeViewController: UITabBarController {
         contactsViewController.delegate = self
         
         self.viewControllers = VTabBarItem.allCases.map { createTabBarViewControllers(for: $0) }
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(callReceived(_:)), name: .incomingCall, object: nil)
     }
     
     public func conversationListViewControllerDidRefresh() {
@@ -90,11 +94,35 @@ class HomeViewController: UITabBarController {
         navigationController?.present(createConversationViewController, animated: true, completion: nil)
     }
     
-    private func loadConversations() {
-        let token = NXMClient.shared.authToken
+    @objc func callReceived(_ notification: NSNotification) {
+        DispatchQueue.main.async { [weak self] in
+            if let call = notification.object as? NXMCall {
+                self?.call = call
+                self?.displayIncomingCallAlert(call: call)
+            }
+        }
+    }
+    
+    func displayIncomingCallAlert(call: NXMCall) {
+        var from = "Unknown"
+        if let otherParty = call.allMembers.first {
+            from = otherParty.channel?.from.data ?? "Unknown"
+        }
+        let alert = UIAlertController(title: "Incoming call from", message: from, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Answer", style: .default, handler: { _ in
+            call.answer(nil)
+            
+        }))
+        alert.addAction(UIAlertAction(title: "Reject", style: .destructive, handler: { _ in
+            call.reject(nil)
+        }))
         
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    private func loadConversations() {
         RemoteLoader.load(path: Conversations.path,
-                          authToken: token,
+                          authToken: ClientManager.shared.token,
                           body: Optional<String>.none,
                           responseType: Conversations.List.Response.self) { [weak self] result in
             guard let self = self else { return }
@@ -108,11 +136,9 @@ class HomeViewController: UITabBarController {
         }
     }
     
-    private func loadUsers() {
-        let token = NXMClient.shared.authToken
-        
+    private func loadUsers() {        
         RemoteLoader.load(path: Users.path,
-                          authToken: token,
+                          authToken: ClientManager.shared.token,
                           body: Optional<String>.none,
                           responseType: Users.List.Response.self) { [weak self] result in
             guard let self = self else { return }

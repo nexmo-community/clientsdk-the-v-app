@@ -3,15 +3,20 @@ import NexmoClient
 protocol ClientManagerDelegate: AnyObject {
     func clientManager(_ clientManager: ClientManager, responseForAuth response: Auth.Response)
     func clientManager(_ clientManager: ClientManager, authDidFail errorMessage: String?)
+    func clientManager(_ clientManager: ClientManager, didMakeCall success: (Bool, String?))
 }
 
 final class ClientManager: NSObject {
     
     static let shared = ClientManager()
+    public var token: String {
+        return NXMClient.shared.authToken ?? ""
+    }
     
     private let encoder = JSONEncoder()
     private let decoder = JSONDecoder()
     private var response: Auth.Response?
+//    public var call: NXMCall?
     
     weak var delegate: ClientManagerDelegate?
     
@@ -43,6 +48,18 @@ final class ClientManager: NSObject {
             }
         }
     }
+    
+//    func call(name: String) {
+//        NXMClient.shared.call(name, callHandler: .inApp) { [weak self] error, call in
+//            guard let self = self else { return }
+//            if error != nil {
+//                self.delegate?.clientManager(self, didMakeCall: (false, error?.localizedDescription))
+//            }
+//
+//            self.call = call
+//            self.delegate?.clientManager(self, didMakeCall: (true, nil))
+//        }
+//    }
 }
 
 extension ClientManager: NXMClientDelegate {
@@ -57,5 +74,10 @@ extension ClientManager: NXMClientDelegate {
     
     func client(_ client: NXMClient, didReceiveError error: Error) {
         self.delegate?.clientManager(self, authDidFail: error.localizedDescription)
+    }
+    
+    func client(_ client: NXMClient, didReceive call: NXMCall) {
+//        self.call = call
+        NotificationCenter.default.post(name: .incomingCall, object: call)
     }
 }

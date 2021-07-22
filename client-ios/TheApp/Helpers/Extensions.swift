@@ -57,3 +57,7 @@ extension UIBarButtonItem {
         }
     }
 }
+
+extension Notification.Name {
+    static let incomingCall = Notification.Name("Call")
+}

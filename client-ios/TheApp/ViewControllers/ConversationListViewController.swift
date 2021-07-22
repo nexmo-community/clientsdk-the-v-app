@@ -1,5 +1,4 @@
 import UIKit
-import NexmoClient
 
 protocol ConversationListViewControllerDelegate: AnyObject {
     func conversationListViewControllerDelegateDidRefreshList(_ conversationListViewController: ConversationListViewController)
@@ -51,14 +50,14 @@ class ConversationListViewController: UIViewController {
 }
 
 extension ConversationListViewController: ListViewControllerDelegate {
-    func listViewControllerDelegateDidRefresh<T>(_: ListViewController<T>) where T : Hashable, T : ListViewPresentable {
-        delegate?.conversationListViewControllerDelegateDidRefreshList(self)
-    }
-    
     func listViewControllerDelegate<T>(_: ListViewController<T>, didSelectRow data: T) where T : Hashable, T : ListViewPresentable {
         if let conversation = data as? Conversations.Conversation {
             navigationController?.pushViewController(ChatViewController(conversation: conversation), animated: true)
         }
+    }
+    
+    func listViewControllerDelegateDidRefresh<T>(_: ListViewController<T>) where T : Hashable, T : ListViewPresentable {
+        delegate?.conversationListViewControllerDelegateDidRefreshList(self)
     }
 }
 
