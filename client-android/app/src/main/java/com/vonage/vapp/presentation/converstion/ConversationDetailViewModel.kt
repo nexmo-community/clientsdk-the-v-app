@@ -19,7 +19,6 @@ import com.nexmo.client.NexmoTypingEvent
 import com.nexmo.client.request_listener.NexmoApiError
 import com.nexmo.client.request_listener.NexmoRequestListener
 import com.vonage.vapp.core.ext.asLiveData
-import com.vonage.vapp.data.MemoryRepository
 
 class ConversationDetailViewModel : ViewModel() {
 
@@ -29,7 +28,6 @@ class ConversationDetailViewModel : ViewModel() {
     private val viewActionMutableLiveData = MutableLiveData<Action>()
     val viewActionLiveData = viewActionMutableLiveData.asLiveData()
 
-    private val memoryRepository = MemoryRepository
     private var conversation: NexmoConversation? = null
 
     private val messageListener = object : NexmoMessageEventListener {
@@ -91,27 +89,22 @@ class ConversationDetailViewModel : ViewModel() {
         val lines = ArrayList<String>()
 
         for (event in events) {
-            var line = ""
-
-            when (event) {
+            val line = when (event) {
                 is NexmoMemberEvent -> {
-                    val userName = event.embeddedInfo.user.name
-
-                    line = when (event.state) {
-                        NexmoMemberState.JOINED -> "$userName joined"
-                        NexmoMemberState.INVITED -> "$userName invited"
-                        NexmoMemberState.LEFT -> "$userName left"
-                        NexmoMemberState.UNKNOWN -> "Error: Unknown member event state"
-                    }
+                    getConversationLine(event)
                 }
                 is NexmoTextEvent -> {
-                    line = "${event.embeddedInfo.user.name} said: ${event.text}"
+                    getConversationLine(event)
+                }
+                else -> {
+                    null
                 }
             }
-            lines.add(line)
+
+            line?.let { lines.add(it) }
         }
 
-        // Production application should utilise RecyclerView to provide better UX
+        // Production-ready application should utilise RecyclerView to provide better UX
         val linesString = if (lines.isNullOrEmpty()) {
             "Conversation has No messages"
         } else {
@@ -121,24 +114,21 @@ class ConversationDetailViewModel : ViewModel() {
         viewActionMutableLiveData.postValue(Action.SetConversation(linesString))
     }
 
-    private fun getUserDisplayName(userId: String): String {
-        return memoryRepository.allUsers.firstOrNull { it.id == userId }?.displayName ?: "Unknown"
-    }
-
     private fun getConversationLine(memberEvent: NexmoMemberEvent): String {
-        val user = memberEvent.embeddedInfo.user.name
+        // Bug in SDK 3.0.1 - embeddedInfo can be null for JOINED events
+        val userName = memberEvent.embeddedInfo?.user?.name ?: ""
 
         return when (memberEvent.state) {
-            NexmoMemberState.JOINED -> "$user joined"
-            NexmoMemberState.INVITED -> "$user invited"
-            NexmoMemberState.LEFT -> "$user left"
+            NexmoMemberState.JOINED -> "$userName joined"
+            NexmoMemberState.INVITED -> "$userName invited"
+            NexmoMemberState.LEFT -> "$userName left"
             else -> "Error: Unknown member event state"
         }
     }
 
     private fun getConversationLine(textEvent: NexmoTextEvent): String {
-        val user = textEvent.embeddedInfo.user.name
-        return "$user said: ${textEvent.text}"
+        val userName = textEvent.embeddedInfo?.user?.name ?: "Unknown"
+        return "$userName said: ${textEvent.text}"
     }
 
     private fun addConversationLine(line: String?) {
