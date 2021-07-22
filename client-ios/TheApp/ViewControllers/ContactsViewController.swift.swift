@@ -8,6 +8,10 @@
 
 import UIKit
 
+protocol ContactsViewControllerDelegate: AnyObject {
+    func contactsViewControllerDelegateDidRefreshList(_ contactsViewControllerDelegate: ContactsViewController)
+}
+
 class ContactsViewController: UIViewController {
     
     private lazy var listViewController: ListViewController<Users.User> = {
@@ -17,7 +21,9 @@ class ContactsViewController: UIViewController {
         return vc
     }()
     
-    private let users: [Users.User]
+    private var users: [Users.User]
+    
+    weak var delegate: ContactsViewControllerDelegate?
 
     init(users: [Users.User]) {
         self.users =  users
@@ -32,6 +38,8 @@ class ContactsViewController: UIViewController {
         super.viewDidLoad()
         setUpView()
         setUpConstraints()
+        guard let homeViewController = tabBarController as? HomeViewController else { return }
+        homeViewController.homeDelegate = self
     }
     
     private func setUpView() {
@@ -40,23 +48,34 @@ class ContactsViewController: UIViewController {
     }
     
     private func setUpConstraints() {
-        // TODO: heights of the tab and nav bar
         NSLayoutConstraint.activate([
-            listViewController.view.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 50),
+            listViewController.view.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             listViewController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             listViewController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            listViewController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -50)
+            listViewController.view.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
     }
 
 }
 
+// TODO: Make call
 extension ContactsViewController: ListViewControllerDelegate {
     func listViewControllerDelegate<T>(_: ListViewController<T>, didSelectRow data: T) where T : Hashable, T : ListViewPresentable {
         
     }
     
-    func listViewControllerDelegateDidRefresh<T>(_: ListViewController<T>) where T : Hashable, T : ListViewPresentable {}
+    func listViewControllerDelegateDidRefresh<T>(_: ListViewController<T>) where T : Hashable, T : ListViewPresentable {
+        delegate?.contactsViewControllerDelegateDidRefreshList(self)
+    }
+}
+
+extension ContactsViewController: HomeViewControllerDelegate {
+    func homeViewControllerDelegate(_ HomeViewController: HomeViewController, didCreateConversation conversation: Conversations.Conversation, conversations: [Conversations.Conversation]) {}
     
+    func homeViewControllerDelegate(_ HomeViewController: HomeViewController, didLoadConversations conversations: [Conversations.Conversation]) {}
     
+    func homeViewControllerDelegate(_ HomeViewController: HomeViewController, didLoadUsers users: [Users.User]) {
+        self.users = users
+        self.listViewController.triggerUpdate(with: users)
+    }
 }

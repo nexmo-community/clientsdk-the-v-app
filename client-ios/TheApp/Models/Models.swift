@@ -6,8 +6,11 @@ protocol ListViewPresentable {
 }
 
 struct Users: Codable, Hashable {
-    struct Response: Codable {
-        let users: [User]
+    static let path = "/users"
+    
+    
+    struct List: Codable {
+        typealias Response = [User]
     }
     
     struct User: Codable, Hashable, ListViewPresentable {
@@ -59,7 +62,7 @@ struct Conversations: Codable {
         }
         
         struct Event: Codable, Hashable {
-            let id: Int
+            let id: String
             let from: String
             let type: String
             let content: String?

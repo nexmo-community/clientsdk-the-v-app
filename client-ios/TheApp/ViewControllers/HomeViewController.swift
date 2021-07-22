@@ -12,12 +12,14 @@ import NexmoClient
 protocol HomeViewControllerDelegate: AnyObject {
     func homeViewControllerDelegate(_ HomeViewController: HomeViewController, didCreateConversation conversation: Conversations.Conversation, conversations: [Conversations.Conversation])
     func homeViewControllerDelegate(_ HomeViewController: HomeViewController, didLoadConversations conversations: [Conversations.Conversation])
+    func homeViewControllerDelegate(_ HomeViewController: HomeViewController, didLoadUsers users: [Users.User])
 }
 
 class HomeViewController: UITabBarController {
     
     private let data: Auth.Response
     private var conversations: [Conversations.Conversation]
+    private var users: [Users.User]
     
     //TODO: Make lazy
     private let conversationListViewController: ConversationListViewController
@@ -31,8 +33,9 @@ class HomeViewController: UITabBarController {
     init(data: Auth.Response) {
         self.data = data
         self.conversations = data.conversations
+        self.users = data.users
         self.conversationListViewController = ConversationListViewController(conversations: conversations)
-        self.contactsViewController = ContactsViewController(users: data.users)
+        self.contactsViewController = ContactsViewController(users: users)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -55,6 +58,7 @@ class HomeViewController: UITabBarController {
         
         delegate = self
         conversationListViewController.delegate = self
+        contactsViewController.delegate = self
         
         self.viewControllers = VTabBarItem.allCases.map { createTabBarViewControllers(for: $0) }
     }
@@ -96,7 +100,26 @@ class HomeViewController: UITabBarController {
             guard let self = self else { return }
             switch result {
             case .success(let conversations):
+                self.conversations = conversations
                 self.homeDelegate?.homeViewControllerDelegate(self, didLoadConversations: conversations)
+            case .failure(let error):
+                self.showErrorAlert(message: error.localizedDescription)
+            }
+        }
+    }
+    
+    private func loadUsers() {
+        let token = NXMClient.shared.authToken
+        
+        RemoteLoader.load(path: Users.path,
+                          authToken: token,
+                          body: Optional<String>.none,
+                          responseType: Users.List.Response.self) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let users):
+                self.users = users
+                self.homeDelegate?.homeViewControllerDelegate(self, didLoadUsers: users)
             case .failure(let error):
                 self.showErrorAlert(message: error.localizedDescription)
             }
@@ -124,5 +147,11 @@ extension HomeViewController: CreateConversationViewControllerDelegate {
 extension HomeViewController: ConversationListViewControllerDelegate {
     func conversationListViewControllerDelegateDidRefreshList(_ conversationListViewController: ConversationListViewController) {
         loadConversations()
+    }
+}
+
+extension HomeViewController: ContactsViewControllerDelegate {
+    func contactsViewControllerDelegateDidRefreshList(_ contactsViewControllerDelegate: ContactsViewController) {
+        loadUsers()
     }
 }

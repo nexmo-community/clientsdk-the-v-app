@@ -45,7 +45,7 @@ class ConversationListViewController: UIViewController {
             listViewController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             listViewController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             listViewController.view.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            listViewController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            listViewController.view.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
         ])
     }
 }
@@ -76,4 +76,6 @@ extension ConversationListViewController: HomeViewControllerDelegate {
         self.conversations = conversations
         self.listViewController.triggerUpdate(with: self.conversations)
     }
+    
+    func homeViewControllerDelegate(_ HomeViewController: HomeViewController, didLoadUsers users: [Users.User]) {}
 }
