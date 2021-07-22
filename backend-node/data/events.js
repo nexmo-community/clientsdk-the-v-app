@@ -33,7 +33,7 @@ const create = async (client, event_id, event_type, conversation_id, from_member
   // - type:         ${event.vonage_type}
   // - content:      ${event.content}`);
   } catch (err) {
-    // console.log(err);
+    console.log(err);
   }
   return event;
 }

@@ -28,7 +28,7 @@ vonageRoutes.use(jwt({
 vonageRoutes.get('/users', async (req, res) => {
   const jwt = fromHeaderOrQuerystring(req);
   if (!jwt || !req.user || !req.user.sub) {
-    return res.status(403);
+    return res.status(403).json("Unauthorised");
   }
   const pool = new Pool({ connectionString: process.env.postgresDatabaseUrl });
   pool.connect(async (err, client, done) => {
@@ -43,7 +43,7 @@ vonageRoutes.get('/users', async (req, res) => {
 vonageRoutes.get('/conversations', async (req, res) => {
   const jwt = fromHeaderOrQuerystring(req);
   if (!jwt || !req.user || !req.user.user_id) {
-    return res.status(403);
+    return res.status(403).json("Unauthorised");
   }
   const pool = new Pool({ connectionString: process.env.postgresDatabaseUrl });
   pool.connect(async (err, client, done) => {
@@ -58,7 +58,7 @@ vonageRoutes.get('/conversations', async (req, res) => {
 vonageRoutes.get('/conversations/:id', async (req, res) => {
   const jwt = fromHeaderOrQuerystring(req);
   if (!jwt || !req.user || !req.user.user_id) {
-    return res.status(403);
+    return res.status(403).json("Unauthorised");
   }
   const pool = new Pool({ connectionString: process.env.postgresDatabaseUrl });
   pool.connect(async (err, client, done) => {
@@ -77,7 +77,7 @@ vonageRoutes.get('/conversations/:id', async (req, res) => {
 vonageRoutes.post('/conversations', async (req, res) => {
   const jwt = fromHeaderOrQuerystring(req);
   if (!jwt || !req.user || !req.user.user_id) {
-    return res.status(403);
+    return res.status(403).json("Unauthorised");
   }
   const users = req.body.users;
   if (!users || users.length == 0) {

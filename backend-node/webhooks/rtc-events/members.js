@@ -39,7 +39,10 @@ async function invited(client, reqBody) {
 }
 
 async function statusUpdate(client, newStatus, reqBody) {
-  const { from, conversation_id, body } = reqBody;
+  const { id, type, from, conversation_id, body, timestamp } = reqBody
+  if(!id || !type || !conversation_id || !body || !timestamp) {
+    return 'Missing data';
+  }
   console.log(JSON.stringify(conversation_id));
   if(!conversation_id || !body) {
     return 'Missing data';
@@ -57,6 +60,11 @@ async function statusUpdate(client, newStatus, reqBody) {
   if(!member) {
     return `ERROR: member doesn't exist: ${from}`;
   }
+  let event = await Data.events.create(client, id, type, conversation_id, from, null, null, timestamp);
+  if(event) {
+    console.log(`Created text event: ${JSON.stringify(event)}`);
+  }
+
   member = await Data.members.statusUpdate(client, from, newStatus);
   if(member) {
     return `member: ${member.vonage_id} - JOINED`;

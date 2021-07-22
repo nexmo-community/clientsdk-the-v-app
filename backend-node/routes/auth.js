@@ -1,3 +1,4 @@
+const { json } = require('express');
 const express = require('express');
 const { Pool } = require('pg');
 
@@ -51,15 +52,19 @@ authRoutes.post('/signup', async (req, res) => {
           });
         } else {
           // New User created successfully
-          const token = JWT.getUserJWT(user.name, user.vonage_id);
+          user.id = user.vonage_id;
+          delete user.vonage_id;
+          const token = JWT.getUserJWT(user.name, user.id);
           let users = await Data.users.getInterlocutorsFor(client, user.name);
-          const conversations = await Data.conversations.getAllForUser(client, user.vonage_id);
-          res.status(201).send({
+          const conversations = await Data.conversations.getAllForUser(client, user.id);
+          jsonResponse = {
             user,
             token,
             users,
             conversations
-          });
+          }
+          console.log(jsonResponse);
+          res.status(201).send(jsonResponse);
         }
       }
     }
@@ -83,12 +88,16 @@ const signupExistingUser = async function (res, client, user, name, password) {
       ]
     });
   } else {
+    user.id = user.vonage_id;
+    delete user.vonage_id;
     await Data.users.addPassword(client, name, password);
-    const token = JWT.getUserJWT(user.name, user.vonage_id);
-    res.status(201).send({
+    const token = JWT.getUserJWT(user.name, user.id);
+    jsonResponse = {
       user,
       token
-    });
+    }
+    console.log(jsonResponse);
+    res.status(201).send(jsonResponse);
   }
 };
 
@@ -116,10 +125,9 @@ const signupCreateVonageUserError = async function(res, client, error, name, pas
   }
   user.id = user.vonage_id;
   delete user.vonage_id;
-  
   // The user existed on the Vonage server - we'll add the password
   await Data.users.addPassword(client, name, password);
-  const token = JWT.getUserJWT(user.name, user.vonage_id);
+  const token = JWT.getUserJWT(user.name, user.id);
   res.status(201).send({
     user,
     token
@@ -156,15 +164,17 @@ authRoutes.post('/login', async (req, res) => {
     } else {
       user.id = user.vonage_id;
       delete user.vonage_id;
-      const token = JWT.getUserJWT(user.name, user.vonage_id);
+      const token = JWT.getUserJWT(user.name, user.id);
       let users = await Data.users.getInterlocutorsFor(client, user.name);
-      const conversations = await Data.conversations.getAllForUser(client, user.vonage_id);
-      res.status(200).send({
+      const conversations = await Data.conversations.getAllForUser(client, user.id);
+      jsonResponse = {
         user,
         token,
         users,
         conversations
-      });
+      }
+      console.log(jsonResponse);
+      res.status(200).send(jsonResponse);
     }
     client.release();
   });

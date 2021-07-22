@@ -33,7 +33,7 @@ CREATE TABLE members (
 
 CREATE TABLE events (
     id SERIAL PRIMARY KEY,
-    vonage_id character varying UNIQUE,
+    vonage_id character varying NOT NULL,
     vonage_type character varying NOT NULL,
     conversation_id character varying NOT NULL,
     from_member_id character varying NOT NULL,
