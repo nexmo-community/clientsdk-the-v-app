@@ -10,7 +10,7 @@ import UIKit
 
 class SettingsViewController: UIViewController {
     
-    private static let settings = [Setting(id: "1", displayName: "Log out", type: .logout)]
+    private static let settings = [Setting(id: "1", displayName: "Log out", type: .logout, iconString: "person.fill.badge.minus")]
     
     private lazy var profilePicView: UIImageView = {
         let imageView = UIImageView()
@@ -88,8 +88,8 @@ extension SettingsViewController: ListViewControllerDelegate {
         if let setting = data as? Setting {
             switch setting.type {
             case .logout:
-                // TODO: logout and pop to login screen
-                print("logout")
+                ClientManager.shared.logout()
+                self.navigationController?.popViewController(animated: true)
             }
         }
     }

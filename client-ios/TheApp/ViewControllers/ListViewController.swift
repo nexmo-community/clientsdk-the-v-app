@@ -123,8 +123,9 @@ private extension ListViewController {
             var config = cell.defaultContentConfiguration()
             config.text = data.displayName
             
-            if let item = data as? Setting {
-                // TODO: Add icon
+            if let setting = data as? Setting {
+                config.image = UIImage(systemName: setting.iconString)
+                config.imageProperties.tintColor = .gray
             }
             
             cell.contentConfiguration = config

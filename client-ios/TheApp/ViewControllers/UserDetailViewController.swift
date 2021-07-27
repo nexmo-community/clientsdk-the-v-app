@@ -11,6 +11,7 @@ import NexmoClient
 
 class UserDetailViewController: UIViewController {
     
+    // TODO: Make custom view and encapsulate loading
     private lazy var profilePicView: UIImageView = {
         let imageView = UIImageView()
         imageView.clipsToBounds = true

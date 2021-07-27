@@ -14,6 +14,7 @@ struct Setting: Hashable, ListViewPresentable {
     let id: String
     let displayName: String
     let type: SettingType
+    let iconString: String
 }
 
 struct Users: Codable, Hashable {

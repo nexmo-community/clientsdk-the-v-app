@@ -54,6 +54,7 @@ class SpinnerView: UIView {
             spinner.startAnimating()
         } else {
             self.isHidden = true
+            detailLabel.isHidden = true
             spinner.stopAnimating()
         }
     }

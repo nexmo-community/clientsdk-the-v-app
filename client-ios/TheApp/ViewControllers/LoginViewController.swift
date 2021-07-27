@@ -28,7 +28,7 @@ class LoginViewController: UIViewController, LoadingViewController {
         return stackView
     }()
     
-    private var loading = false
+    private var loggedin = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,6 +36,13 @@ class LoginViewController: UIViewController, LoadingViewController {
         setUpView()
         setUpConstraints()
         checkExistingTokenAndLogin()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if loggedin {
+            resetView()
+        }
     }
     
     private func setUpView() {
@@ -60,15 +67,20 @@ class LoginViewController: UIViewController, LoadingViewController {
             ClientManager.shared.delegate = self
             toggleLoading()
             ClientManager.shared.auth(username: credentials.0, password: credentials.1, displayName: nil, url: Auth.loginPath, storeCredentials: false)
-            hideViews()
+            toggleViewVisibility(hidden: true)
             spinnerView.setDetailText(text: "Welcome back \(credentials.0)")
         }
     }
     
-    private func hideViews() {
-        stackView.isHidden = true
-        usernameField.isHidden = true
-        passwordField.isHidden = true
+    private func toggleViewVisibility(hidden: Bool) {
+        stackView.isHidden = hidden
+        usernameField.isHidden = hidden
+        passwordField.isHidden = hidden
+    }
+    
+    private func resetView() {
+        loggedin = false
+        toggleViewVisibility(hidden: false)
     }
     
     @objc func loginButtonTapped() {
@@ -90,6 +102,7 @@ class LoginViewController: UIViewController, LoadingViewController {
 extension LoginViewController: ClientManagerDelegate {
     func clientManager(_ clientManager: ClientManager, responseForAuth response: Auth.Response) {
         toggleLoading()
+        loggedin = true
         navigationController?.pushViewController(HomeViewController(data: response), animated: true)
     }
     
