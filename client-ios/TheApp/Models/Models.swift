@@ -5,6 +5,17 @@ protocol ListViewPresentable {
     var displayName: String { get }
 }
 
+struct Setting: Hashable, ListViewPresentable {
+    
+    enum SettingType {
+        case logout
+    }
+    
+    let id: String
+    let displayName: String
+    let type: SettingType
+}
+
 struct Users: Codable, Hashable {
     static let path = "/users"
     

@@ -12,6 +12,7 @@
 		122D6F6B26A83C0E00028418 /* ContactsViewController.swift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122D6F6926A83C0E00028418 /* ContactsViewController.swift.swift */; };
 		122D6F6C26A83C0E00028418 /* SettingsViewController.swift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122D6F6A26A83C0E00028418 /* SettingsViewController.swift.swift */; };
 		122D6F6E26A999AA00028418 /* UserDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122D6F6D26A999AA00028418 /* UserDetailViewController.swift */; };
+		122D6F7026B0426100028418 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122D6F6F26B0426100028418 /* Constants.swift */; };
 		1248413925FB8A93009DBEB9 /* ClientManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1248413825FB8A93009DBEB9 /* ClientManager.swift */; };
 		127E728C26A5D0CF00737906 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 127E728B26A5D0CF00737906 /* HomeViewController.swift */; };
 		127E729026A5D60100737906 /* VTabBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 127E728F26A5D60100737906 /* VTabBarItem.swift */; };
@@ -37,6 +38,7 @@
 		122D6F6926A83C0E00028418 /* ContactsViewController.swift.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactsViewController.swift.swift; sourceTree = "<group>"; };
 		122D6F6A26A83C0E00028418 /* SettingsViewController.swift.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift.swift; sourceTree = "<group>"; };
 		122D6F6D26A999AA00028418 /* UserDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDetailViewController.swift; sourceTree = "<group>"; };
+		122D6F6F26B0426100028418 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		1248413825FB8A93009DBEB9 /* ClientManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientManager.swift; sourceTree = "<group>"; };
 		127E728B26A5D0CF00737906 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		127E728F26A5D60100737906 /* VTabBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VTabBarItem.swift; sourceTree = "<group>"; };
@@ -137,6 +139,7 @@
 			children = (
 				121D9D9425FA772200C36658 /* RemoteLoader.swift */,
 				12D2385525FFE409004D1FC6 /* Extensions.swift */,
+				122D6F6F26B0426100028418 /* Constants.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -297,6 +300,7 @@
 				12B77904250FA8BE0081D8AF /* SceneDelegate.swift in Sources */,
 				12D2385925FFE42A004D1FC6 /* SpinnerView.swift in Sources */,
 				12D2386E2600F371004D1FC6 /* ConversationListViewController.swift in Sources */,
+				122D6F7026B0426100028418 /* Constants.swift in Sources */,
 				121D9D9525FA772200C36658 /* RemoteLoader.swift in Sources */,
 				122D6F6E26A999AA00028418 /* UserDetailViewController.swift in Sources */,
 				1297BDE426026A4E00025D12 /* ChatViewController.swift in Sources */,

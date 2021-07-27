@@ -7,7 +7,7 @@ protocol ConversationListViewControllerDelegate: AnyObject {
 class ConversationListViewController: UIViewController {
     
     private lazy var listViewController: ListViewController<Conversations.Conversation> = {
-        let vc = ListViewController(data: conversations)
+        let vc = ListViewController(data: conversations, supportsRefresh: true)
         vc.delegate = self
         vc.view.translatesAutoresizingMaskIntoConstraints = false
         return vc

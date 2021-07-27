@@ -57,15 +57,16 @@ class UserDetailViewController: UIViewController {
         setUpConstraints()
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        profilePicView.layer.cornerRadius = profilePicView.frame.height / 2
+    }
+    
+    
     private func setUpView() {
         view.backgroundColor = .white
         view.addSubviews(profilePicView, nameLabel, callButton)
         ClientManager.shared.callDelegate = self
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        profilePicView.layer.cornerRadius = profilePicView.frame.height / 2
     }
     
     private func setUpConstraints() {

@@ -13,12 +13,15 @@ protocol ClientManagerCallDelegate: AnyObject {
 final class ClientManager: NSObject {
     
     static let shared = ClientManager()
+    
     public var token: String {
         return NXMClient.shared.authToken ?? ""
     }
     
-    private let encoder = JSONEncoder()
-    private let decoder = JSONDecoder()
+    public var username: String {
+        return NXMClient.shared.user?.name ?? ""
+    }
+    
     private var response: Auth.Response?
     public var call: NXMCall?
     
@@ -34,7 +37,7 @@ final class ClientManager: NSObject {
         NXMClient.shared.setDelegate(self)
     }
     
-    func auth(username: String, password: String, displayName: String?, url: String) {
+    func auth(username: String, password: String, displayName: String?, url: String, storeCredentials: Bool = true) {
         let user = Auth.Body(name: username, password: password, displayName: displayName)
         
         RemoteLoader.load(path: url, body: user, responseType: Auth.Response.self) { [weak self] result in
@@ -43,6 +46,9 @@ final class ClientManager: NSObject {
             case .success(let response):
                 self.response = response
                 NXMClient.shared.login(withAuthToken: response.token)
+                if storeCredentials {
+                    self.storeCredentials(username: username, password: password)
+                }
             case .failure(let error):
                 switch error {
                 case .api(error: let apiError):
@@ -64,6 +70,62 @@ final class ClientManager: NSObject {
             self.call = call
             self.callDelegate?.clientManager(self, didMakeCall: (true, nil))
         }
+    }
+    
+    func logout() {
+        deleteCredentials()
+        NXMClient.shared.logout()
+    }
+}
+
+extension ClientManager {
+    private func storeCredentials(username: String, password: String) {
+        if let passwordData = password.data(using: .utf8) {
+            let keychainItem = [
+                kSecClass: kSecClassInternetPassword,
+                kSecAttrServer: Constants.keychainServer,
+                kSecReturnData: true,
+                kSecReturnAttributes: true,
+                kSecAttrAccount: username,
+                kSecValueData: passwordData
+            ] as CFDictionary
+            
+            let status = SecItemAdd(keychainItem, nil)
+            print("Keychain storing finished with status: \(status)")
+        }
+    }
+    
+    func getCredentials() -> (String, String)? {
+        let query = [
+            kSecClass: kSecClassInternetPassword,
+            kSecAttrServer: Constants.keychainServer,
+            kSecReturnAttributes: true,
+            kSecReturnData: true,
+            kSecMatchLimit: 1
+        ] as CFDictionary
+        
+        var result: AnyObject?
+        let status = SecItemCopyMatching(query, &result)
+        print("Keychain querying finished with status: \(status)")
+        
+        if let resultArray = result as? NSDictionary,
+           let username = resultArray[kSecAttrAccount] as? String,
+           let passwordData = resultArray[kSecValueData] as? Data,
+           let password = String(data: passwordData, encoding: .utf8) {
+            return (username, password)
+        } else {
+            return nil
+        }
+    }
+    
+    private func deleteCredentials() {
+        let query = [
+            kSecClass: kSecClassInternetPassword,
+            kSecAttrServer: Constants.keychainServer,
+            kSecAttrAccount: username
+        ] as CFDictionary
+        
+        SecItemDelete(query)
     }
 }
 

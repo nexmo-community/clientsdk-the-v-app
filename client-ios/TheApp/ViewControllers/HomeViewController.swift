@@ -21,10 +21,10 @@ class HomeViewController: UITabBarController {
     private var conversations: [Conversations.Conversation]
     private var users: [Users.User]
     
-    //TODO: Make lazy
+    // TODO: Make lazy
     private let conversationListViewController: ConversationListViewController
     private let contactsViewController: ContactsViewController
-    private let settingsViewController = SettingsViewController()
+    private let settingsViewController: SettingsViewController
     
     private var newConversationButton: UIBarButtonItem?
     
@@ -36,6 +36,7 @@ class HomeViewController: UITabBarController {
         self.users = data.users
         self.conversationListViewController = ConversationListViewController(conversations: conversations)
         self.contactsViewController = ContactsViewController(users: users)
+        self.settingsViewController = SettingsViewController()
         super.init(nibName: nil, bundle: nil)
     }
     

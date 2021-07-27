@@ -1,6 +1,7 @@
 import UIKit
 import NexmoClient
 
+// TODO: Add call button for 1-1 calls
 class ChatViewController: UIViewController, LoadingViewController {
     
     private lazy var inputField: VTextField = {

@@ -17,12 +17,14 @@ class ListViewController<T: ListViewPresentable & Hashable>: UIViewController, U
     
     private var data: [T]
     private let supportsMultipleSelection: Bool
+    private let supportsRefresh: Bool
     
     weak var delegate: ListViewControllerDelegate?
     
-    init(data: [T], supportsMultipleSelection: Bool = false) {
+    init(data: [T], supportsMultipleSelection: Bool = false, supportsRefresh: Bool = false) {
         self.data = Array(Set(data))
         self.supportsMultipleSelection = supportsMultipleSelection
+        self.supportsRefresh = supportsRefresh
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -41,7 +43,7 @@ class ListViewController<T: ListViewPresentable & Hashable>: UIViewController, U
         view.backgroundColor = .white
         collectionView.dataSource = dataSource
         collectionView.delegate = self
-        if !supportsMultipleSelection {
+        if supportsRefresh {
             collectionView.addSubview(refreshControl)
         }
         view.addSubview(collectionView)
@@ -120,6 +122,11 @@ private extension ListViewController {
         return UICollectionView.CellRegistration { cell, indexPath, data in
             var config = cell.defaultContentConfiguration()
             config.text = data.displayName
+            
+            if let item = data as? Setting {
+                // TODO: Add icon
+            }
+            
             cell.contentConfiguration = config
         }
     }

@@ -15,7 +15,7 @@ protocol ContactsViewControllerDelegate: AnyObject {
 class ContactsViewController: UIViewController {
     
     private lazy var listViewController: ListViewController<Users.User> = {
-        let vc = ListViewController(data: users)
+        let vc = ListViewController(data: users, supportsRefresh: true)
         vc.delegate = self
         vc.view.translatesAutoresizingMaskIntoConstraints = false
         return vc
@@ -58,7 +58,6 @@ class ContactsViewController: UIViewController {
 
 }
 
-// TODO: Make call
 extension ContactsViewController: ListViewControllerDelegate {
     func listViewControllerDelegate<T>(_: ListViewController<T>, didSelectRow data: T) where T : Hashable, T : ListViewPresentable {
         if let user = data as? Users.User {
