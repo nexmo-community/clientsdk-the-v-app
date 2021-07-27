@@ -4,7 +4,7 @@ class LoginViewController: UIViewController, LoadingViewController {
     
     private let usernameField = VTextField(placeholder: "Username")
     private let passwordField = VTextField(placeholder: "Password", isSecure: true)
-    lazy var spinnerView = SpinnerView(superView: view)
+    lazy var spinnerView = SpinnerView(parentView: view)
     
     private lazy var loginButton: UIButton = {
         let button = UIButton(type: .system)
@@ -35,6 +35,7 @@ class LoginViewController: UIViewController, LoadingViewController {
         title = "The V App"
         setUpView()
         setUpConstraints()
+        checkExistingTokenAndLogin()
     }
     
     private func setUpView() {
@@ -52,6 +53,22 @@ class LoginViewController: UIViewController, LoadingViewController {
             usernameField.heightAnchor.constraint(equalToConstant: 50),
             passwordField.heightAnchor.constraint(equalToConstant: 50)
         ])
+    }
+    
+    private func checkExistingTokenAndLogin() {
+        if let credentials = ClientManager.shared.getCredentials() {
+            ClientManager.shared.delegate = self
+            toggleLoading()
+            ClientManager.shared.auth(username: credentials.0, password: credentials.1, displayName: nil, url: Auth.loginPath, storeCredentials: false)
+            hideViews()
+            spinnerView.setDetailText(text: "Welcome back \(credentials.0)")
+        }
+    }
+    
+    private func hideViews() {
+        stackView.isHidden = true
+        usernameField.isHidden = true
+        passwordField.isHidden = true
     }
     
     @objc func loginButtonTapped() {

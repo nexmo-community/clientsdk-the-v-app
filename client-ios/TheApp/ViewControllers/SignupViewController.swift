@@ -5,7 +5,7 @@ class SignUpViewController: UIViewController, LoadingViewController {
     private let displayNameField = VTextField(placeholder: "Display Name")
     private let usernameField = VTextField(placeholder: "Username")
     private let passwordField = VTextField(placeholder: "Password", isSecure: true)
-    lazy var spinnerView = SpinnerView(superView: view)
+    lazy var spinnerView = SpinnerView(parentView: view)
     
     private lazy var signUpButton: UIButton = {
         let button = UIButton(type: .system)

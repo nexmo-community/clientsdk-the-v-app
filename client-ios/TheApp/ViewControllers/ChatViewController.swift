@@ -20,7 +20,7 @@ class ChatViewController: UIViewController, LoadingViewController {
         return textView
     }()
     
-    lazy var spinnerView = SpinnerView(superView: view)
+    lazy var spinnerView = SpinnerView(parentView: view)
     
     var nxmConversation: NXMConversation?
     

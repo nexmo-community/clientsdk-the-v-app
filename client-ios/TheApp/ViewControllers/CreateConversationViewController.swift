@@ -31,7 +31,7 @@ class CreateConversationViewController: UIViewController, LoadingViewController 
         return button
     }()
     
-    lazy var spinnerView = SpinnerView(superView: view)
+    lazy var spinnerView = SpinnerView(parentView: view)
     
     weak var delegate: CreateConversationViewControllerDelegate?
     
