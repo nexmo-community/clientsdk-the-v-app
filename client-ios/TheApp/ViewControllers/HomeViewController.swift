@@ -65,10 +65,6 @@ class HomeViewController: UITabBarController {
         self.viewControllers = VTabBarItem.allCases.map { createTabBarViewControllers(for: $0) }
     }
     
-    public func conversationListViewControllerDidRefresh() {
-        print("refresh")
-    }
-    
     private func createTabBarViewControllers(for vBarItem: VTabBarItem) -> UIViewController {
         let item = UITabBarItem(title: vBarItem.title, image: vBarItem.image, tag: vBarItem.tag)
         let viewController: UIViewController

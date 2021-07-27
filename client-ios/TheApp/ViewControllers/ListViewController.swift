@@ -41,6 +41,7 @@ class ListViewController<T: ListViewPresentable & Hashable>: UIViewController, U
     
     private func setUpView() {
         view.backgroundColor = .white
+        collectionView.backgroundColor = .white
         collectionView.dataSource = dataSource
         collectionView.delegate = self
         if supportsRefresh {
