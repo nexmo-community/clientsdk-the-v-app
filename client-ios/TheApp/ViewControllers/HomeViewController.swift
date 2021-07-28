@@ -169,9 +169,6 @@ extension HomeViewController: ContactsViewControllerDelegate {
 }
 
 extension HomeViewController: ClientManagerCallDelegate {
-    func clientManager(_ clientManager: ClientManager, didMakeCall success: (Bool, String?)) {
-    }
-    
     func clientManager(_ clientManager: ClientManager, didReceiveCall call: NXMCall) {
         DispatchQueue.main.async {
             self.displayIncomingCallAlert(call: call)

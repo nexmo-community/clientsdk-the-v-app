@@ -75,6 +75,4 @@ extension ConversationListViewController: HomeViewControllerDelegate {
         self.conversations = conversations
         self.listViewController.triggerUpdate(with: self.conversations)
     }
-    
-    func homeViewControllerDelegate(_ HomeViewController: HomeViewController, didLoadUsers users: [Users.User]) {}
 }

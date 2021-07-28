@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import NexmoClient
 
 class UserDetailViewController: UIViewController {
     
@@ -41,8 +40,6 @@ class UserDetailViewController: UIViewController {
     
     private let user: Users.User
     
-    private var call: NXMCall?
-    
     init(user: Users.User) {
         self.user = user
         super.init(nibName: nil, bundle: nil)
@@ -67,7 +64,6 @@ class UserDetailViewController: UIViewController {
     private func setUpView() {
         view.backgroundColor = .white
         view.addSubviews(profilePicView, nameLabel, callButton)
-        ClientManager.shared.callDelegate = self
     }
     
     private func setUpConstraints() {
@@ -86,17 +82,7 @@ class UserDetailViewController: UIViewController {
     }
     
     @objc func callButtonTapped() {
-        ClientManager.shared.call(name: user.name)
-    }
-}
-
-// TODO: present call screen modally
-extension UserDetailViewController: ClientManagerCallDelegate {
-    func clientManager(_ clientManager: ClientManager, didMakeCall success: (Bool, String?)) {
-    
-    }
-    
-    func clientManager(_ clientManager: ClientManager, didReceiveCall call: NXMCall) {
-        
+        // TODO: present call screen modally
+        present(CallViewController(user: user), animated: true, completion: nil)
     }
 }

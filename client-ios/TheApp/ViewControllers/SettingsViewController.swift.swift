@@ -93,6 +93,4 @@ extension SettingsViewController: ListViewControllerDelegate {
             }
         }
     }
-    
-    func listViewControllerDelegateDidRefresh<T>(_: ListViewController<T>) where T : Hashable, T : ListViewPresentable {}
 }

@@ -6,7 +6,8 @@ protocol ClientManagerDelegate: AnyObject {
 }
 
 protocol ClientManagerCallDelegate: AnyObject {
-    func clientManager(_ clientManager: ClientManager, didMakeCall success: (Bool, String?))
+    func clientManager(_ clientManager: ClientManager, didMakeCall call: NXMCall?)
+    func clientManager(_ clientManager: ClientManager, makeCallDidFail errorMessage: String?)
     func clientManager(_ clientManager: ClientManager, didReceiveCall call: NXMCall)
 }
 
@@ -23,7 +24,6 @@ final class ClientManager: NSObject {
     }
     
     private var response: Auth.Response?
-    public var call: NXMCall?
     
     weak var delegate: ClientManagerDelegate?
     weak var callDelegate: ClientManagerCallDelegate?
@@ -64,11 +64,11 @@ final class ClientManager: NSObject {
         NXMClient.shared.call(name, callHandler: .inApp) { [weak self] error, call in
             guard let self = self else { return }
             if error != nil {
-                self.callDelegate?.clientManager(self, didMakeCall: (false, error?.localizedDescription))
+                self.callDelegate?.clientManager(self, makeCallDidFail: error?.localizedDescription)
+                return
             }
 
-            self.call = call
-            self.callDelegate?.clientManager(self, didMakeCall: (true, nil))
+            self.callDelegate?.clientManager(self, didMakeCall: call)
         }
     }
     
@@ -144,7 +144,6 @@ extension ClientManager: NXMClientDelegate {
     }
     
     func client(_ client: NXMClient, didReceive call: NXMCall) {
-        self.call = call
         callDelegate?.clientManager(self, didReceiveCall: call)
     }
 }

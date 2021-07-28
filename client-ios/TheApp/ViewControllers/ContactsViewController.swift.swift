@@ -70,11 +70,7 @@ extension ContactsViewController: ListViewControllerDelegate {
     }
 }
 
-extension ContactsViewController: HomeViewControllerDelegate {
-    func homeViewControllerDelegate(_ HomeViewController: HomeViewController, didCreateConversation conversation: Conversations.Conversation, conversations: [Conversations.Conversation]) {}
-    
-    func homeViewControllerDelegate(_ HomeViewController: HomeViewController, didLoadConversations conversations: [Conversations.Conversation]) {}
-    
+extension ContactsViewController: HomeViewControllerDelegate {    
     func homeViewControllerDelegate(_ HomeViewController: HomeViewController, didLoadUsers users: [Users.User]) {
         self.users = users
         self.listViewController.triggerUpdate(with: users)

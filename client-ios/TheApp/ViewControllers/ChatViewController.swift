@@ -1,7 +1,6 @@
 import UIKit
 import NexmoClient
 
-// TODO: Add call button for 1-1 calls
 class ChatViewController: UIViewController, LoadingViewController {
     
     private lazy var inputField: VTextField = {
@@ -56,6 +55,16 @@ class ChatViewController: UIViewController, LoadingViewController {
         title = conversation.displayName
         view.backgroundColor = .white
         view.addSubviews(conversationTextView, inputField)
+        
+        if conversation.users.count == 1 {
+            
+            let callButton = UIButton()
+            callButton.setImage(UIImage(systemName: "phone.fill.arrow.up.right"), for: .normal)
+            callButton.addTarget(self, action: #selector(makeCallButtonTapped), for: .touchUpInside)
+            let callButtonItem = UIBarButtonItem(customView: callButton)
+
+            navigationItem.rightBarButtonItem = callButtonItem
+        }
     }
     
     private func setUpConstraints() {
@@ -75,6 +84,12 @@ class ChatViewController: UIViewController, LoadingViewController {
     @objc func keyboardWasShown(notification: NSNotification) {
         if let kbSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect)?.size {
             self.additionalSafeAreaInsets = UIEdgeInsets(top: 0, left: 0, bottom: kbSize.height - 20, right: 0)
+        }
+    }
+    
+    @objc func makeCallButtonTapped() {
+        if let user = conversation.users.first {
+            present(CallViewController(user: user), animated: true, completion: nil)
         }
     }
     
@@ -131,14 +146,12 @@ class ChatViewController: UIViewController, LoadingViewController {
     }
     
     func processNxmEvent(event: NXMEvent) {
-        
         if let memberEvent = event as? NXMMemberEvent {
             showMemberEvent(event: memberEvent)
         }
         if let textEvent = event as? NXMTextEvent {
             showTextEvent(event: textEvent)
         }
-        
     }
     
     func showMemberEvent(event: NXMMemberEvent) {
