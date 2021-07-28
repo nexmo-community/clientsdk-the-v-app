@@ -88,7 +88,6 @@ class HomeViewController: UITabBarController {
         navigationController?.present(createConversationViewController, animated: true, completion: nil)
     }
     
-    // TODO: present call screen modally
     func displayIncomingCallAlert(call: NXMCall) {
         var from = "Unknown"
         if let otherParty = call.allMembers.first {
@@ -96,8 +95,8 @@ class HomeViewController: UITabBarController {
         }
         let alert = UIAlertController(title: "Incoming call from", message: from, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Answer", style: .default, handler: { _ in
-            call.answer(nil)
-            
+            // TODO: test when a modal is already presented
+            self.present(CallViewController(call: call), animated: true, completion: nil)
         }))
         alert.addAction(UIAlertAction(title: "Reject", style: .destructive, handler: { _ in
             call.reject(nil)

@@ -36,6 +36,7 @@ class LoginViewController: UIViewController, LoadingViewController {
         setUpView()
         setUpConstraints()
         checkExistingTokenAndLogin()
+        hideKeyboardWhenTappedAround()
     }
     
     override func viewWillAppear(_ animated: Bool) {

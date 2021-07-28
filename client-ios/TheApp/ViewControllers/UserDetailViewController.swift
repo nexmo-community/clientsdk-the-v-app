@@ -82,7 +82,6 @@ class UserDetailViewController: UIViewController {
     }
     
     @objc func callButtonTapped() {
-        // TODO: present call screen modally
         present(CallViewController(user: user), animated: true, completion: nil)
     }
 }

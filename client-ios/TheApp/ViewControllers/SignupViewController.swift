@@ -26,6 +26,7 @@ class SignUpViewController: UIViewController, LoadingViewController {
         super.viewDidLoad()
         setUpView()
         setUpConstraints()
+        hideKeyboardWhenTappedAround()
     }
     
     private func setUpView() {
