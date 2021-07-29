@@ -22,7 +22,7 @@ class ListViewController<T: ListViewPresentable & Hashable>: UIViewController, U
     weak var delegate: ListViewControllerDelegate?
     
     init(data: [T], supportsMultipleSelection: Bool = false, supportsRefresh: Bool = false) {
-        self.data = Array(Set(data))
+        self.data = data
         self.supportsMultipleSelection = supportsMultipleSelection
         self.supportsRefresh = supportsRefresh
         super.init(nibName: nil, bundle: nil)

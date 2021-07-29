@@ -58,5 +58,7 @@
 	</array>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>To make calls.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>To add a profile picture.</string>
 </dict>
 </plist>

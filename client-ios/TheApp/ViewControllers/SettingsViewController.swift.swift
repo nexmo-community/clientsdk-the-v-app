@@ -10,12 +10,24 @@ import UIKit
 
 class SettingsViewController: UIViewController {
     
-    private static let settings = [Setting(id: "1", displayName: "Log out", type: .logout, iconString: "person.fill.badge.minus")]
+    private static let settings = [
+        Setting(
+            id: "1",
+            displayName: "Change profile picture",
+            type: .picture,
+            iconString: "person.crop.square.fill"
+        ),
+        Setting(
+            id: "2",
+            displayName: "Log out",
+            type: .logout,
+            iconString: "person.fill.badge.minus"
+        )
+    ]
     
-    private lazy var profilePicView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.clipsToBounds = true
-        imageView.backgroundColor = .gray
+    private lazy var profilePicView: VProfilePictureView = {
+        let imageView = VProfilePictureView()
+        imageView.imageURL = imageURL
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
@@ -37,10 +49,22 @@ class SettingsViewController: UIViewController {
         return vc
     }()
     
+    private lazy var imagePicker: UIImagePickerController = {
+        let imagePicker = UIImagePickerController()
+        imagePicker.delegate = self
+        imagePicker.allowsEditing = false
+        imagePicker.sourceType = .photoLibrary
+        return imagePicker
+    }()
+    
     private let username: String
-
+    private let imageURL: String?
+    
+    private var image: UIImage?
+    
     init() {
         self.username = ClientManager.shared.username
+        self.imageURL = ClientManager.shared.imageURL
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -53,11 +77,6 @@ class SettingsViewController: UIViewController {
         setUpView()
         setUpConstraints()
         view.backgroundColor = .white
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        profilePicView.layer.cornerRadius = profilePicView.frame.height / 2
     }
     
     private func setUpView() {
@@ -87,10 +106,28 @@ extension SettingsViewController: ListViewControllerDelegate {
     func listViewControllerDelegate<T>(_: ListViewController<T>, didSelectRow data: T) where T : Hashable, T : ListViewPresentable {
         if let setting = data as? Setting {
             switch setting.type {
+            case .picture:
+                self.present(imagePicker, animated: true, completion: nil)
             case .logout:
                 ClientManager.shared.logout()
                 self.navigationController?.popViewController(animated: true)
             }
         }
+    }
+}
+
+extension SettingsViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+            // TODO: upload to backend
+            profilePicView.image = UIImage(data: pickedImage.jpegData(compressionQuality: 0.5)!)
+        }
+        
+        dismiss(animated: true, completion: nil)
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        dismiss(animated: true, completion: nil)
     }
 }

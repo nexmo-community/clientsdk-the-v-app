@@ -26,6 +26,10 @@ final class ClientManager: NSObject {
         return NXMClient.shared.user?.name ?? ""
     }
     
+    public var imageURL: String? {
+        return NXMClient.shared.user?.imageUrl
+    }
+    
     private var response: Auth.Response?
     
     weak var delegate: ClientManagerDelegate?

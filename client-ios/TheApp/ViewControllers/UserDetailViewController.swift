@@ -10,11 +10,9 @@ import UIKit
 
 class UserDetailViewController: UIViewController {
     
-    // TODO: Make custom view and encapsulate loading
-    private lazy var profilePicView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.clipsToBounds = true
-        imageView.backgroundColor = .gray
+    private lazy var profilePicView: VProfilePictureView = {
+        let imageView = VProfilePictureView()
+        imageView.imageURL = user.imageURL
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
@@ -54,12 +52,6 @@ class UserDetailViewController: UIViewController {
         setUpView()
         setUpConstraints()
     }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        profilePicView.layer.cornerRadius = profilePicView.frame.height / 2
-    }
-    
     
     private func setUpView() {
         view.backgroundColor = .white

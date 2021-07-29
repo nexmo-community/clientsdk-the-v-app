@@ -19,10 +19,9 @@ class CallViewController: UIViewController {
         case error(reason: String?)
     }
     
-    private lazy var profilePicView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.clipsToBounds = true
-        imageView.backgroundColor = .gray
+    private lazy var profilePicView: VProfilePictureView = {
+        let imageView = VProfilePictureView()
+        imageView.imageURL = user.imageURL
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
@@ -128,11 +127,6 @@ class CallViewController: UIViewController {
             call?.setDelegate(self)
             callState = .ongoing
         }
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        profilePicView.layer.cornerRadius = profilePicView.frame.height / 2
     }
     
     override func viewDidDisappear(_ animated: Bool) {

@@ -8,6 +8,7 @@ protocol ListViewPresentable {
 struct Setting: Hashable, ListViewPresentable {
     
     enum SettingType {
+        case picture
         case logout
     }
     
@@ -30,9 +31,11 @@ struct Users: Codable, Hashable {
         let name: String
         let displayName: String
         let detail: String? = nil
+        let imageURL: String? = nil
         
         enum CodingKeys: String, CodingKey {
             case id, name
+            case imageURL = "image_url"
             case displayName = "display_name"
         }
     }

@@ -57,7 +57,7 @@ class ChatViewController: UIViewController, LoadingViewController {
         view.addSubviews(conversationTextView, inputField)
         
         if conversation.users.count == 1 {
-            
+            // TODO: tap target size
             let callButton = UIButton()
             callButton.setImage(UIImage(systemName: "phone.fill.arrow.up.right"), for: .normal)
             callButton.addTarget(self, action: #selector(makeCallButtonTapped), for: .touchUpInside)
