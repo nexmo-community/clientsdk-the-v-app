@@ -57,6 +57,16 @@ class CallViewController: UIViewController {
         return button
     }()
     
+    private lazy var muteButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Mute", for: .normal)
+        button.setImage(UIImage(systemName: "mic.slash.fill"), for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.tintColor = .gray
+        button.addTarget(self, action: #selector(muteButtonTapped), for: .touchUpInside)
+        return button
+    }()
+    
     private lazy var muteIconImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(systemName: "mic.slash.fill"))
         imageView.isHidden = true
@@ -68,6 +78,7 @@ class CallViewController: UIViewController {
     private let user: Users.User
 
     private var call: NXMCall?
+    private var isMuted = false
     
     init(user: Users.User) {
         self.user = user
@@ -76,7 +87,12 @@ class CallViewController: UIViewController {
     
     init(call: NXMCall) {
         self.call = call
-        self.user = Users.User(id: call.allMembers.first!.user.uuid, name: call.allMembers.first!.user.name, displayName: call.allMembers.first!.user.name)
+        guard let callUser = call.allMembers.first?.user else { fatalError("Missing call member") }
+        self.user = Users.User(
+            id: callUser.uuid,
+            name: callUser.name,
+            displayName: callUser.displayName
+        )
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -95,7 +111,9 @@ class CallViewController: UIViewController {
             callStatusLabel.text = "Ringing..."
         } else {
             call?.answer(nil)
+            call?.setDelegate(self)
             callStatusLabel.text = "Call ongoing"
+            endCallButton.isHidden = false
         }
     }
     
@@ -105,10 +123,15 @@ class CallViewController: UIViewController {
     }
     
     
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        endCall(with: "Call ended")
+    }
+    
     private func setUpView() {
         view.backgroundColor = .white
         title = "Calling \(user.displayName)"
-        view.addSubviews(profilePicView, nameLabel, muteIconImageView, callStatusLabel, endCallButton, callButton)
+        view.addSubviews(profilePicView, nameLabel, muteIconImageView, callStatusLabel, muteButton, endCallButton, callButton)
     }
     
     private func setUpConstraints() {
@@ -132,6 +155,10 @@ class CallViewController: UIViewController {
             callStatusLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             callStatusLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
+            muteButton.topAnchor.constraint(equalTo: callStatusLabel.bottomAnchor, constant: 20),
+            muteButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            muteButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            
             endCallButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             endCallButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             endCallButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
@@ -142,16 +169,33 @@ class CallViewController: UIViewController {
         ])
     }
     
-    @objc func endCallButtonTapped() {
+    private func endCall(with endDescription: String) {
         call?.hangup()
-        callStatusLabel.text = "Call ended"
+        callStatusLabel.text = endDescription
         callButton.isHidden = false
         endCallButton.isHidden = true
         call = nil
     }
     
-    @objc func callButtonTapped() {
+    @objc private func endCallButtonTapped() {
+        endCall(with: "Call ended")
+    }
+    
+    @objc private func callButtonTapped() {
+        callButton.isHidden = true
         ClientManager.shared.call(name: user.name)
+    }
+    
+    @objc private func muteButtonTapped() {
+        if isMuted {
+            call?.unmute()
+            isMuted = false
+            muteButton.setTitle("Mute", for: .normal)
+        } else {
+            call?.mute()
+            isMuted = true
+            muteButton.setTitle("Unmute", for: .normal)
+        }
     }
 }
 
@@ -171,15 +215,33 @@ extension CallViewController: ClientManagerCallDelegate {
 }
 
 extension CallViewController: NXMCallDelegate {
-    // TODO: handle events and update the labels
     func call(_ call: NXMCall, didUpdate member: NXMMember, with status: NXMCallMemberStatus) {
         guard member.user.name == user.name else { return }
-        
+        DispatchQueue.main.async {
+            switch status {
+            case .answered:
+                // Person called picked up
+                self.callStatusLabel.text = "Call ongoing"
+            case .completed:
+                // Person called ended the call
+                self.endCall(with: "\(self.user.displayName) ended the call")
+            case .cancelled, .rejected:
+                // Person called rejected the call
+                self.endCall(with: "\(self.user.displayName) rejected the call")
+            case .busy, .failed, .timeout:
+                // Issue with the call
+                self.endCall(with: "There was an error with the call, try again")
+            default:
+                break
+            }
+        }
     }
     
     func call(_ call: NXMCall, didUpdate member: NXMMember, isMuted muted: Bool) {
         guard member.user.name == user.name else { return }
-        muteIconImageView.isHidden = !muted
+        DispatchQueue.main.async {
+            self.muteIconImageView.isHidden = !muted
+        }
     }
     
     func call(_ call: NXMCall, didReceive error: Error) {
