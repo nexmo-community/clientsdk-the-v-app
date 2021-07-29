@@ -11,6 +11,14 @@ import NexmoClient
 
 class CallViewController: UIViewController {
     
+    enum CallState {
+        case inactive
+        case ringing
+        case ongoing
+        case ended(reason: String?)
+        case error(reason: String?)
+    }
+    
     private lazy var profilePicView: UIImageView = {
         let imageView = UIImageView()
         imageView.clipsToBounds = true
@@ -60,6 +68,7 @@ class CallViewController: UIViewController {
     private lazy var muteButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Mute", for: .normal)
+        button.isHidden = true
         button.setImage(UIImage(systemName: "mic.slash.fill"), for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.tintColor = .gray
@@ -79,6 +88,11 @@ class CallViewController: UIViewController {
 
     private var call: NXMCall?
     private var isMuted = false
+    private var callState: CallState = .inactive {
+        didSet {
+            updateUIForCallState()
+        }
+    }
     
     init(user: Users.User) {
         self.user = user
@@ -108,12 +122,11 @@ class CallViewController: UIViewController {
         
         if call == nil {
             ClientManager.shared.call(name: user.name)
-            callStatusLabel.text = "Ringing..."
+            callState = .ringing
         } else {
             call?.answer(nil)
             call?.setDelegate(self)
-            callStatusLabel.text = "Call ongoing"
-            endCallButton.isHidden = false
+            callState = .ongoing
         }
     }
     
@@ -122,10 +135,9 @@ class CallViewController: UIViewController {
         profilePicView.layer.cornerRadius = profilePicView.frame.height / 2
     }
     
-    
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        endCall(with: "Call ended")
+        callState = .ended(reason: "Call ended")
     }
     
     private func setUpView() {
@@ -169,20 +181,17 @@ class CallViewController: UIViewController {
         ])
     }
     
-    private func endCall(with endDescription: String) {
+    private func endCall() {
         call?.hangup()
-        callStatusLabel.text = endDescription
-        callButton.isHidden = false
-        endCallButton.isHidden = true
         call = nil
     }
     
     @objc private func endCallButtonTapped() {
-        endCall(with: "Call ended")
+        callState = .ended(reason: "Call ended")
     }
     
     @objc private func callButtonTapped() {
-        callButton.isHidden = true
+        callState = .ringing
         ClientManager.shared.call(name: user.name)
     }
     
@@ -197,20 +206,50 @@ class CallViewController: UIViewController {
             muteButton.setTitle("Unmute", for: .normal)
         }
     }
+    
+    private func updateUIForCallState() {
+        switch callState {
+        case .inactive:
+            callStatusLabel.text = nil
+            callButton.isHidden = false
+            endCallButton.isHidden = true
+            muteButton.isHidden = true
+        case .ringing:
+            callStatusLabel.text = "Ringing..."
+            callButton.isHidden = true
+            endCallButton.isHidden = false
+            muteButton.isHidden = true
+        case .ongoing:
+            callStatusLabel.text = "Call ongoing"
+            callButton.isHidden = true
+            endCallButton.isHidden = false
+            muteButton.isHidden = false
+        case .ended(let reason):
+            callStatusLabel.text = reason
+            callButton.isHidden = false
+            endCallButton.isHidden = true
+            muteButton.isHidden = true
+            endCall()
+        case .error(let reason):
+            callStatusLabel.text = reason
+            callButton.isHidden = false
+            endCallButton.isHidden = true
+            muteButton.isHidden = true
+        }
+    }
 }
 
 extension CallViewController: ClientManagerCallDelegate {
     func clientManager(_ clientManager: ClientManager, didMakeCall call: NXMCall?) {
         DispatchQueue.main.async {
             self.call = call
-            self.endCallButton.isHidden = false
+            self.callState = .ringing
             self.call?.setDelegate(self)
         }
     }
     
     func clientManager(_ clientManager: ClientManager, makeCallDidFail errorMessage: String?) {
-        callStatusLabel.text = errorMessage
-        callButton.isHidden = false
+        callState = .error(reason: errorMessage)
     }
 }
 
@@ -221,16 +260,16 @@ extension CallViewController: NXMCallDelegate {
             switch status {
             case .answered:
                 // Person called picked up
-                self.callStatusLabel.text = "Call ongoing"
+                self.callState = .ongoing
             case .completed:
                 // Person called ended the call
-                self.endCall(with: "\(self.user.displayName) ended the call")
+                self.callState = .ended(reason: "\(self.user.displayName) ended the call")
             case .cancelled, .rejected:
                 // Person called rejected the call
-                self.endCall(with: "\(self.user.displayName) rejected the call")
+                self.callState = .ended(reason: "\(self.user.displayName) rejected the call")
             case .busy, .failed, .timeout:
                 // Issue with the call
-                self.endCall(with: "There was an error with the call, try again")
+                self.callState = .ended(reason: "There was an error with the call, try again")
             default:
                 break
             }
