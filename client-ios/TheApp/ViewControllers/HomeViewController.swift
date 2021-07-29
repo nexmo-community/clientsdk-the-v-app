@@ -60,7 +60,7 @@ class HomeViewController: UITabBarController {
         delegate = self
         conversationListViewController.delegate = self
         contactsViewController.delegate = self
-        ClientManager.shared.callDelegate = self
+        ClientManager.shared.incomingCallDelegate = self
         
         self.viewControllers = VTabBarItem.allCases.map { createTabBarViewControllers(for: $0) }
     }
@@ -91,7 +91,7 @@ class HomeViewController: UITabBarController {
     func displayIncomingCallAlert(call: NXMCall) {
         var from = "Unknown"
         if let otherParty = call.allMembers.first {
-            from = otherParty.channel?.from.data ?? "Unknown"
+            from = otherParty.channel?.from.data ?? otherParty.user.name
         }
         let alert = UIAlertController(title: "Incoming call from", message: from, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Answer", style: .default, handler: { _ in
@@ -167,7 +167,7 @@ extension HomeViewController: ContactsViewControllerDelegate {
     }
 }
 
-extension HomeViewController: ClientManagerCallDelegate {
+extension HomeViewController: ClientManagerIncomingCallDelegate {
     func clientManager(_ clientManager: ClientManager, didReceiveCall call: NXMCall) {
         DispatchQueue.main.async {
             self.displayIncomingCallAlert(call: call)

@@ -18,7 +18,6 @@ import NexmoClient
 extension ClientManagerCallDelegate {
     func clientManager(_ clientManager: ClientManager, didMakeCall call: NXMCall?) {}
     func clientManager(_ clientManager: ClientManager, makeCallDidFail errorMessage: String?) {}
-    func clientManager(_ clientManager: ClientManager, didReceiveCall call: NXMCall) {}
 }
 
 extension ListViewControllerDelegate {

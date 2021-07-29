@@ -8,6 +8,9 @@ protocol ClientManagerDelegate: AnyObject {
 protocol ClientManagerCallDelegate: AnyObject {
     func clientManager(_ clientManager: ClientManager, didMakeCall call: NXMCall?)
     func clientManager(_ clientManager: ClientManager, makeCallDidFail errorMessage: String?)
+}
+
+protocol ClientManagerIncomingCallDelegate: AnyObject {
     func clientManager(_ clientManager: ClientManager, didReceiveCall call: NXMCall)
 }
 
@@ -27,6 +30,7 @@ final class ClientManager: NSObject {
     
     weak var delegate: ClientManagerDelegate?
     weak var callDelegate: ClientManagerCallDelegate?
+    weak var incomingCallDelegate: ClientManagerIncomingCallDelegate?
     
     override init() {
         super.init()
@@ -144,6 +148,6 @@ extension ClientManager: NXMClientDelegate {
     }
     
     func client(_ client: NXMClient, didReceive call: NXMCall) {
-        callDelegate?.clientManager(self, didReceiveCall: call)
+        incomingCallDelegate?.clientManager(self, didReceiveCall: call)
     }
 }

@@ -101,7 +101,7 @@ class CallViewController: UIViewController {
     
     init(call: NXMCall) {
         self.call = call
-        guard let callUser = call.allMembers.first?.user else { fatalError("Missing call member") }
+        guard let callUser = (call.allMembers.first { $0.user.name != ClientManager.shared.username })?.user else { fatalError("Missing call member") }
         self.user = Users.User(
             id: callUser.uuid,
             name: callUser.name,
