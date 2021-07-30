@@ -36,7 +36,7 @@ class VProfilePictureView: UIImageView {
     
     private func loadImage() {
         spinnerView.toggle()
-        RemoteLoader.fetch(url: imageURL!) { result in
+        RemoteLoader.fetchImage(url: imageURL!) { result in
             self.spinnerView.toggle()
             switch result {
             case .success(let data):

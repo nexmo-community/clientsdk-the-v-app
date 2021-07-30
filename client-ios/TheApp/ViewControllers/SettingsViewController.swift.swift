@@ -8,7 +8,7 @@
 
 import UIKit
 
-class SettingsViewController: UIViewController {
+class SettingsViewController: UIViewController, LoadingViewController {
     
     private static let settings = [
         Setting(
@@ -57,14 +57,15 @@ class SettingsViewController: UIViewController {
         return imagePicker
     }()
     
-    private let username: String
-    private let imageURL: String?
+    lazy var spinnerView = SpinnerView(parentView: view)
+    
+    private let username = ClientManager.shared.username
+    private let imageURL = ClientManager.shared.imageURL
+    private let token = ClientManager.shared.token
     
     private var image: UIImage?
     
     init() {
-        self.username = ClientManager.shared.username
-        self.imageURL = ClientManager.shared.imageURL
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -76,7 +77,6 @@ class SettingsViewController: UIViewController {
         super.viewDidLoad()
         setUpView()
         setUpConstraints()
-        view.backgroundColor = .white
     }
     
     private func setUpView() {
@@ -120,8 +120,22 @@ extension SettingsViewController: UIImagePickerControllerDelegate, UINavigationC
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-            // TODO: upload to backend
-            profilePicView.image = UIImage(data: pickedImage.jpegData(compressionQuality: 0.5)!)
+            if let imageData = pickedImage.jpegData(compressionQuality: 0.1) {
+                toggleLoading()
+                spinnerView.setDetailText(text: "Uploading your image")
+                RemoteLoader.uploadImage(authToken: token, body: imageData) { result in
+                    DispatchQueue.main.async {
+                        self.toggleLoading()
+                        switch result {
+                        case .success:
+                            self.profilePicView.image = pickedImage
+                        case .failure(let error):
+                            self.showErrorAlert(message: error.localizedDescription)
+                        }
+                    }
+                    
+                }
+            }
         }
         
         dismiss(animated: true, completion: nil)

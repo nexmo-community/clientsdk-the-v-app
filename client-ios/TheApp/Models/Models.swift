@@ -18,9 +18,20 @@ struct Setting: Hashable, ListViewPresentable {
     let iconString: String
 }
 
+struct Image: Codable {
+    static let path = "/image"
+    
+    struct Response: Codable  {
+        let imageURL: String
+        
+        enum CodingKeys: String, CodingKey {
+            case imageURL = "image_url"
+        }
+    }
+}
+
 struct Users: Codable, Hashable {
     static let path = "/users"
-    
     
     struct List: Codable {
         typealias Response = [User]

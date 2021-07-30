@@ -10,27 +10,7 @@ enum RemoteLoaderError: Error {
 final class RemoteLoader {
     
     static let baseURL = ""
-    
-    // TODO: merge into initial function
-    static func fetch(url: String, completion: @escaping ((Result<Data, RemoteLoaderError>) -> Void)) {
-        guard let url = URL(string: url) else {
-            completion(.failure(.url))
-            return
-        }
         
-        URLSession.shared.dataTask(with: url) { data, response, error in
-            guard error == nil else {
-                completion(.failure(.misc(error: error!)))
-                return
-            }
-            
-            if let data = data {
-                completion(.success(data))
-                return
-            }
-        }.resume()
-    }
-    
     static func load<T: Codable, U: Codable>(path: String,
                                              authToken: String? = nil,
                                              body: T?,
@@ -65,4 +45,82 @@ final class RemoteLoader {
             completion(.failure(.data))
         }.resume()
     }
+    
+    static func fetchImage(url: String, completion: @escaping ((Result<Data, RemoteLoaderError>) -> Void)) {
+        guard let url = URL(string: url) else {
+            completion(.failure(.url))
+            return
+        }
+        
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            guard error == nil else {
+                completion(.failure(.misc(error: error!)))
+                return
+            }
+            
+            if let data = data {
+                completion(.success(data))
+                return
+            }
+        }.resume()
+    }
+    
+    // Source: https://github.com/donnywals/MultipartRequestURLSession
+    static func uploadImage(authToken: String? = nil,
+                            body: Data,
+                            completion: @escaping ((Result<Image.Response, RemoteLoaderError>) -> Void)) {
+        // TODO: Remove dev url
+        guard let url = URL(string: "https://abdulajet.ngrok.io" + Image.path) else {
+            completion(.failure(.url))
+            return
+        }
+        
+        let boundary = "Boundary-\(UUID().uuidString)"
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        
+        let httpBody = NSMutableData()
+        
+        httpBody.append(convertFileData(fieldName: "image",
+                                        fileName: "image",
+                                        mimeType: "image/jpeg",
+                                        fileData: body,
+                                        using: boundary))
+
+        httpBody.appendString("--\(boundary)--")
+
+        request.httpBody = httpBody as Data
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            guard error == nil else {
+                completion(.failure(.misc(error: error!)))
+                return
+            }
+            
+            if let data = data {
+                if let response = try? JSONDecoder().decode(Image.Response.self, from: data) {
+                    completion(.success(response))
+                    return
+                } else if let apiError = try? JSONDecoder().decode(APIError.self, from: data) {
+                    completion(.failure(.api(error: apiError)))
+                    return
+                }
+            }
+            completion(.failure(.data))
+        }.resume()
+    }
+    
+    private static func convertFileData(fieldName: String, fileName: String, mimeType: String, fileData: Data, using boundary: String) -> Data {
+        let data = NSMutableData()
+
+        data.appendString("--\(boundary)\r\n")
+        data.appendString("Content-Disposition: form-data; name=\"\(fieldName)\"; filename=\"\(fileName)\"\r\n")
+        data.appendString("Content-Type: \(mimeType)\r\n\r\n")
+        data.append(fileData)
+        data.appendString("\r\n")
+
+        return data as Data
+      }
 }
