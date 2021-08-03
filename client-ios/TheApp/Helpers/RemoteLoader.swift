@@ -66,7 +66,7 @@ final class RemoteLoader {
     }
     
     // Source: https://github.com/donnywals/MultipartRequestURLSession
-    static func uploadImage(authToken: String? = nil,
+    static func uploadImage(authToken: String,
                             body: Data,
                             completion: @escaping ((Result<Image.Response, RemoteLoaderError>) -> Void)) {
         guard let url = URL(string: RemoteLoader.baseURL + Image.path) else {
@@ -79,6 +79,7 @@ final class RemoteLoader {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
         
         let httpBody = NSMutableData()
         

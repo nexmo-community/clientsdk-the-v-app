@@ -22,15 +22,8 @@ final class ClientManager: NSObject {
         return NXMClient.shared.authToken ?? ""
     }
     
-    public var username: String {
-        return NXMClient.shared.user?.name ?? ""
-    }
-    
-    public var imageURL: String? {
-        return NXMClient.shared.user?.imageUrl
-    }
-    
     private var response: Auth.Response?
+    public var user: Users.User?
     
     weak var delegate: ClientManagerDelegate?
     weak var callDelegate: ClientManagerCallDelegate?
@@ -53,6 +46,7 @@ final class ClientManager: NSObject {
             switch result {
             case .success(let response):
                 self.response = response
+                self.user = response.user
                 NXMClient.shared.login(withAuthToken: response.token)
                 if storeCredentials {
                     self.storeCredentials(username: username, password: password)
@@ -127,10 +121,11 @@ extension ClientManager {
     }
     
     private func deleteCredentials() {
+        guard let user = user else { return }
         let query = [
             kSecClass: kSecClassInternetPassword,
             kSecAttrServer: Constants.keychainServer,
-            kSecAttrAccount: username
+            kSecAttrAccount: user.name
         ] as CFDictionary
         
         SecItemDelete(query)

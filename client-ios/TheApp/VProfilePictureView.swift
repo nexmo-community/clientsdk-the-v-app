@@ -37,14 +37,14 @@ class VProfilePictureView: UIImageView {
     private func loadImage() {
         spinnerView.toggle()
         RemoteLoader.fetchData(url: imageURL!) { result in
-            self.spinnerView.toggle()
-            switch result {
-            case .success(let data):
-                DispatchQueue.main.async {
+            DispatchQueue.main.async {
+                self.spinnerView.toggle()
+                switch result {
+                case .success(let data):
                     self.image = UIImage(data: data)
+                default:
+                    break
                 }
-            default:
-                break
             }
         }
     }

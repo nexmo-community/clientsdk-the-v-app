@@ -59,8 +59,8 @@ class SettingsViewController: UIViewController, LoadingViewController {
     
     lazy var spinnerView = SpinnerView(parentView: view)
     
-    private let username = ClientManager.shared.username
-    private let imageURL = ClientManager.shared.imageURL
+    private let username: String = ClientManager.shared.user?.displayName ?? ""
+    private let imageURL = ClientManager.shared.user?.imageURL
     private let token = ClientManager.shared.token
     
     private var image: UIImage?

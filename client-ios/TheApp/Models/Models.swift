@@ -41,8 +41,7 @@ struct Users: Codable, Hashable {
         let id: String
         let name: String
         let displayName: String
-        let detail: String? = nil
-        let imageURL: String? = nil
+        let imageURL: String?
         
         enum CodingKeys: String, CodingKey {
             case id, name
