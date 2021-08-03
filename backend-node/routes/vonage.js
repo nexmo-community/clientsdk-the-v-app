@@ -1,11 +1,22 @@
 const express = require('express');
 const { Pool } = require('pg');
 const jwt = require('express-jwt');
-const jsonwebtoken = require('jsonwebtoken');
-const fs = require('fs');
 const Data = require('../data');
+const aws = require('aws-sdk');
+const multer = require('multer');
+const multerS3 = require('multer-s3');
+const Vonage = require('../vonage');
+var path = require('path');
 
 const vonageRoutes = express.Router();
+
+aws.config.update({
+  secretAccessKey: process.env.awsAccessSecret,
+  accessKeyId: process.env.awsAccessKey,
+  region: process.env.awsRegion
+});
+
+const s3 = new aws.S3();
 
 const fromHeaderOrQuerystring = (req) => {
   if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
@@ -14,6 +25,27 @@ const fromHeaderOrQuerystring = (req) => {
     return req.query.token;
   }
   return null;
+}
+
+const uploadImage = multer({
+  storage: multerS3({
+      s3: s3,
+      bucket: process.env.awsBucketName,
+      key: function (req, file, cb) {
+          const extensionArray = file.mimetype.split("/");
+          const extension = extensionArray[extensionArray.length - 1];
+          const filename = Date.now().toString() + '.' + extension;
+          cb(null, filename);
+      }
+  })
+});
+
+function authUser(req, res, next) {
+  const jwt = fromHeaderOrQuerystring(req);
+  if (!jwt || !req.user || !req.user.user_id) {
+    return res.status(403).json("Unauthorised hello there");
+  }
+  next();
 }
 
 const private_key = process.env.vonageAppPrivateKey;
@@ -99,6 +131,33 @@ vonageRoutes.post('/conversations', async (req, res) => {
     client.release();
   });
   pool.end();
+});
+
+vonageRoutes.post('/image', authUser, uploadImage.single('image'), async (req, res) => {
+  const pool = new Pool({ connectionString: process.env.postgresDatabaseUrl });
+  pool.connect(async (err, client, done) => {
+    if (err) throw err
+    const user = await Data.users.getByVonageId(client, req.user.user_id)
+    if (user.image_url) {
+      const filename = path.basename(user.image_url);
+      const params = {
+        Bucket: process.env.awsBucketName,
+        Key: filename
+      }   
+      s3.deleteObject(params, function(err, data) {
+        if (err) console.log(err, err.stack);
+        else console.log('delete', data);
+      });
+    }
+    client.release();
+  });
+
+  const imageResponse = await Vonage.users.addImage(req.user.user_id, req.file.location);
+  if (imageResponse.id) {
+    res.status(200).json({'image_url': req.file.location});
+  } else {
+    res.status(500).json("ERROR");
+  }
 });
 
 module.exports = vonageRoutes

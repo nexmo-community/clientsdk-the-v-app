@@ -5,7 +5,7 @@ const Vonage = require('../vonage');
 
 const getAll = async function (client) {
   try {
-    const res = await client.query('SELECT vonage_id, name, display_name FROM users');
+    const res = await client.query('SELECT vonage_id, name, display_name, image_url FROM users');
     if (res.rowCount > 0 ) {
       return res.rows;
     }
@@ -19,12 +19,12 @@ const getAll = async function (client) {
 const getInterlocutorsFor = async function (client, user_name) {
   const users = await getAll(client);
   return users.filter(f => f.name !== user_name).map(u => { 
-    return { 'id': u.vonage_id, 'name': u.name, 'display_name': u.display_name } 
+    return { 'id': u.vonage_id, 'name': u.name, 'display_name': u.display_name, "image_url": u.image_url } 
   })
 }
 
 
-const create = async function (client, vonage_id, name, display_name, password) {
+const create = async function (client, vonage_id, name, display_name, image_url, password) {
   let user;
   user = await getByName(client, name);
   if (user) {
@@ -40,7 +40,7 @@ const create = async function (client, vonage_id, name, display_name, password) 
     if(!vonage_id) { 
       vonage_id = '';
     }
-    const res = await client.query('INSERT INTO users(vonage_id, name, display_name, password_digest, created_at, updated_at) VALUES($1, $2, $3, $4, NOW(), NOW()) RETURNING vonage_id, name, display_name', [vonage_id, name, display_name, passwordHash]);
+    const res = await client.query('INSERT INTO users(vonage_id, name, display_name, image_url, password_digest, created_at, updated_at) VALUES($1, $2, $3, $4, $5, NOW(), NOW()) RETURNING vonage_id, name, display_name, image_url', [vonage_id, name, display_name, image_url, passwordHash]);
     if (res.rowCount === 1) {
       user = res.rows[0];
     }
@@ -73,7 +73,7 @@ const authenticate = async function (client, name, password) {
     const passwordHash = crypto.createHash('sha256', process.env.salt)
       .update(password)
       .digest('hex');
-    const res = await client.query('SELECT vonage_id, name, display_name from users where name=$1::text and password_digest=$2::text', [name, passwordHash]);
+    const res = await client.query('SELECT vonage_id, name, display_name, image_url from users where name=$1::text and password_digest=$2::text', [name, passwordHash]);
 
     if (res.rowCount === 1) {
       user = res.rows[0];
@@ -88,7 +88,7 @@ const authenticate = async function (client, name, password) {
 const getByName = async function (client, name) {
   let user;
   try {
-    const res = await client.query('SELECT vonage_id, name, display_name, password_digest from users where name=$1', [name]);
+    const res = await client.query('SELECT vonage_id, name, display_name, image_url, password_digest from users where name=$1', [name]);
     if (res.rowCount === 1) {
       user = res.rows[0];
     }
@@ -102,7 +102,7 @@ const getByName = async function (client, name) {
 const getByVonageId = async function (client, vonageId) {
   let user;
   try {
-    const res = await client.query('SELECT vonage_id, name, display_name, password_digest from users where vonage_id=$1', [vonageId]);
+    const res = await client.query('SELECT vonage_id, name, display_name, image_url, password_digest from users where vonage_id=$1', [vonageId]);
     if (res.rowCount === 1) {
       user = res.rows[0];
     }
@@ -140,17 +140,17 @@ const syncUser = async function (client, vonageUser) {
   // console.log("user", user);
   if(!user) {
     // if not present (insert)
-    const res = await client.query('INSERT INTO users(vonage_id, name, display_name, created_at, updated_at) VALUES($1, $2, $3, NOW(), NOW()) RETURNING vonage_id, name, display_name', [vonageUser.vonage_id, vonageUser.name, vonageUser.display_name]);
+    const res = await client.query('INSERT INTO users(vonage_id, name, display_name, image_url, created_at, updated_at) VALUES($1, $2, $3, $4, NOW(), NOW()) RETURNING vonage_id, name, display_name, image_url', [vonageUser.vonage_id, vonageUser.name, vonageUser.display_name, vonageUser.image_url]);
     if (res.rowCount === 1) {
       user = res.rows[0];
     }
   } else {
     // if present (update)
-    const res = await client.query('UPDATE users SET vonage_id=$1, display_name=$2, updated_at=NOW() WHERE name=$3 RETURNING vonage_id, name, display_name', [vonageUser.vonage_id, vonageUser.display_name, vonageUser.name]);
+    const res = await client.query('UPDATE users SET vonage_id=$1, display_name=$2, image_url=$3, updated_at=NOW() WHERE name=$4 RETURNING vonage_id, name, display_name, image_url', [vonageUser.vonage_id, vonageUser.display_name, vonageUser.image_url, vonageUser.name]);
     // console.log(res);
     if (res.rowCount === 1) {
       user = res.rows[0];
-      console.log(`USER UPDATED - ${user.vonage_id}\t${user.name} \t ${user.display_name}`);
+      console.log(`USER UPDATED - ${user.vonage_id}\t${user.name} \t ${user.display_name} \t ${user.image_url}`);
     }
   }
   return user

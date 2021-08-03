@@ -3,6 +3,7 @@ CREATE TABLE users (
     vonage_id character varying UNIQUE,
     name character varying NOT NULL UNIQUE,
     display_name character varying,
+    image_url character varying,
     password_digest character varying,
     is_active boolean DEFAULT true,
     sync_at timestamp without time zone,
