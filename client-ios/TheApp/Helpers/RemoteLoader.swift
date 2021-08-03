@@ -46,7 +46,7 @@ final class RemoteLoader {
         }.resume()
     }
     
-    static func fetchImage(url: String, completion: @escaping ((Result<Data, RemoteLoaderError>) -> Void)) {
+    static func fetchData(url: String, completion: @escaping ((Result<Data, RemoteLoaderError>) -> Void)) {
         guard let url = URL(string: url) else {
             completion(.failure(.url))
             return
@@ -69,8 +69,7 @@ final class RemoteLoader {
     static func uploadImage(authToken: String? = nil,
                             body: Data,
                             completion: @escaping ((Result<Image.Response, RemoteLoaderError>) -> Void)) {
-        // TODO: Remove dev url
-        guard let url = URL(string: "https://abdulajet.ngrok.io" + Image.path) else {
+        guard let url = URL(string: RemoteLoader.baseURL + Image.path) else {
             completion(.failure(.url))
             return
         }
@@ -88,9 +87,8 @@ final class RemoteLoader {
                                         mimeType: "image/jpeg",
                                         fileData: body,
                                         using: boundary))
-
         httpBody.appendString("--\(boundary)--")
-
+        
         request.httpBody = httpBody as Data
         
         URLSession.shared.dataTask(with: request) { data, response, error in
@@ -114,13 +112,13 @@ final class RemoteLoader {
     
     private static func convertFileData(fieldName: String, fileName: String, mimeType: String, fileData: Data, using boundary: String) -> Data {
         let data = NSMutableData()
-
+        
         data.appendString("--\(boundary)\r\n")
         data.appendString("Content-Disposition: form-data; name=\"\(fieldName)\"; filename=\"\(fileName)\"\r\n")
         data.appendString("Content-Type: \(mimeType)\r\n\r\n")
         data.append(fileData)
         data.appendString("\r\n")
-
+        
         return data as Data
-      }
+    }
 }
