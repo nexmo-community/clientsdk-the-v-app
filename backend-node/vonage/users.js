@@ -41,6 +41,28 @@ const create = async (name, display_name) => {
   return { vonageUser, error};
 }
 
+const addImage = async (user_id, image_url) => {
+  let responseId;
+  let error;
+
+  try {
+    const body = { image_url };
+    const config = getConfig(JWT.getAdminJWT());
+    const response = await axios.patch(`${vonageAPIUrl}/users/${user_id}`, body, config);
+    console.log(response);
+    if (response && response.data) {
+        responseId = response.data.id;
+    } else {
+      error = "Unexpected error";
+    }
+  }
+  catch (err) {
+    error = err.response.data || err;
+  }
+  
+  return { responseId, error };
+}
+
 const getAll = async () => {
   let users;
   try {
@@ -68,5 +90,6 @@ const getAll = async () => {
 
 module.exports = {
   create,
+  addImage,
   getAll
 }
