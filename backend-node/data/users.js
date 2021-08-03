@@ -66,6 +66,14 @@ const addPassword = async function (client, name, password) {
   }
 }
 
+const addImage = async function (client, name, image_url) {
+  try {
+    const res = await client.query('UPDATE users SET image_url=$1, updated_at=NOW() WHERE name=$2', [image_url, name]);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 
 const authenticate = async function (client, name, password) {
   let user;
@@ -162,6 +170,7 @@ module.exports = {
   getInterlocutorsFor,
   create,
   addPassword,
+  addImage,
   getByName,
   getByVonageId,
   authenticate,
