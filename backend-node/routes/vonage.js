@@ -43,7 +43,7 @@ const uploadImage = multer({
 function authUser(req, res, next) {
   const jwt = fromHeaderOrQuerystring(req);
   if (!jwt || !req.user || !req.user.user_id) {
-    return res.status(403).json("Unauthorised hello there");
+    return res.status(403).json("Unauthorised");
   }
   next();
 }
@@ -139,6 +139,7 @@ vonageRoutes.post('/image', authUser, uploadImage.single('image'), async (req, r
     if (err) throw err
     const user = await Data.users.getByVonageId(client, req.user.user_id)
     if (user.image_url) {
+      // If the user already has an image delete it from S3
       const filename = path.basename(user.image_url);
       const params = {
         Bucket: process.env.awsBucketName,
@@ -149,11 +150,17 @@ vonageRoutes.post('/image', authUser, uploadImage.single('image'), async (req, r
         else console.log('delete', data);
       });
     }
+
+    // Set the new image
+    await Data.users.addImage(client, user.name, req.file.location)
+
     client.release();
   });
 
+  // upload the image to vonage
   const imageResponse = await Vonage.users.addImage(req.user.user_id, req.file.location);
-  if (imageResponse.id) {
+  
+  if (imageResponse.responseId) {
     res.status(200).json({'image_url': req.file.location});
   } else {
     res.status(500).json("ERROR");
