@@ -21,7 +21,6 @@ class HomeViewController: UITabBarController {
     private var conversations: [Conversations.Conversation]
     private var users: [Users.User]
     
-    // TODO: Make lazy
     private let conversationListViewController: ConversationListViewController
     private let contactsViewController: ContactsViewController
     private let settingsViewController: SettingsViewController
