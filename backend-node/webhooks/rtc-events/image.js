@@ -6,7 +6,7 @@ async function create(client, reqBody) {
   if(!type || type != 'image' || !conversation_id || !from || !body || !id || !timestamp) {
     return 'Missing data';
   }
-  const { url } = body.medium.url;
+  const { url } = body.representations.original.url;
   console.log(`URL: ${JSON.stringify(url)}`);
 
   if(!url ) {
