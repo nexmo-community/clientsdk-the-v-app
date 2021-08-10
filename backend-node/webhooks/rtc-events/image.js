@@ -30,7 +30,7 @@ async function create(client, reqBody) {
 
   let event = await Data.events.create(client, id, type, conversation_id, from, to, url, timestamp);
   if(event) {
-    return `Created text event: ${JSON.stringify(event)}`;
+    return `Created image event: ${JSON.stringify(event)}`;
   } else {
     return 'Could not add event to the DB';
   }
