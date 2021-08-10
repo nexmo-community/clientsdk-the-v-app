@@ -29,7 +29,7 @@ const getConversationForUser = async function (client, conversationId, userId) {
     let conv = await buildConversation(client, res.rows[0], userId);
     let events = await getEvents(client, conv.id);
     // console.dir(events);
-    conv.events = events.filter( event => ['text','member:joined','member:left'].includes(event.vonage_type)).map( event => {
+    conv.events = events.filter( event => ['text', 'image', 'member:joined','member:left'].includes(event.vonage_type)).map( event => {
       return {
         id: event.vonage_id,
         from: event.user_id,
