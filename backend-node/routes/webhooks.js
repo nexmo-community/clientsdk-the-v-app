@@ -49,8 +49,9 @@ webhookRoutes.post('/rtc/events', async (req, res) => {
       case  "text":
         status = await rtcEvents.text.create(client, req.body);
         break;
-      case "image":
+      case  "image":
         status = await rtcEvents.image.create(client, req.body);
+        break;
       default:
         console.log(`🚨🚨🚨 UNHANDLED TYPE: ${type}`);
         console.log(req.body);

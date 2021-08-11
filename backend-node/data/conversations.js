@@ -291,6 +291,14 @@ const syncEvents = async (client, conversation_id) => {
       }
       return;
     }
+    if (type == "image") {
+      const {to} = vonageEvent;
+      if (body.representations.original.url) {
+        let event = await Events.create(client, id, type, conversation_id, from, to, body.representations.original.url, timestamp);
+      }
+      return;
+    }
+    
   }
 }
 
