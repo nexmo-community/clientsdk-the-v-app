@@ -5,7 +5,7 @@ class SignUpViewController: UIViewController, LoadingViewController {
     private let displayNameField = VTextField(placeholder: "Display Name")
     private let usernameField = VTextField(placeholder: "Username")
     private let passwordField = VTextField(placeholder: "Password", isSecure: true)
-    lazy var spinnerView = SpinnerView(superView: view)
+    lazy var spinnerView = SpinnerView(parentView: view)
     
     private lazy var signUpButton: UIButton = {
         let button = UIButton(type: .system)
@@ -26,6 +26,7 @@ class SignUpViewController: UIViewController, LoadingViewController {
         super.viewDidLoad()
         setUpView()
         setUpConstraints()
+        hideKeyboardWhenTappedAround()
     }
     
     private func setUpView() {
@@ -68,7 +69,7 @@ class SignUpViewController: UIViewController, LoadingViewController {
 extension SignUpViewController: ClientManagerDelegate {
     func clientManager(_ clientManager: ClientManager, responseForAuth response: Auth.Response) {
         toggleLoading()
-        navigationController?.pushViewController(ConversationListViewController(data: response), animated: true)
+        navigationController?.pushViewController(HomeViewController(data: response), animated: true)
     }
     
     func clientManager(_ clientManager: ClientManager, authDidFail errorMessage: String?) {

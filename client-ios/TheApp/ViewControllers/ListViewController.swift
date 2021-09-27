@@ -1,6 +1,6 @@
 import UIKit
 
-protocol ListViewControllerDelegate: class {
+protocol ListViewControllerDelegate: AnyObject {
     func listViewControllerDelegate<T>(_: ListViewController<T>, didSelectRow data: T)
     func listViewControllerDelegateDidRefresh<T>(_: ListViewController<T>)
 }
@@ -17,12 +17,14 @@ class ListViewController<T: ListViewPresentable & Hashable>: UIViewController, U
     
     private var data: [T]
     private let supportsMultipleSelection: Bool
+    private let supportsRefresh: Bool
     
     weak var delegate: ListViewControllerDelegate?
     
-    init(data: [T], supportsMultipleSelection: Bool = false) {
-        self.data = Array(Set(data))
+    init(data: [T], supportsMultipleSelection: Bool = false, supportsRefresh: Bool = false) {
+        self.data = data
         self.supportsMultipleSelection = supportsMultipleSelection
+        self.supportsRefresh = supportsRefresh
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -39,9 +41,10 @@ class ListViewController<T: ListViewPresentable & Hashable>: UIViewController, U
     
     private func setUpView() {
         view.backgroundColor = .white
+        collectionView.backgroundColor = .white
         collectionView.dataSource = dataSource
         collectionView.delegate = self
-        if !supportsMultipleSelection {
+        if supportsRefresh {
             collectionView.addSubview(refreshControl)
         }
         view.addSubview(collectionView)
@@ -120,6 +123,12 @@ private extension ListViewController {
         return UICollectionView.CellRegistration { cell, indexPath, data in
             var config = cell.defaultContentConfiguration()
             config.text = data.displayName
+            
+            if let setting = data as? Setting {
+                config.image = UIImage(systemName: setting.iconString)
+                config.imageProperties.tintColor = .gray
+            }
+            
             cell.contentConfiguration = config
         }
     }

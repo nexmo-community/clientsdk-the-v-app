@@ -5,19 +5,47 @@ protocol ListViewPresentable {
     var displayName: String { get }
 }
 
+struct Setting: Hashable, ListViewPresentable {
+    
+    enum SettingType {
+        case picture
+        case logout
+    }
+    
+    let id: String
+    let displayName: String
+    let type: SettingType
+    let iconString: String
+}
+
+struct Image: Codable {
+    static let path = "/image"
+    
+    struct Response: Codable  {
+        let imageURL: String
+        
+        enum CodingKeys: String, CodingKey {
+            case imageURL = "image_url"
+        }
+    }
+}
+
 struct Users: Codable, Hashable {
-    struct Response: Codable {
-        let users: [User]
+    static let path = "/users"
+    
+    struct List: Codable {
+        typealias Response = [User]
     }
     
     struct User: Codable, Hashable, ListViewPresentable {
         let id: String
         let name: String
         let displayName: String
-        let detail: String? = nil
+        let imageURL: String?
         
         enum CodingKeys: String, CodingKey {
             case id, name
+            case imageURL = "image_url"
             case displayName = "display_name"
         }
     }
@@ -59,7 +87,7 @@ struct Conversations: Codable {
         }
         
         struct Event: Codable, Hashable {
-            let id: Int
+            let id: String
             let from: String
             let type: String
             let content: String?
@@ -96,10 +124,22 @@ struct APIError: Codable {
     let type: String?
     let title: String?
     let detail: String?
-    let invalidParameters: [String: String]?
+    let invalidParameters: [[String: String]]?
     
     enum CodingKeys: String, CodingKey {
         case type, title, detail
         case invalidParameters = "invalid_parameters"
+    }
+    
+    var description: String {
+        var descriptionString: String = self.detail ?? ""
+        
+        if let invalidParameters = invalidParameters {
+            for invalidParameter in invalidParameters {
+                descriptionString += "\n \(invalidParameter.description)"
+            }
+        }
+        
+        return descriptionString
     }
 }

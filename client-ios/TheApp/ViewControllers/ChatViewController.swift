@@ -19,7 +19,7 @@ class ChatViewController: UIViewController, LoadingViewController {
         return textView
     }()
     
-    lazy var spinnerView = SpinnerView(superView: view)
+    lazy var spinnerView = SpinnerView(parentView: view)
     
     var nxmConversation: NXMConversation?
     
@@ -55,6 +55,15 @@ class ChatViewController: UIViewController, LoadingViewController {
         title = conversation.displayName
         view.backgroundColor = .white
         view.addSubviews(conversationTextView, inputField)
+        
+        if conversation.users.count == 1 {
+            let callButton = UIButton(frame: CGRect(x: 0, y: 0, width: 44, height: 44))
+            callButton.setImage(UIImage(systemName: "phone.fill.arrow.up.right"), for: .normal)
+            callButton.addTarget(self, action: #selector(makeCallButtonTapped), for: .touchUpInside)
+            let callButtonItem = UIBarButtonItem(customView: callButton)
+
+            navigationItem.rightBarButtonItem = callButtonItem
+        }
     }
     
     private func setUpConstraints() {
@@ -74,6 +83,12 @@ class ChatViewController: UIViewController, LoadingViewController {
     @objc func keyboardWasShown(notification: NSNotification) {
         if let kbSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect)?.size {
             self.additionalSafeAreaInsets = UIEdgeInsets(top: 0, left: 0, bottom: kbSize.height - 20, right: 0)
+        }
+    }
+    
+    @objc func makeCallButtonTapped() {
+        if let user = conversation.users.first {
+            present(CallViewController(user: user), animated: true, completion: nil)
         }
     }
     
@@ -130,24 +145,25 @@ class ChatViewController: UIViewController, LoadingViewController {
     }
     
     func processNxmEvent(event: NXMEvent) {
-        
         if let memberEvent = event as? NXMMemberEvent {
             showMemberEvent(event: memberEvent)
         }
         if let textEvent = event as? NXMTextEvent {
             showTextEvent(event: textEvent)
         }
-        
     }
     
     func showMemberEvent(event: NXMMemberEvent) {
+        guard let displayName = event.embeddedInfo?.user.displayName else { return }
         switch event.state {
         case .invited:
-            addConversationLine("\(event.member.user.displayName) was invited.")
+            addConversationLine("\(displayName) was invited.")
         case .joined:
-            addConversationLine("\(event.member.user.displayName) joined.")
+            addConversationLine("\(displayName) joined.")
         case .left:
-            addConversationLine("\(event.member.user.displayName) left.")
+            addConversationLine("\(displayName) left.")
+        case .unknown:
+            fatalError("Unknown member event state.")
         @unknown default:
             fatalError("Unknown member event state.")
         }
@@ -155,7 +171,7 @@ class ChatViewController: UIViewController, LoadingViewController {
     
     func showTextEvent(event: NXMTextEvent) {
         if let message = event.text {
-            addConversationLine("\(event.fromMember?.user.displayName ?? "A user") said: '\(message)'")
+            addConversationLine("\(event.embeddedInfo?.user.displayName ?? "A user") said: '\(message)'")
         }
     }
     

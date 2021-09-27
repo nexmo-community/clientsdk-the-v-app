@@ -7,12 +7,16 @@
 //
 
 import UIKit
+import AVFoundation
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        AVAudioSession.sharedInstance().requestRecordPermission { granted in
+            print("Allow microphone use. Response: %d", granted)
+        }
         return true
     }
 

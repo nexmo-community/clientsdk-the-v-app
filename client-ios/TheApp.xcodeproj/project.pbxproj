@@ -9,7 +9,13 @@
 /* Begin PBXBuildFile section */
 		121D9D9225FA764200C36658 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 121D9D9125FA764200C36658 /* Models.swift */; };
 		121D9D9525FA772200C36658 /* RemoteLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 121D9D9425FA772200C36658 /* RemoteLoader.swift */; };
+		122D6F6B26A83C0E00028418 /* ContactsViewController.swift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122D6F6926A83C0E00028418 /* ContactsViewController.swift.swift */; };
+		122D6F6C26A83C0E00028418 /* SettingsViewController.swift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122D6F6A26A83C0E00028418 /* SettingsViewController.swift.swift */; };
+		122D6F6E26A999AA00028418 /* UserDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122D6F6D26A999AA00028418 /* UserDetailViewController.swift */; };
+		122D6F7026B0426100028418 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122D6F6F26B0426100028418 /* Constants.swift */; };
 		1248413925FB8A93009DBEB9 /* ClientManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1248413825FB8A93009DBEB9 /* ClientManager.swift */; };
+		127E728C26A5D0CF00737906 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 127E728B26A5D0CF00737906 /* HomeViewController.swift */; };
+		127E729026A5D60100737906 /* VTabBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 127E728F26A5D60100737906 /* VTabBarItem.swift */; };
 		1297BDDD2601227F00025D12 /* CreateConversationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1297BDDC2601227F00025D12 /* CreateConversationViewController.swift */; };
 		1297BDE0260123AB00025D12 /* ListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1297BDDF260123AB00025D12 /* ListViewController.swift */; };
 		1297BDE426026A4E00025D12 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1297BDE326026A4E00025D12 /* ChatViewController.swift */; };
@@ -22,6 +28,9 @@
 		12D2385925FFE42A004D1FC6 /* SpinnerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D2385825FFE42A004D1FC6 /* SpinnerView.swift */; };
 		12D238602600E6BD004D1FC6 /* VTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D2385F2600E6BD004D1FC6 /* VTextField.swift */; };
 		12D2386E2600F371004D1FC6 /* ConversationListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D2386D2600F371004D1FC6 /* ConversationListViewController.swift */; };
+		12EA0F3426B1A9BD00E41537 /* DelegateExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12EA0F3326B1A9BD00E41537 /* DelegateExtensions.swift */; };
+		12EA0F3626B1AD4700E41537 /* CallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12EA0F3526B1AD4700E41537 /* CallViewController.swift */; };
+		12EA0F3A26B3056400E41537 /* VProfilePictureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12EA0F3926B3056400E41537 /* VProfilePictureView.swift */; };
 		12FABB3425FFBF9F00B61567 /* SignupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12FABB3325FFBF9F00B61567 /* SignupViewController.swift */; };
 		801DA66827ABF3D56EA9B62A /* Pods_TheApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA80DEE4ED3F73D8F1D8F54E /* Pods_TheApp.framework */; };
 /* End PBXBuildFile section */
@@ -29,7 +38,13 @@
 /* Begin PBXFileReference section */
 		121D9D9125FA764200C36658 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		121D9D9425FA772200C36658 /* RemoteLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteLoader.swift; sourceTree = "<group>"; };
+		122D6F6926A83C0E00028418 /* ContactsViewController.swift.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactsViewController.swift.swift; sourceTree = "<group>"; };
+		122D6F6A26A83C0E00028418 /* SettingsViewController.swift.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift.swift; sourceTree = "<group>"; };
+		122D6F6D26A999AA00028418 /* UserDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDetailViewController.swift; sourceTree = "<group>"; };
+		122D6F6F26B0426100028418 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		1248413825FB8A93009DBEB9 /* ClientManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientManager.swift; sourceTree = "<group>"; };
+		127E728B26A5D0CF00737906 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
+		127E728F26A5D60100737906 /* VTabBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VTabBarItem.swift; sourceTree = "<group>"; };
 		1297BDDC2601227F00025D12 /* CreateConversationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateConversationViewController.swift; sourceTree = "<group>"; };
 		1297BDDF260123AB00025D12 /* ListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListViewController.swift; sourceTree = "<group>"; };
 		1297BDE326026A4E00025D12 /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
@@ -44,6 +59,9 @@
 		12D2385825FFE42A004D1FC6 /* SpinnerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerView.swift; sourceTree = "<group>"; };
 		12D2385F2600E6BD004D1FC6 /* VTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VTextField.swift; sourceTree = "<group>"; };
 		12D2386D2600F371004D1FC6 /* ConversationListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationListViewController.swift; sourceTree = "<group>"; };
+		12EA0F3326B1A9BD00E41537 /* DelegateExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelegateExtensions.swift; sourceTree = "<group>"; };
+		12EA0F3526B1AD4700E41537 /* CallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallViewController.swift; sourceTree = "<group>"; };
+		12EA0F3926B3056400E41537 /* VProfilePictureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VProfilePictureView.swift; sourceTree = "<group>"; };
 		12FABB3325FFBF9F00B61567 /* SignupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignupViewController.swift; sourceTree = "<group>"; };
 		61C588AC4C8E10B991F32309 /* Pods-TheApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TheApp.release.xcconfig"; path = "Target Support Files/Pods-TheApp/Pods-TheApp.release.xcconfig"; sourceTree = "<group>"; };
 		AFF66C2E8B6C7F1876623B97 /* Pods-TheApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TheApp.debug.xcconfig"; path = "Target Support Files/Pods-TheApp/Pods-TheApp.debug.xcconfig"; sourceTree = "<group>"; };
@@ -105,6 +123,11 @@
 				12D2386D2600F371004D1FC6 /* ConversationListViewController.swift */,
 				1297BDDC2601227F00025D12 /* CreateConversationViewController.swift */,
 				1297BDDF260123AB00025D12 /* ListViewController.swift */,
+				127E728B26A5D0CF00737906 /* HomeViewController.swift */,
+				122D6F6926A83C0E00028418 /* ContactsViewController.swift.swift */,
+				122D6F6A26A83C0E00028418 /* SettingsViewController.swift.swift */,
+				122D6F6D26A999AA00028418 /* UserDetailViewController.swift */,
+				12EA0F3526B1AD4700E41537 /* CallViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -114,6 +137,7 @@
 			children = (
 				12D2385825FFE42A004D1FC6 /* SpinnerView.swift */,
 				12D2385F2600E6BD004D1FC6 /* VTextField.swift */,
+				12EA0F3926B3056400E41537 /* VProfilePictureView.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -123,6 +147,8 @@
 			children = (
 				121D9D9425FA772200C36658 /* RemoteLoader.swift */,
 				12D2385525FFE409004D1FC6 /* Extensions.swift */,
+				122D6F6F26B0426100028418 /* Constants.swift */,
+				12EA0F3326B1A9BD00E41537 /* DelegateExtensions.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -132,6 +158,7 @@
 			children = (
 				1248413825FB8A93009DBEB9 /* ClientManager.swift */,
 				121D9D9125FA764200C36658 /* Models.swift */,
+				127E728F26A5D60100737906 /* VTabBarItem.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -267,19 +294,28 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				12EA0F3626B1AD4700E41537 /* CallViewController.swift in Sources */,
 				12D238602600E6BD004D1FC6 /* VTextField.swift in Sources */,
 				12B77906250FA8BE0081D8AF /* LoginViewController.swift in Sources */,
 				12D2385625FFE409004D1FC6 /* Extensions.swift in Sources */,
 				12B77902250FA8BE0081D8AF /* AppDelegate.swift in Sources */,
 				12FABB3425FFBF9F00B61567 /* SignupViewController.swift in Sources */,
+				127E728C26A5D0CF00737906 /* HomeViewController.swift in Sources */,
+				127E729026A5D60100737906 /* VTabBarItem.swift in Sources */,
 				1248413925FB8A93009DBEB9 /* ClientManager.swift in Sources */,
 				1297BDE0260123AB00025D12 /* ListViewController.swift in Sources */,
+				122D6F6B26A83C0E00028418 /* ContactsViewController.swift.swift in Sources */,
+				122D6F6C26A83C0E00028418 /* SettingsViewController.swift.swift in Sources */,
 				1297BDDD2601227F00025D12 /* CreateConversationViewController.swift in Sources */,
 				12B77904250FA8BE0081D8AF /* SceneDelegate.swift in Sources */,
 				12D2385925FFE42A004D1FC6 /* SpinnerView.swift in Sources */,
 				12D2386E2600F371004D1FC6 /* ConversationListViewController.swift in Sources */,
+				122D6F7026B0426100028418 /* Constants.swift in Sources */,
 				121D9D9525FA772200C36658 /* RemoteLoader.swift in Sources */,
+				12EA0F3426B1A9BD00E41537 /* DelegateExtensions.swift in Sources */,
+				122D6F6E26A999AA00028418 /* UserDetailViewController.swift in Sources */,
 				1297BDE426026A4E00025D12 /* ChatViewController.swift in Sources */,
+				12EA0F3A26B3056400E41537 /* VProfilePictureView.swift in Sources */,
 				121D9D9225FA764200C36658 /* Models.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -421,6 +457,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7F2B5ZSP8Q;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = TheApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -441,6 +478,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7F2B5ZSP8Q;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = TheApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
 				LD_RUNPATH_SEARCH_PATHS = (

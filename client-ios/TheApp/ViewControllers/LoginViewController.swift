@@ -4,7 +4,7 @@ class LoginViewController: UIViewController, LoadingViewController {
     
     private let usernameField = VTextField(placeholder: "Username")
     private let passwordField = VTextField(placeholder: "Password", isSecure: true)
-    lazy var spinnerView = SpinnerView(superView: view)
+    lazy var spinnerView = SpinnerView(parentView: view)
     
     private lazy var loginButton: UIButton = {
         let button = UIButton(type: .system)
@@ -28,13 +28,22 @@ class LoginViewController: UIViewController, LoadingViewController {
         return stackView
     }()
     
-    private var loading = false
+    private var loggedin = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "The V App"
         setUpView()
         setUpConstraints()
+        checkExistingTokenAndLogin()
+        hideKeyboardWhenTappedAround()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if loggedin {
+            resetView()
+        }
     }
     
     private func setUpView() {
@@ -52,6 +61,27 @@ class LoginViewController: UIViewController, LoadingViewController {
             usernameField.heightAnchor.constraint(equalToConstant: 50),
             passwordField.heightAnchor.constraint(equalToConstant: 50)
         ])
+    }
+    
+    private func checkExistingTokenAndLogin() {
+        if let credentials = ClientManager.shared.getCredentials() {
+            ClientManager.shared.delegate = self
+            toggleLoading()
+            ClientManager.shared.auth(username: credentials.0, password: credentials.1, displayName: nil, url: Auth.loginPath, storeCredentials: false)
+            toggleViewVisibility(hidden: true)
+            spinnerView.setDetailText(text: "Welcome back \(credentials.0)")
+        }
+    }
+    
+    private func toggleViewVisibility(hidden: Bool) {
+        stackView.isHidden = hidden
+        usernameField.isHidden = hidden
+        passwordField.isHidden = hidden
+    }
+    
+    private func resetView() {
+        loggedin = false
+        toggleViewVisibility(hidden: false)
     }
     
     @objc func loginButtonTapped() {
@@ -73,7 +103,8 @@ class LoginViewController: UIViewController, LoadingViewController {
 extension LoginViewController: ClientManagerDelegate {
     func clientManager(_ clientManager: ClientManager, responseForAuth response: Auth.Response) {
         toggleLoading()
-        navigationController?.pushViewController(ConversationListViewController(data: response), animated: true)
+        loggedin = true
+        navigationController?.pushViewController(HomeViewController(data: response), animated: true)
     }
     
     func clientManager(_ clientManager: ClientManager, authDidFail errorMessage: String?) {

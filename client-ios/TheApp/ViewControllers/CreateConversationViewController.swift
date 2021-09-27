@@ -1,7 +1,6 @@
 import UIKit
-import NexmoClient
 
-protocol CreateConversationViewControllerDelegate: class {
+protocol CreateConversationViewControllerDelegate: AnyObject {
     func createConversationViewController(_ createConversationViewController: CreateConversationViewController,
                                           didCreateConversation conversation: Conversations.Conversation)
 }
@@ -32,7 +31,7 @@ class CreateConversationViewController: UIViewController, LoadingViewController 
         return button
     }()
     
-    lazy var spinnerView = SpinnerView(superView: view)
+    lazy var spinnerView = SpinnerView(parentView: view)
     
     weak var delegate: CreateConversationViewControllerDelegate?
     
@@ -82,11 +81,10 @@ class CreateConversationViewController: UIViewController, LoadingViewController 
             return
         }
         
-        let token = NXMClient.shared.authToken
         let body = Conversations.Create.Body(users: selectedUsers.map { $0.id })
         toggleLoading()
         RemoteLoader.load(path: Conversations.path,
-                          authToken: token,
+                          authToken: ClientManager.shared.token,
                           body: body,
                           responseType: Conversations.Create.Response.self) { [weak self] result in
             guard let self = self else { return }
@@ -115,6 +113,4 @@ extension CreateConversationViewController: ListViewControllerDelegate {
             }
         }
     }
-    
-    func listViewControllerDelegateDidRefresh<T>(_: ListViewController<T>) where T : Hashable, T : ListViewPresentable {}
 }
