@@ -1,4 +1,4 @@
-package com.vonage.vapp.presentation
+package com.vonage.vapp.presentation.signup
 
 import android.os.Bundle
 import android.view.View
@@ -7,11 +7,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.vonage.vapp.R
-import com.vonage.vapp.core.delegate.viewBinding
 import com.vonage.vapp.core.ext.observe
 import com.vonage.vapp.core.ext.toast
 import com.vonage.vapp.databinding.FragmentSignupBinding
-import com.vonage.vapp.presentation.SignupViewModel.Action
+import com.vonage.vapp.presentation.signup.SignupViewModel.Action
+import com.vonage.vapp.utils.viewBinding
 
 class SignupFragment : Fragment(R.layout.fragment_signup) {
 
@@ -31,7 +31,7 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
             signUp()
         }
 
-        observe(viewModel.viewStateLiveData, actionObserver)
+        observe(viewModel.viewActionLiveData, actionObserver)
     }
 
     private fun signUp() {

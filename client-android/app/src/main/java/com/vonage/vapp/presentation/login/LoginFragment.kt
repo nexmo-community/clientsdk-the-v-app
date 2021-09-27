@@ -1,4 +1,4 @@
-package com.vonage.vapp.presentation
+package com.vonage.vapp.presentation.login
 
 import android.os.Bundle
 import android.view.View
@@ -7,11 +7,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.vonage.vapp.R
-import com.vonage.vapp.core.delegate.viewBinding
 import com.vonage.vapp.core.ext.observe
 import com.vonage.vapp.core.ext.toast
 import com.vonage.vapp.databinding.FragmentLoginBinding
-import com.vonage.vapp.presentation.LoginViewModel.Action
+import com.vonage.vapp.presentation.login.LoginViewModel.Action
+import com.vonage.vapp.utils.viewBinding
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
     private val binding by viewBinding<FragmentLoginBinding>()
@@ -34,7 +34,9 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             viewModel.navigateToSignup()
         }
 
-        observe(viewModel.viewStateLiveData, actionObserver)
+        observe(viewModel.viewActionLiveData, actionObserver)
+
+//        login()
     }
 
     private fun login() {

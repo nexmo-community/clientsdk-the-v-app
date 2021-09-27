@@ -5,59 +5,97 @@
         android:id="@+id/nav_graph"
         app:startDestination="@id/loginFragment">
 
+    <action
+            android:id="@+id/action_global_incomingCallFragment"
+            app:destination="@id/incomingCallFragment" />
+
     <fragment
             android:id="@+id/signupFragment"
-            android:name="com.vonage.vapp.presentation.SignupFragment"
+            android:name="com.vonage.vapp.presentation.signup.SignupFragment"
             tools:layout="@layout/fragment_signup">
 
         <action
-                android:id="@+id/action_SignupFragment_to_conversationsFragment"
-                app:destination="@id/conversationsFragment" />
+                android:id="@+id/action_SignupFragment_to_mainFragment"
+                app:destination="@id/mainFragment" />
     </fragment>
     <fragment
-            android:id="@+id/conversationDetailFragment"
-            android:name="com.vonage.vapp.presentation.ConversationDetailFragment"
-            android:label="ConversationDetailFragment"
-            tools:layout="@layout/fragment_conversation_detail">
-        <argument
-                android:name="conversaion"
-                app:argType="com.vonage.vapp.data.model.Conversation" />
-        <argument
-                android:name="users"
-                app:argType="com.vonage.vapp.data.model.User[]" />
-    </fragment>
-    <fragment
-            android:id="@+id/conversationsFragment"
-            android:name="com.vonage.vapp.presentation.ConversationsFragment"
-            android:label="ConversationsFragment"
-            tools:layout="@layout/fragment_conversations">
+            android:id="@+id/mainFragment"
+            android:name="com.vonage.vapp.presentation.main.MainFragment"
+            android:label="MainFragment">
         <action
-                android:id="@+id/action_conversationsFragment_to_conversationDetailFragment"
-                app:destination="@id/conversationDetailFragment" />
-        <argument
-                android:name="user"
-                app:argType="com.vonage.vapp.data.model.User" />
-        <argument
-                android:name="users"
-                app:argType="com.vonage.vapp.data.model.User[]" />
-        <argument
-                android:name="conversations"
-                app:argType="com.vonage.vapp.data.model.Conversation[]" />
-        <argument
-                android:name="token"
-                app:argType="string" />
+                android:id="@+id/action_mainFragment_to_conversationsFragment"
+                app:destination="@id/conversationsFragment" />
+        <action
+                android:id="@+id/action_mainFragment_to_usersFragment"
+                app:destination="@id/usersFragment" />
     </fragment>
     <fragment
             android:id="@+id/loginFragment"
-            android:name="com.vonage.vapp.presentation.LoginFragment"
+            android:name="com.vonage.vapp.presentation.login.LoginFragment"
             android:label="LoginFragment"
             tools:layout="@layout/fragment_login">
         <action
-                android:id="@+id/action_loginFragment_to_conversationsFragment"
-                app:destination="@id/conversationsFragment" />
+                android:id="@+id/action_loginFragment_to_mainFragment"
+                app:destination="@id/mainFragment" />
 
         <action
                 android:id="@+id/action_loginFragment_to_SignupFragment"
                 app:destination="@id/signupFragment" />
     </fragment>
+    <fragment
+            android:id="@+id/conversationsFragment"
+            android:name="com.vonage.vapp.presentation.converstion.ConversationsFragment"
+            android:label="ConversationsFragment" >
+
+        <action
+                android:id="@+id/action_conversationsFragment_to_conversationDetailFragment"
+                app:destination="@id/conversationDetailFragment" />
+
+    </fragment>
+    <fragment
+            android:id="@+id/usersFragment"
+            android:name="com.vonage.vapp.presentation.user.UsersFragment"
+            android:label="UsersFragment">
+        <action
+                android:id="@+id/action_usersFragment_to_userDetailFragment"
+                app:destination="@id/userDetailFragment" />
+
+    </fragment>
+    <fragment
+            android:id="@+id/conversationDetailFragment"
+            android:name="com.vonage.vapp.presentation.converstion.ConversationDetailFragment"
+            android:label="ConversationDetailFragment">
+
+        <argument
+                android:name="conversaion"
+                app:argType="com.vonage.vapp.data.model.Conversation" />
+    </fragment>
+    <fragment
+            android:id="@+id/userDetailFragment"
+            android:name="com.vonage.vapp.presentation.user.UserDetailFragment"
+            android:label="UserDetailFragment">
+
+        <argument
+                android:name="user"
+                app:argType="com.vonage.vapp.data.model.User" />
+        <action
+                android:id="@+id/action_userDetailFragment_to_onCallFragment"
+                app:destination="@id/onCallFragment" />
+        <action
+                android:id="@+id/action_userDetailFragment_to_conversationDetailFragment"
+                app:destination="@id/conversationDetailFragment" />
+    </fragment>
+    <fragment
+            android:id="@+id/onCallFragment"
+            android:name="com.vonage.tutorial.voice.OnCallFragment"
+            android:label="OnCallFragment" />
+    <fragment
+            android:id="@+id/incomingCallFragment"
+            android:name="com.vonage.vapp.presentation.incommingcall.IncomingCallFragment"
+            android:label="IncomingCallFragment">
+        <action
+                android:id="@+id/action_incomingCallFragment_to_onCallFragment"
+                app:destination="@id/onCallFragment" />
+    </fragment>
+
 </navigation>

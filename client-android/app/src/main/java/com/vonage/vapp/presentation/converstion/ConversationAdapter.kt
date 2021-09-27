@@ -1,4 +1,4 @@
-package com.vonage.vapp.presentation
+package com.vonage.vapp.presentation.converstion
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -46,7 +46,7 @@ class ConversationAdapter : RecyclerView.Adapter<ConversationAdapter.ViewHolder>
             itemView.setOnClickListener { onClickListener?.invoke(conversation) }
 
             binding.name.text = conversation.name
-            // conversation user list does not contain current user so +1
+            // conversation user list does not contain current user so add +1
             binding.description.text = "Created: ${conversation.createdAt}, Users: ${conversation.users.size + 1}"
         }
     }

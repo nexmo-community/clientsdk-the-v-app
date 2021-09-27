@@ -9,6 +9,7 @@ import com.vonage.vapp.data.model.GetConversationResponseModel
 import com.vonage.vapp.data.model.GetConversationsResponseModel
 import com.vonage.vapp.data.model.LoginRequestModel
 import com.vonage.vapp.data.model.SignupRequestModel
+import com.vonage.vapp.data.model.User
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
@@ -39,15 +40,23 @@ object ApiRepository {
 
     private val apiService: ApiService = retrofit.create(ApiService::class.java)
 
-    private var token: String? = null
+    private val memoryRepository = MemoryRepository
 
     suspend fun signup(name: String, displayName: String, password: String): Any? {
         val requestModel = SignupRequestModel(name, displayName, password)
         val response = apiService.signup(requestModel)
 
         return if (response.isSuccessful) {
-            val body = response.body()
-            token = body?.token
+            var body = response.body()?.let {
+                it.copy(
+                    // filterNotNull() is used due to API bug
+                    conversations = it.conversations.filterNotNull(),
+                    // distinctBy is used because of API bug where duplicated items are returned
+                    otherUsers = it.otherUsers.distinctBy { it.id }
+                )
+            }
+
+            body?.let { memoryRepository.update(it) }
             body
         } else {
             getErrorResponseModel(response)
@@ -60,8 +69,19 @@ object ApiRepository {
         val response = apiService.login(requestModel)
 
         return if (response.isSuccessful) {
-            val body = response.body()
-            token = body?.token
+            var body = response.body()?.let {
+                val addedUsers = it.otherUsers.distinctBy { it.id }.toMutableList()
+                addedUsers.add(User("Jan DN", "if", "Jan"))
+
+                it.copy(
+                    // filterNotNull() is used due to API bug
+                    conversations = it.conversations.filterNotNull(),
+                    // distinctBy is used because of API bug where duplicated items are returned
+                    otherUsers = addedUsers
+                )
+            }
+
+            body?.let { memoryRepository.update(it) }
             body
         } else {
             getErrorResponseModel(response)
@@ -69,12 +89,11 @@ object ApiRepository {
     }
 
     suspend fun getConversations(): Any? {
-        checkNotNull(token)
-
-        val response = apiService.getConversations("Bearer $token")
+        val response = apiService.getConversations("Bearer ${memoryRepository.token}")
 
         return if (response.isSuccessful) {
             val conversations = response.body() ?: listOf()
+            memoryRepository.setConversations(conversations)
             GetConversationsResponseModel(conversations)
         } else {
             getErrorResponseModel(response)
@@ -82,9 +101,7 @@ object ApiRepository {
     }
 
     suspend fun getConversation(conversationId: String): Any? {
-        checkNotNull(token)
-
-        val response = apiService.getConversation("Bearer $token", conversationId)
+        val response = apiService.getConversation("Bearer ${memoryRepository.token}", conversationId)
 
         return if (response.isSuccessful) {
             val conversations = response.body()
@@ -95,19 +112,20 @@ object ApiRepository {
     }
 
     suspend fun createConversation(userIds: Set<String>): Any? {
-        checkNotNull(token)
-
         val requestModel = CreateConversationRequestModel(userIds)
-        val response = apiService.createConversation("Bearer $token", requestModel)
+        val response = apiService.createConversation("Bearer ${memoryRepository.token}", requestModel)
 
         return if (response.isSuccessful) {
-            val conversations = response.body() as Conversation
-            CreateConversationResponseModel(conversations)
+            val conversation = response.body() as Conversation
+            memoryRepository.addConversation(conversation)
+            CreateConversationResponseModel(conversation)
         } else {
             getErrorResponseModel(response)
         }
     }
 
-    private suspend fun getErrorResponseModel(response: Response<*>): ErrorResponseModel? =
-        moshi.adapter(ErrorResponseModel::class.java).fromJson(response.errorBody()?.source())
+    private suspend fun getErrorResponseModel(response: Response<*>): ErrorResponseModel? {
+        val source = response.errorBody()?.source() ?: return null
+        return moshi.adapter(ErrorResponseModel::class.java).fromJson(source)
+    }
 }

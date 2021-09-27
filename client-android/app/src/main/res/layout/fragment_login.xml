@@ -7,7 +7,7 @@
         android:layout_margin="20dp"
         android:orientation="vertical"
         android:gravity="center"
-        tools:context=".presentation.SignupFragment">
+        tools:context=".presentation.login.LoginFragment">
 
     <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
