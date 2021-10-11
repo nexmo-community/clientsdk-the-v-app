@@ -10,7 +10,7 @@ const getAllForUser = async function (client, userId) {
     const res = await client.query('SELECT conversations.vonage_id, conversations.state, conversations.created_at FROM conversations JOIN members ON conversations.vonage_id = members.conversation_id WHERE user_id=$1', [userId]);
     if (res.rowCount > 0 ) {
       let conversations = await Promise.all(res.rows.map(async (conv) => {
-        return await buildConversation(client, conv, userId);
+        return await buildConversation(client, conv, userId, false);
       }));
       return conversations;
     }
@@ -26,7 +26,7 @@ const getConversationForUser = async function (client, conversationId, userId) {
     if(res.rowCount != 1) {
       return null;
     }
-    let conv = await buildConversation(client, res.rows[0], userId);
+    let conv = await buildConversation(client, res.rows[0], userId, true);
     let events = await getEvents(client, conv.id);
     // console.dir(events);
     conv.events = events.filter( event => ['text', 'image', 'member:joined','member:left'].includes(event.vonage_type)).map( event => {
@@ -45,7 +45,7 @@ const getConversationForUser = async function (client, conversationId, userId) {
   return null;
 }
 
-async function buildConversation(client, conv, userId) {
+async function buildConversation(client, conv, userId, loadEvents) {
   conv.id = conv.vonage_id;
   delete conv.vonage_id;
 
@@ -63,6 +63,7 @@ async function buildConversation(client, conv, userId) {
   conv.name = interlocutorNames.join(", ");
 
   if(!myMember) { return; }
+  if(!loadEvents) { return conv;}
 
   let events = await getEvents(client, conv.id);
 
