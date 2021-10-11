@@ -22,7 +22,7 @@ class VProfilePictureView: UIImageView {
     init() {
         super.init(frame: .zero)
         self.clipsToBounds = true
-        self.backgroundColor = .gray
+        self.backgroundColor = Constants.highlightColor
     }
     
     override func layoutSubviews() {

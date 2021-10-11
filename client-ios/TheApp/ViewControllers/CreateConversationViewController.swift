@@ -11,6 +11,7 @@ class CreateConversationViewController: UIViewController, LoadingViewController 
         let label = UILabel()
         label.textAlignment = .center
         label.numberOfLines = 0
+        label.textColor = Constants.primaryTextColor
         label.text = "Select users to start a conversation with"
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -26,6 +27,7 @@ class CreateConversationViewController: UIViewController, LoadingViewController 
     private lazy var createButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Create Conversation", for: .normal)
+        button.setTitleColor(Constants.highlightColor, for: .normal)
         button.addTarget(self, action: #selector(createButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -54,7 +56,7 @@ class CreateConversationViewController: UIViewController, LoadingViewController 
     }
     
     private func setUpView() {
-        view.backgroundColor = .white
+        view.backgroundColor = Constants.secondaryBackgroundColor
         view.addSubviews(titleLabel, listViewController.view, createButton)
     }
     

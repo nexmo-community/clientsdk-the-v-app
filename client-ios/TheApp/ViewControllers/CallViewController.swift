@@ -30,6 +30,7 @@ class CallViewController: UIViewController {
         let label = UILabel()
         label.text = user.displayName
         label.textAlignment = .natural
+        label.textColor = Constants.primaryTextColor
         label.font = label.font.withSize(24)
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -39,6 +40,7 @@ class CallViewController: UIViewController {
     private lazy var callStatusLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
+        label.textColor = Constants.primaryTextColor
         label.font = label.font.withSize(24)
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -48,7 +50,7 @@ class CallViewController: UIViewController {
     private lazy var endCallButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("End Call", for: .normal)
-        button.setTitleColor(.red, for: .normal)
+        button.setTitleColor(Constants.destructiveTextColor, for: .normal)
         button.isHidden = true
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(endCallButtonTapped), for: .touchUpInside)
@@ -58,6 +60,7 @@ class CallViewController: UIViewController {
     private lazy var callButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Call", for: .normal)
+        button.setTitleColor(Constants.highlightColor, for: .normal)
         button.isHidden = true
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(callButtonTapped), for: .touchUpInside)
@@ -70,7 +73,7 @@ class CallViewController: UIViewController {
         button.isHidden = true
         button.setImage(UIImage(systemName: "mic.slash.fill"), for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.tintColor = .gray
+        button.tintColor = Constants.primaryTextColor
         button.addTarget(self, action: #selector(muteButtonTapped), for: .touchUpInside)
         return button
     }()
@@ -78,7 +81,7 @@ class CallViewController: UIViewController {
     private lazy var muteIconImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(systemName: "mic.slash.fill"))
         imageView.isHidden = true
-        imageView.tintColor = .red
+        imageView.tintColor = Constants.destructiveTextColor
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
@@ -89,7 +92,9 @@ class CallViewController: UIViewController {
     private var isMuted = false
     private var callState: CallState = .inactive {
         didSet {
-            updateUIForCallState()
+            DispatchQueue.main.async {
+                self.updateUIForCallState()
+            }
         }
     }
     
@@ -136,7 +141,7 @@ class CallViewController: UIViewController {
     }
     
     private func setUpView() {
-        view.backgroundColor = .white
+        view.backgroundColor = Constants.secondaryBackgroundColor
         title = "Calling \(user.displayName)"
         view.addSubviews(profilePicView, nameLabel, muteIconImageView, callStatusLabel, muteButton, endCallButton, callButton)
     }

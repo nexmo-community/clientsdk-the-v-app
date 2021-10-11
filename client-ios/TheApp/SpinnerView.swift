@@ -6,7 +6,7 @@ class SpinnerView: UIView {
         let spinner = UIActivityIndicatorView(style: .large)
         spinner.backgroundColor = .white
         spinner.color = .purple
-        spinner.layer.cornerRadius = 2
+        spinner.layer.cornerRadius = 12
         spinner.translatesAutoresizingMaskIntoConstraints = false
         return spinner
     }()
@@ -17,6 +17,7 @@ class SpinnerView: UIView {
         label.font = label.font.withSize(16)
         label.numberOfLines = 0
         label.isHidden = true
+        label.textColor = Constants.primaryTextColor
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()

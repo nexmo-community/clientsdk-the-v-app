@@ -36,8 +36,9 @@ class SettingsViewController: UIViewController, LoadingViewController {
         let label = UILabel()
         label.text = "Logged in as \(username)"
         label.textAlignment = .center
-        label.font = label.font.withSize(30)
+        label.font = label.font.withSize(24)
         label.numberOfLines = 0
+        label.textColor = Constants.primaryTextColor
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -80,7 +81,7 @@ class SettingsViewController: UIViewController, LoadingViewController {
     }
     
     private func setUpView() {
-        view.backgroundColor = .white
+        view.backgroundColor = Constants.backgroundColor
         view.addSubviews(profilePicView, nameLabel, listViewController.view)
     }
     

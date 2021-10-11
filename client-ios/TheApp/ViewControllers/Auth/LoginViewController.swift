@@ -28,6 +28,7 @@ class LoginViewController: UIViewController, LoadingViewController {
     
     private lazy var logoView: UIImageView = {
         let imageView = UIImageView(image: UIImage(named: "logo"))
+        imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
@@ -64,14 +65,15 @@ class LoginViewController: UIViewController, LoadingViewController {
     private func setUpConstraints() {
         NSLayoutConstraint.activate([
             logoView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            logoView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 96),
-            logoView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -96),
+            logoView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
             stackView.topAnchor.constraint(equalTo: logoView.bottomAnchor, constant: 16),
-            stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 96),
             stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -96),
             
+            logoView.heightAnchor.constraint(equalToConstant: 300),
+            logoView.widthAnchor.constraint(equalToConstant: 300),
             usernameField.heightAnchor.constraint(equalToConstant: 48),
             passwordField.heightAnchor.constraint(equalToConstant: 48)
         ])
