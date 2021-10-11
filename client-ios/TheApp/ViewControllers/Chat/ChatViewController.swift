@@ -25,7 +25,7 @@ class ChatViewController: UIViewController, LoadingViewController {
     }()
     
     private lazy var inputField: VTextField = {
-        let input = VTextField(placeholder: "Type a message")
+        let input = VTextField(placeholder: "Type a message", isChat: true)
         input.delegate = self
         input.returnKeyType = .send
         input.translatesAutoresizingMaskIntoConstraints = false
@@ -96,7 +96,7 @@ class ChatViewController: UIViewController, LoadingViewController {
     
     private func setUpView() {
         title = conversation.displayName
-        view.backgroundColor = .white
+        view.backgroundColor = Constants.backgroundColor
         view.addSubviews(chatListViewController.view, inputStackView)
         inputStackView.addArrangedSubviews(imageButton, inputField, sendButton)
         

@@ -60,7 +60,6 @@ class HomeViewController: UITabBarController {
         conversationListViewController.delegate = self
         contactsViewController.delegate = self
         ClientManager.shared.incomingCallDelegate = self
-        
         self.viewControllers = VTabBarItem.allCases.map { createTabBarViewControllers(for: $0) }
     }
     
@@ -93,6 +92,9 @@ class HomeViewController: UITabBarController {
             from = otherParty.channel?.from.data ?? otherParty.user.name
         }
         let alert = UIAlertController(title: "Incoming call from", message: from, preferredStyle: .alert)
+        
+        alert.view.subviews.first?.subviews.first?.subviews.first?.backgroundColor = Constants.secondaryBackgroundColor
+        
         alert.addAction(UIAlertAction(title: "Answer", style: .default, handler: { _ in
             // TODO: test when a modal is already presented
             self.present(CallViewController(call: call), animated: true, completion: nil)
@@ -140,9 +142,9 @@ class HomeViewController: UITabBarController {
 extension HomeViewController: UITabBarControllerDelegate {
     override func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
         if item.tag != VTabBarItem.chats.tag {
-            newConversationButton?.isHidden = true
+            navigationItem.rightBarButtonItem = nil
         } else {
-            newConversationButton?.isHidden = false
+            navigationItem.rightBarButtonItem = newConversationButton
         }
     }
 }

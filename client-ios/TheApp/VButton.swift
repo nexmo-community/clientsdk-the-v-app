@@ -14,7 +14,7 @@ class VButton: UIButton {
         super.init(frame: .zero)
         setTitle(title, for: .normal)
         titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .bold)
-        layer.cornerRadius = 10
+        layer.cornerRadius = 12
         contentEdgeInsets = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
         if isSecondary {
             backgroundColor = .white

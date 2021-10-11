@@ -43,7 +43,7 @@ class ContactsViewController: UIViewController {
     }
     
     private func setUpView() {
-        view.backgroundColor = .white
+        view.backgroundColor = Constants.backgroundColor
         view.addSubview(listViewController.view)
     }
     

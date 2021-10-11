@@ -21,7 +21,7 @@ class ChatListViewController: UIViewController {
     }
     
     private func setUpView() {
-        view.backgroundColor = .white
+        view.backgroundColor = Constants.backgroundColor
         view.addSubview(tableView)
     }
     
@@ -36,7 +36,7 @@ class ChatListViewController: UIViewController {
     
     private func makeTableView() -> UITableView {
         let tableView = UITableView(frame: .zero)
-        tableView.backgroundColor = .white
+        tableView.backgroundColor = Constants.backgroundColor
         tableView.separatorStyle = .none
         tableView.dataSource = self
         tableView.allowsSelection = false

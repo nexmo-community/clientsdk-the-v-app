@@ -21,6 +21,7 @@ class UserDetailViewController: UIViewController {
         let label = UILabel()
         label.text = user.displayName
         label.textAlignment = .center
+        label.textColor = Constants.primaryTextColor
         label.font = label.font.withSize(24)
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -30,6 +31,7 @@ class UserDetailViewController: UIViewController {
     private lazy var callButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Call", for: .normal)
+        button.setTitleColor(Constants.highlightColor, for: .normal)
         button.titleLabel?.font = button.titleLabel?.font.withSize(48)
         button.addTarget(self, action: #selector(callButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -54,7 +56,7 @@ class UserDetailViewController: UIViewController {
     }
     
     private func setUpView() {
-        view.backgroundColor = .white
+        view.backgroundColor = Constants.backgroundColor
         view.addSubviews(profilePicView, nameLabel, callButton)
     }
     
