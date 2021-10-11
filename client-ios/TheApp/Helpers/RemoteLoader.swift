@@ -46,13 +46,20 @@ final class RemoteLoader {
         }.resume()
     }
     
-    static func fetchData(url: String, completion: @escaping ((Result<Data, RemoteLoaderError>) -> Void)) {
+    static func fetchData(url: String, authToken: String? = nil, completion: @escaping ((Result<Data, RemoteLoaderError>) -> Void)) {
         guard let url = URL(string: url) else {
             completion(.failure(.url))
             return
         }
         
-        URLSession.shared.dataTask(with: url) { data, response, error in
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        
+        if let token = authToken {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
             guard error == nil else {
                 completion(.failure(.misc(error: error!)))
                 return

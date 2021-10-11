@@ -8,8 +8,7 @@ class SignUpViewController: UIViewController, LoadingViewController {
     lazy var spinnerView = SpinnerView(parentView: view)
     
     private lazy var signUpButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("Sign Up", for: .normal)
+        let button = VButton(title: "Sign Up")
         button.addTarget(self, action: #selector(signUpButtonTapped), for: .touchUpInside)
         return button
     }()
@@ -17,12 +16,13 @@ class SignUpViewController: UIViewController, LoadingViewController {
     private lazy var stackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
-        stackView.spacing = 20
+        stackView.spacing = 16
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
     
     override func viewDidLoad() {
+        title = "The V App"
         super.viewDidLoad()
         setUpView()
         setUpConstraints()
@@ -30,20 +30,25 @@ class SignUpViewController: UIViewController, LoadingViewController {
     }
     
     private func setUpView() {
-        view.backgroundColor = .white
-        stackView.addArrangedSubviews(displayNameField, usernameField, passwordField, signUpButton)
+        view.backgroundColor = Constants.backgroundColor
+        stackView.addArrangedSubviews(
+            displayNameField,
+            usernameField,
+            passwordField,
+            UIStackView.spacing(value: 4),
+            signUpButton)
         view.addSubviews(stackView)
     }
     
     private func setUpConstraints() {
         NSLayoutConstraint.activate([
             stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 100),
-            stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -100),
+            stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 96),
+            stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -96),
             
-            displayNameField.heightAnchor.constraint(equalToConstant: 50),
-            usernameField.heightAnchor.constraint(equalToConstant: 50),
-            passwordField.heightAnchor.constraint(equalToConstant: 50)
+            displayNameField.heightAnchor.constraint(equalToConstant: 48),
+            usernameField.heightAnchor.constraint(equalToConstant: 48),
+            passwordField.heightAnchor.constraint(equalToConstant: 48)
         ])
     }
     

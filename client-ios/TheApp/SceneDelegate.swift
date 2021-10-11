@@ -23,8 +23,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.windowScene = windowScene
         
         let navigationController = UINavigationController(rootViewController: LoginViewController())
-        
         navigationController.navigationBar.isTranslucent = false
+        navigationController.navigationBar.barTintColor = Constants.backgroundColor
+        navigationController.navigationBar.tintColor = Constants.primaryTextColor
+        navigationController.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor.white]
+        
+
         
         window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
