@@ -21,7 +21,7 @@ class UserDetailViewController: UIViewController {
         let label = UILabel()
         label.text = user.displayName
         label.textAlignment = .center
-        label.font = label.font.withSize(30)
+        label.font = label.font.withSize(24)
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -30,7 +30,7 @@ class UserDetailViewController: UIViewController {
     private lazy var callButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Call", for: .normal)
-        button.titleLabel?.font = button.titleLabel?.font.withSize(50)
+        button.titleLabel?.font = button.titleLabel?.font.withSize(48)
         button.addTarget(self, action: #selector(callButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -60,15 +60,15 @@ class UserDetailViewController: UIViewController {
     
     private func setUpConstraints() {
         NSLayoutConstraint.activate([
-            profilePicView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 50),
+            profilePicView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 48),
             profilePicView.widthAnchor.constraint(equalToConstant: 200),
             profilePicView.heightAnchor.constraint(equalToConstant: 200),
             profilePicView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
-            nameLabel.topAnchor.constraint(equalTo: profilePicView.bottomAnchor, constant: 20),
+            nameLabel.topAnchor.constraint(equalTo: profilePicView.bottomAnchor, constant: 16),
             nameLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
-            callButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            callButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
             callButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
         ])
     }

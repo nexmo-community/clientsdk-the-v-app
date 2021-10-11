@@ -1,8 +1,21 @@
 import Foundation
 
+enum ChatMessageContent: Hashable, Equatable {
+    case info(content: String)
+    case text(content: String)
+    case image(urlString: String)
+}
+
 protocol ListViewPresentable {
     var id: String { get }
     var displayName: String { get }
+}
+
+struct ChatMessage: Hashable {
+    let id: Int
+    let sender: String
+    let content: ChatMessageContent
+    let date: Date
 }
 
 struct Setting: Hashable, ListViewPresentable {

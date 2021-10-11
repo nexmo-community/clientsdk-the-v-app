@@ -86,15 +86,15 @@ class SettingsViewController: UIViewController, LoadingViewController {
     
     private func setUpConstraints() {
         NSLayoutConstraint.activate([
-            profilePicView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 50),
+            profilePicView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 48),
             profilePicView.widthAnchor.constraint(equalToConstant: 200),
             profilePicView.heightAnchor.constraint(equalToConstant: 200),
             profilePicView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
-            nameLabel.topAnchor.constraint(equalTo: profilePicView.bottomAnchor, constant: 20),
+            nameLabel.topAnchor.constraint(equalTo: profilePicView.bottomAnchor, constant: 16),
             nameLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
-            listViewController.view.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 50),
+            listViewController.view.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 48),
             listViewController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             listViewController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             listViewController.view.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)

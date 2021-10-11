@@ -14,8 +14,14 @@
 		122D6F6E26A999AA00028418 /* UserDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122D6F6D26A999AA00028418 /* UserDetailViewController.swift */; };
 		122D6F7026B0426100028418 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122D6F6F26B0426100028418 /* Constants.swift */; };
 		1248413925FB8A93009DBEB9 /* ClientManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1248413825FB8A93009DBEB9 /* ClientManager.swift */; };
+		12665CD026BD48E1000DD42E /* ChatListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12665CCF26BD48E1000DD42E /* ChatListViewController.swift */; };
+		12665CD426BD4B95000DD42E /* TextCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12665CD326BD4B95000DD42E /* TextCollectionViewCell.swift */; };
+		12665CD826BD737C000DD42E /* InfoCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12665CD726BD737C000DD42E /* InfoCollectionViewCell.swift */; };
+		12665CDA26BD9C5A000DD42E /* VDateFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12665CD926BD9C5A000DD42E /* VDateFormatter.swift */; };
+		12665CDC26C13E6B000DD42E /* ImageCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12665CDB26C13E6B000DD42E /* ImageCollectionViewCell.swift */; };
 		127E728C26A5D0CF00737906 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 127E728B26A5D0CF00737906 /* HomeViewController.swift */; };
 		127E729026A5D60100737906 /* VTabBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 127E728F26A5D60100737906 /* VTabBarItem.swift */; };
+		1287D94526FCDBDC004D87F9 /* VButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1287D94426FCDBDC004D87F9 /* VButton.swift */; };
 		1297BDDD2601227F00025D12 /* CreateConversationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1297BDDC2601227F00025D12 /* CreateConversationViewController.swift */; };
 		1297BDE0260123AB00025D12 /* ListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1297BDDF260123AB00025D12 /* ListViewController.swift */; };
 		1297BDE426026A4E00025D12 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1297BDE326026A4E00025D12 /* ChatViewController.swift */; };
@@ -43,8 +49,14 @@
 		122D6F6D26A999AA00028418 /* UserDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDetailViewController.swift; sourceTree = "<group>"; };
 		122D6F6F26B0426100028418 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		1248413825FB8A93009DBEB9 /* ClientManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientManager.swift; sourceTree = "<group>"; };
+		12665CCF26BD48E1000DD42E /* ChatListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatListViewController.swift; sourceTree = "<group>"; };
+		12665CD326BD4B95000DD42E /* TextCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextCollectionViewCell.swift; sourceTree = "<group>"; };
+		12665CD726BD737C000DD42E /* InfoCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoCollectionViewCell.swift; sourceTree = "<group>"; };
+		12665CD926BD9C5A000DD42E /* VDateFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VDateFormatter.swift; sourceTree = "<group>"; };
+		12665CDB26C13E6B000DD42E /* ImageCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCollectionViewCell.swift; sourceTree = "<group>"; };
 		127E728B26A5D0CF00737906 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		127E728F26A5D60100737906 /* VTabBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VTabBarItem.swift; sourceTree = "<group>"; };
+		1287D94426FCDBDC004D87F9 /* VButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VButton.swift; sourceTree = "<group>"; };
 		1297BDDC2601227F00025D12 /* CreateConversationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateConversationViewController.swift; sourceTree = "<group>"; };
 		1297BDDF260123AB00025D12 /* ListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListViewController.swift; sourceTree = "<group>"; };
 		1297BDE326026A4E00025D12 /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
@@ -80,6 +92,34 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		12665CD526BD56CD000DD42E /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				12B77905250FA8BE0081D8AF /* LoginViewController.swift */,
+				12FABB3325FFBF9F00B61567 /* SignupViewController.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		12665CD626BD56E4000DD42E /* Chat */ = {
+			isa = PBXGroup;
+			children = (
+				1297BDE326026A4E00025D12 /* ChatViewController.swift */,
+				12665CCF26BD48E1000DD42E /* ChatListViewController.swift */,
+			);
+			path = Chat;
+			sourceTree = "<group>";
+		};
+		12665CDD26C13EA6000DD42E /* CollectionViewCells */ = {
+			isa = PBXGroup;
+			children = (
+				12665CD326BD4B95000DD42E /* TextCollectionViewCell.swift */,
+				12665CDB26C13E6B000DD42E /* ImageCollectionViewCell.swift */,
+				12665CD726BD737C000DD42E /* InfoCollectionViewCell.swift */,
+			);
+			name = CollectionViewCells;
+			sourceTree = "<group>";
+		};
 		12B778F5250FA8BE0081D8AF = {
 			isa = PBXGroup;
 			children = (
@@ -117,9 +157,8 @@
 		12D2385B2600E676004D1FC6 /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
-				12B77905250FA8BE0081D8AF /* LoginViewController.swift */,
-				12FABB3325FFBF9F00B61567 /* SignupViewController.swift */,
-				1297BDE326026A4E00025D12 /* ChatViewController.swift */,
+				12665CD526BD56CD000DD42E /* Auth */,
+				12665CD626BD56E4000DD42E /* Chat */,
 				12D2386D2600F371004D1FC6 /* ConversationListViewController.swift */,
 				1297BDDC2601227F00025D12 /* CreateConversationViewController.swift */,
 				1297BDDF260123AB00025D12 /* ListViewController.swift */,
@@ -135,9 +174,11 @@
 		12D2385D2600E69E004D1FC6 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				12665CDD26C13EA6000DD42E /* CollectionViewCells */,
 				12D2385825FFE42A004D1FC6 /* SpinnerView.swift */,
 				12D2385F2600E6BD004D1FC6 /* VTextField.swift */,
 				12EA0F3926B3056400E41537 /* VProfilePictureView.swift */,
+				1287D94426FCDBDC004D87F9 /* VButton.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -149,6 +190,7 @@
 				12D2385525FFE409004D1FC6 /* Extensions.swift */,
 				122D6F6F26B0426100028418 /* Constants.swift */,
 				12EA0F3326B1A9BD00E41537 /* DelegateExtensions.swift */,
+				12665CD926BD9C5A000DD42E /* VDateFormatter.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -294,13 +336,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				12665CDA26BD9C5A000DD42E /* VDateFormatter.swift in Sources */,
 				12EA0F3626B1AD4700E41537 /* CallViewController.swift in Sources */,
 				12D238602600E6BD004D1FC6 /* VTextField.swift in Sources */,
+				12665CD826BD737C000DD42E /* InfoCollectionViewCell.swift in Sources */,
 				12B77906250FA8BE0081D8AF /* LoginViewController.swift in Sources */,
 				12D2385625FFE409004D1FC6 /* Extensions.swift in Sources */,
 				12B77902250FA8BE0081D8AF /* AppDelegate.swift in Sources */,
+				12665CD426BD4B95000DD42E /* TextCollectionViewCell.swift in Sources */,
 				12FABB3425FFBF9F00B61567 /* SignupViewController.swift in Sources */,
 				127E728C26A5D0CF00737906 /* HomeViewController.swift in Sources */,
+				12665CDC26C13E6B000DD42E /* ImageCollectionViewCell.swift in Sources */,
 				127E729026A5D60100737906 /* VTabBarItem.swift in Sources */,
 				1248413925FB8A93009DBEB9 /* ClientManager.swift in Sources */,
 				1297BDE0260123AB00025D12 /* ListViewController.swift in Sources */,
@@ -310,8 +356,10 @@
 				12B77904250FA8BE0081D8AF /* SceneDelegate.swift in Sources */,
 				12D2385925FFE42A004D1FC6 /* SpinnerView.swift in Sources */,
 				12D2386E2600F371004D1FC6 /* ConversationListViewController.swift in Sources */,
+				1287D94526FCDBDC004D87F9 /* VButton.swift in Sources */,
 				122D6F7026B0426100028418 /* Constants.swift in Sources */,
 				121D9D9525FA772200C36658 /* RemoteLoader.swift in Sources */,
+				12665CD026BD48E1000DD42E /* ChatListViewController.swift in Sources */,
 				12EA0F3426B1A9BD00E41537 /* DelegateExtensions.swift in Sources */,
 				122D6F6E26A999AA00028418 /* UserDetailViewController.swift in Sources */,
 				1297BDE426026A4E00025D12 /* ChatViewController.swift in Sources */,

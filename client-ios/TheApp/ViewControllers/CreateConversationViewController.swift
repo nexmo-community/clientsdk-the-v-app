@@ -60,17 +60,17 @@ class CreateConversationViewController: UIViewController, LoadingViewController 
     
     private func setUpConstraints() {
         NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 50),
-            titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -50),
+            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
+            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 48),
+            titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -48),
             
-            listViewController.view.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 20),
+            listViewController.view.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 16),
             listViewController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             listViewController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             
-            createButton.topAnchor.constraint(equalTo: listViewController.view.bottomAnchor, constant: 20),
-            createButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 100),
-            createButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -100),
+            createButton.topAnchor.constraint(equalTo: listViewController.view.bottomAnchor, constant: 16),
+            createButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 96),
+            createButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -96),
             createButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
         ])
     }
