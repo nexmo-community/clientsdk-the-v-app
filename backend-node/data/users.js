@@ -148,13 +148,13 @@ const syncUser = async function (client, vonageUser) {
   // console.log("user", user);
   if(!user) {
     // if not present (insert)
-    const res = await client.query('INSERT INTO users(vonage_id, name, display_name, image_url, created_at, updated_at) VALUES($1, $2, $3, $4, NOW(), NOW()) RETURNING vonage_id, name, display_name, image_url', [vonageUser.vonage_id, vonageUser.name, vonageUser.display_name, vonageUser.image_url]);
+    const res = await client.query('INSERT INTO users(vonage_id, name, display_name, created_at, updated_at) VALUES($1, $2, $3, NOW(), NOW()) RETURNING vonage_id, name, display_name', [vonageUser.vonage_id, vonageUser.name, vonageUser.display_name]);
     if (res.rowCount === 1) {
       user = res.rows[0];
     }
   } else {
     // if present (update)
-    const res = await client.query('UPDATE users SET vonage_id=$1, display_name=$2, image_url=$3, updated_at=NOW() WHERE name=$4 RETURNING vonage_id, name, display_name, image_url', [vonageUser.vonage_id, vonageUser.display_name, vonageUser.image_url, vonageUser.name]);
+    const res = await client.query('UPDATE users SET vonage_id=$1, display_name=$2, updated_at=NOW() WHERE name=$3 RETURNING vonage_id, name, display_name, image_url', [vonageUser.vonage_id, vonageUser.display_name, vonageUser.name]);
     // console.log(res);
     if (res.rowCount === 1) {
       user = res.rows[0];
