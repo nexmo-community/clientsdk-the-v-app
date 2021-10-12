@@ -11,6 +11,7 @@ class ListViewController<T: ListViewPresentable & Hashable>: UIViewController, U
     private lazy var dataSource = makeDataSource()
     private lazy var refreshControl: UIRefreshControl = {
         let rc = UIRefreshControl()
+        rc.tintColor = Constants.primaryTextColor
         rc.addTarget(self, action: #selector(refresh), for: .valueChanged)
         return rc
     }()
