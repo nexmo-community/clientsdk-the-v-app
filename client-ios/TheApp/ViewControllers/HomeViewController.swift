@@ -91,19 +91,20 @@ class HomeViewController: UITabBarController {
         if let otherParty = call.allMembers.first {
             from = otherParty.channel?.from.data ?? otherParty.user.name
         }
+        let presentingVC = navigationController?.presentedViewController ?? self
+        
         let alert = UIAlertController(title: "Incoming call from", message: from, preferredStyle: .alert)
         
-        alert.view.subviews.first?.subviews.first?.subviews.first?.backgroundColor = Constants.secondaryBackgroundColor
-        
         alert.addAction(UIAlertAction(title: "Answer", style: .default, handler: { _ in
-            // TODO: test when a modal is already presented
-            self.present(CallViewController(call: call), animated: true, completion: nil)
+            presentingVC.present(CallViewController(call: call), animated: true, completion: nil)
         }))
         alert.addAction(UIAlertAction(title: "Reject", style: .destructive, handler: { _ in
             call.reject(nil)
         }))
         
-        self.present(alert, animated: true, completion: nil)
+        alert.view.tintColor = Constants.highlightColor
+        
+        presentingVC.present(alert, animated: true, completion: nil)
     }
     
     private func loadConversations() {
