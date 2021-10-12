@@ -10,6 +10,11 @@ protocol ClientManagerCallDelegate: AnyObject {
     func clientManager(_ clientManager: ClientManager, makeCallDidFail errorMessage: String?)
 }
 
+protocol ClientManagerConversationDelegate: AnyObject {
+    func clientManager(_ clientManager: ClientManager, didGetConversation conversation: NXMConversation?)
+    func clientManager(_ clientManager: ClientManager, getConversationDidFail errorMessage: String?)
+}
+
 protocol ClientManagerIncomingCallDelegate: AnyObject {
     func clientManager(_ clientManager: ClientManager, didReceiveCall call: NXMCall)
 }
@@ -28,6 +33,7 @@ final class ClientManager: NSObject {
     weak var delegate: ClientManagerDelegate?
     weak var callDelegate: ClientManagerCallDelegate?
     weak var incomingCallDelegate: ClientManagerIncomingCallDelegate?
+    weak var conversationDelegate: ClientManagerConversationDelegate?
     
     override init() {
         super.init()
@@ -63,7 +69,7 @@ final class ClientManager: NSObject {
     }
     
     func call(name: String) {
-        NXMClient.shared.call(name, callHandler: .inApp) { [weak self] error, call in
+        NXMClient.shared.serverCall(withCallee: name, customData: nil) { [weak self] error, call in
             guard let self = self else { return }
             if error != nil {
                 self.callDelegate?.clientManager(self, makeCallDidFail: error?.localizedDescription)
@@ -71,6 +77,18 @@ final class ClientManager: NSObject {
             }
 
             self.callDelegate?.clientManager(self, didMakeCall: call)
+        }
+    }
+    
+    func getConversation(conversationID: String) {
+        NXMClient.shared.getConversationWithUuid(conversationID) { [weak self] error, conversation in
+            guard let self = self else { return }
+            if error != nil {
+                self.conversationDelegate?.clientManager(self, getConversationDidFail: error?.localizedDescription)
+                return
+            }
+            
+            self.conversationDelegate?.clientManager(self, didGetConversation: conversation)
         }
     }
     

@@ -1,4 +1,5 @@
 import UIKit
+import NexmoClient
 
 protocol LoadingViewController {
     var spinnerView: SpinnerView { get }
@@ -47,6 +48,13 @@ extension UIStackView {
             self.addArrangedSubview(view)
         }
     }
+    
+    static func spacing(value: CGFloat) -> UIView {
+        let spacerView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0))
+        spacerView.translatesAutoresizingMaskIntoConstraints = false
+        spacerView.heightAnchor.constraint(equalToConstant: value).isActive = true
+        return spacerView
+    }
 }
 
 extension UIBarButtonItem {
@@ -78,4 +86,48 @@ extension NSMutableData {
       self.append(data)
     }
   }
+}
+
+extension NXMTextEvent {
+    func asChatMessage() -> ChatMessage {
+        let displayName = embeddedInfo?.user.displayName ?? ""
+        return ChatMessage(id: uuid,
+                           sender: displayName,
+                           content: .text(content: text ?? ""),
+                           date: Date(timeIntervalSinceReferenceDate: creationDate.timeIntervalSinceReferenceDate))
+    }
+}
+
+extension NXMMemberEvent {
+    func asChatMessage() -> ChatMessage {
+        let displayName = embeddedInfo?.user.displayName ?? ""
+        let text: String
+        switch state {
+        case .invited:
+            text = "\(displayName) was invited."
+        case .joined:
+            text = "\(displayName) was joined."
+        case .left:
+            text = "\(displayName) was left."
+        case .unknown:
+            fatalError("Unknown member event state.")
+        @unknown default:
+            fatalError("Unknown member event state.")
+        }
+        
+        return ChatMessage(id: self.uuid,
+                           sender: displayName,
+                           content: .info(content: text),
+                           date: Date(timeIntervalSinceReferenceDate: self.creationDate.timeIntervalSinceReferenceDate))
+    }
+}
+
+extension NXMImageEvent {
+    func asChatMessage() -> ChatMessage {
+        let displayName = embeddedInfo?.user.displayName ?? ""
+        return ChatMessage(id: uuid,
+                           sender: displayName,
+                           content: .image(urlString: mediumImage.url.absoluteString),
+                           date: Date(timeIntervalSinceReferenceDate: creationDate.timeIntervalSinceReferenceDate))
+    }
 }

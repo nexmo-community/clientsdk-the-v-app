@@ -4,8 +4,9 @@ class SpinnerView: UIView {
     
     private lazy var spinner: UIActivityIndicatorView = {
         let spinner = UIActivityIndicatorView(style: .large)
-        spinner.backgroundColor = .lightGray
-        spinner.layer.cornerRadius = 2
+        spinner.backgroundColor = .white
+        spinner.color = .purple
+        spinner.layer.cornerRadius = 12
         spinner.translatesAutoresizingMaskIntoConstraints = false
         return spinner
     }()
@@ -13,9 +14,10 @@ class SpinnerView: UIView {
     private lazy var detailLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
-        label.font = label.font.withSize(20)
+        label.font = label.font.withSize(16)
         label.numberOfLines = 0
         label.isHidden = true
+        label.textColor = Constants.primaryTextColor
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -35,11 +37,11 @@ class SpinnerView: UIView {
         NSLayoutConstraint.activate([
             spinner.centerXAnchor.constraint(equalTo: parentView.centerXAnchor),
             spinner.centerYAnchor.constraint(equalTo: parentView.centerYAnchor),
-            spinner.widthAnchor.constraint(equalToConstant: 50),
-            spinner.heightAnchor.constraint(equalToConstant: 50),
+            spinner.widthAnchor.constraint(equalToConstant: 48),
+            spinner.heightAnchor.constraint(equalToConstant: 48),
             
             detailLabel.centerXAnchor.constraint(equalTo: parentView.centerXAnchor),
-            detailLabel.topAnchor.constraint(equalTo: spinner.bottomAnchor, constant: 20)
+            detailLabel.topAnchor.constraint(equalTo: spinner.bottomAnchor, constant: 16)
         ])
     }
     

@@ -40,8 +40,6 @@ class ListViewController<T: ListViewPresentable & Hashable>: UIViewController, U
     }
     
     private func setUpView() {
-        view.backgroundColor = .white
-        collectionView.backgroundColor = .white
         collectionView.dataSource = dataSource
         collectionView.delegate = self
         if supportsRefresh {
@@ -71,6 +69,7 @@ class ListViewController<T: ListViewPresentable & Hashable>: UIViewController, U
         if let row = collectionView.cellForItem(at: indexPath) as? UICollectionViewListCell {
             let index = indexPath.item
             if supportsMultipleSelection {
+                row.tintColor = Constants.highlightColor
                 row.accessories = row.accessories.count == 0 ? [UICellAccessory.checkmark()] : []
             }
             delegate?.listViewControllerDelegate(self, didSelectRow: data[index])
@@ -97,7 +96,8 @@ private extension ListViewController {
     }
     
     func makeCollectionView() -> UICollectionView {
-        let config = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
+        var config = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
+        config.backgroundColor = Constants.backgroundColor
         let layout = UICollectionViewCompositionalLayout.list(using: config)
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
         cv.translatesAutoresizingMaskIntoConstraints = false
@@ -123,13 +123,18 @@ private extension ListViewController {
         return UICollectionView.CellRegistration { cell, indexPath, data in
             var config = cell.defaultContentConfiguration()
             config.text = data.displayName
+            config.textProperties.color = Constants.primaryTextColor
             
             if let setting = data as? Setting {
                 config.image = UIImage(systemName: setting.iconString)
-                config.imageProperties.tintColor = .gray
+                config.imageProperties.tintColor = Constants.highlightColor
             }
             
+            var backgroundConfig = UIBackgroundConfiguration.listGroupedCell()
+            backgroundConfig.backgroundColor = Constants.secondaryBackgroundColor
+            
             cell.contentConfiguration = config
+            cell.backgroundConfiguration = backgroundConfig
         }
     }
 }

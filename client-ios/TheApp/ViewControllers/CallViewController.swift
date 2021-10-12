@@ -30,7 +30,8 @@ class CallViewController: UIViewController {
         let label = UILabel()
         label.text = user.displayName
         label.textAlignment = .natural
-        label.font = label.font.withSize(30)
+        label.textColor = Constants.primaryTextColor
+        label.font = label.font.withSize(24)
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -39,7 +40,8 @@ class CallViewController: UIViewController {
     private lazy var callStatusLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
-        label.font = label.font.withSize(30)
+        label.textColor = Constants.primaryTextColor
+        label.font = label.font.withSize(24)
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -48,7 +50,7 @@ class CallViewController: UIViewController {
     private lazy var endCallButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("End Call", for: .normal)
-        button.setTitleColor(.red, for: .normal)
+        button.setTitleColor(Constants.destructiveTextColor, for: .normal)
         button.isHidden = true
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(endCallButtonTapped), for: .touchUpInside)
@@ -58,6 +60,7 @@ class CallViewController: UIViewController {
     private lazy var callButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Call", for: .normal)
+        button.setTitleColor(Constants.highlightColor, for: .normal)
         button.isHidden = true
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(callButtonTapped), for: .touchUpInside)
@@ -70,7 +73,7 @@ class CallViewController: UIViewController {
         button.isHidden = true
         button.setImage(UIImage(systemName: "mic.slash.fill"), for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.tintColor = .gray
+        button.tintColor = Constants.primaryTextColor
         button.addTarget(self, action: #selector(muteButtonTapped), for: .touchUpInside)
         return button
     }()
@@ -78,7 +81,7 @@ class CallViewController: UIViewController {
     private lazy var muteIconImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(systemName: "mic.slash.fill"))
         imageView.isHidden = true
-        imageView.tintColor = .red
+        imageView.tintColor = Constants.destructiveTextColor
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
@@ -89,7 +92,9 @@ class CallViewController: UIViewController {
     private var isMuted = false
     private var callState: CallState = .inactive {
         didSet {
-            updateUIForCallState()
+            DispatchQueue.main.async {
+                self.updateUIForCallState()
+            }
         }
     }
     
@@ -136,43 +141,43 @@ class CallViewController: UIViewController {
     }
     
     private func setUpView() {
-        view.backgroundColor = .white
+        view.backgroundColor = Constants.secondaryBackgroundColor
         title = "Calling \(user.displayName)"
         view.addSubviews(profilePicView, nameLabel, muteIconImageView, callStatusLabel, muteButton, endCallButton, callButton)
     }
     
     private func setUpConstraints() {
         NSLayoutConstraint.activate([
-            profilePicView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 50),
-            profilePicView.widthAnchor.constraint(equalToConstant: 70),
-            profilePicView.heightAnchor.constraint(equalToConstant: 70),
-            profilePicView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 50),
+            profilePicView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 48),
+            profilePicView.widthAnchor.constraint(equalToConstant: 64),
+            profilePicView.heightAnchor.constraint(equalToConstant: 64),
+            profilePicView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 48),
             
             nameLabel.centerYAnchor.constraint(equalTo: profilePicView.centerYAnchor),
-            nameLabel.leadingAnchor.constraint(equalTo: profilePicView.trailingAnchor, constant: 20),
-            nameLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            nameLabel.leadingAnchor.constraint(equalTo: profilePicView.trailingAnchor, constant: 16),
+            nameLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             
             muteIconImageView.centerXAnchor.constraint(equalTo: profilePicView.centerXAnchor),
             muteIconImageView.centerYAnchor.constraint(equalTo: profilePicView.centerYAnchor),
-            muteIconImageView.widthAnchor.constraint(equalToConstant: 30),
-            muteIconImageView.heightAnchor.constraint(equalToConstant: 30),
+            muteIconImageView.widthAnchor.constraint(equalToConstant: 24),
+            muteIconImageView.heightAnchor.constraint(equalToConstant: 24),
             
             callStatusLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             callStatusLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            callStatusLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            callStatusLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            callStatusLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            callStatusLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             
-            muteButton.topAnchor.constraint(equalTo: callStatusLabel.bottomAnchor, constant: 20),
-            muteButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            muteButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            muteButton.topAnchor.constraint(equalTo: callStatusLabel.bottomAnchor, constant: 16),
+            muteButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            muteButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             
-            endCallButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            endCallButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            endCallButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            endCallButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            endCallButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            endCallButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
             
-            callButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            callButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            callButton.bottomAnchor.constraint(equalTo: endCallButton.topAnchor, constant: -20)
+            callButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            callButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            callButton.bottomAnchor.constraint(equalTo: endCallButton.topAnchor, constant: -16)
         ])
     }
     
