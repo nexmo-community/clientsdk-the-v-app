@@ -66,8 +66,8 @@ vonageRoutes.get('/users', async (req, res) => {
   pool.connect(async (err, client, done) => {
     if (err) throw err
     let users = await Data.users.getInterlocutorsFor(client, req.user.sub);
-    return res.status(200).json(users);
     client.release();
+    return res.status(200).json(users);
   });
   pool.end();
 });
@@ -81,8 +81,8 @@ vonageRoutes.get('/conversations', async (req, res) => {
   pool.connect(async (err, client, done) => {
     if (err) throw err
     const vonageConversations = await Data.conversations.getAllForUser(client, req.user.user_id);
-    return res.status(200).json(vonageConversations);
     client.release();
+    return res.status(200).json(vonageConversations);
   });
   pool.end();
 });
