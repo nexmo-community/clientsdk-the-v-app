@@ -65,6 +65,10 @@ class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
             viewModel.createConversation()
         }
 
+        binding.showUsersFab.setOnClickListener {
+            viewModel.nagivateToUsers()
+        }
+
         binding.swipeRefreshLayout.setOnRefreshListener {
             binding.swipeRefreshLayout.isRefreshing = false
             viewModel.loadConversations()

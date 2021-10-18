@@ -13,34 +13,22 @@
             android:id="@+id/signupFragment"
             android:name="com.vonage.vapp.presentation.signup.SignupFragment"
             tools:layout="@layout/fragment_signup">
-
         <action
-                android:id="@+id/action_SignupFragment_to_mainFragment"
-                app:destination="@id/mainFragment" />
-    </fragment>
-    <fragment
-            android:id="@+id/mainFragment"
-            android:name="com.vonage.vapp.presentation.main.MainFragment"
-            android:label="MainFragment">
-        <action
-                android:id="@+id/action_mainFragment_to_conversationsFragment"
-                app:destination="@id/conversationsFragment" />
-        <action
-                android:id="@+id/action_mainFragment_to_usersFragment"
-                app:destination="@id/usersFragment" />
+            android:id="@+id/action_signupFragment_to_conversationsFragment"
+            app:destination="@id/conversationsFragment" />
     </fragment>
     <fragment
             android:id="@+id/loginFragment"
             android:name="com.vonage.vapp.presentation.login.LoginFragment"
             android:label="LoginFragment"
             tools:layout="@layout/fragment_login">
-        <action
-                android:id="@+id/action_loginFragment_to_mainFragment"
-                app:destination="@id/mainFragment" />
 
         <action
                 android:id="@+id/action_loginFragment_to_SignupFragment"
                 app:destination="@id/signupFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_conversationsFragment"
+            app:destination="@id/conversationsFragment" />
     </fragment>
     <fragment
             android:id="@+id/conversationsFragment"
@@ -50,6 +38,9 @@
         <action
                 android:id="@+id/action_conversationsFragment_to_conversationDetailFragment"
                 app:destination="@id/conversationDetailFragment" />
+        <action
+            android:id="@+id/action_conversationsFragment_to_usersFragment"
+            app:destination="@id/usersFragment" />
 
     </fragment>
     <fragment

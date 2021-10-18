@@ -19,6 +19,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
     private val actionObserver = Observer<Action> {
         when (it) {
+            is Action.ShowContent -> viewModel.navigate()
             is Action.Error -> toast { it.message }
         }
     }
@@ -36,7 +37,6 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
         observe(viewModel.viewActionLiveData, actionObserver)
 
-//        login()
     }
 
     private fun login() {

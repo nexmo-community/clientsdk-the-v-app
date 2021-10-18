@@ -52,6 +52,11 @@ class ConversationsViewModel : ViewModel() {
         NavManager.navigate(navDirections)
     }
 
+    fun nagivateToUsers() {
+        val navDirections = ConversationsFragmentDirections.actionConversationsFragmentToUsersFragment()
+        NavManager.navigate(navDirections)
+    }
+
     fun loadConversations() {
         viewActionMutableLiveData.postValue(Action.ShowLoading)
 
