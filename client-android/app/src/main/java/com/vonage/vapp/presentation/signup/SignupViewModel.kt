@@ -23,7 +23,7 @@ class SignupViewModel : ViewModel() {
             val result = apiRepository.signup(name, displayName, password)
 
             if (result is SignupResponseModel) {
-                val navDirections = SignupFragmentDirections.actionSignupFragmentToMainFragment()
+                val navDirections = SignupFragmentDirections.actionSignupFragmentToConversationsFragment()
                 navManager.navigate(navDirections)
             } else if (result is ErrorResponseModel) {
                 viewActionMutableLiveData.postValue(Action.Error(result.fullMessage))

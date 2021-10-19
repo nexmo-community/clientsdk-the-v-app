@@ -16,7 +16,6 @@ import com.vonage.vapp.core.NavManager
 
 class OnCallViewModel : ViewModel() {
     private val callManager = CallManager
-    private val navManager = NavManager
 
     private val _toast = MutableLiveData<String>()
     val toast = _toast as LiveData<String>
@@ -25,7 +24,6 @@ class OnCallViewModel : ViewModel() {
         override fun onMemberStatusUpdated(nexmoCallStatus: NexmoCallMemberStatus, callMember: NexmoMember) {
             if (nexmoCallStatus == NexmoCallMemberStatus.COMPLETED || nexmoCallStatus == NexmoCallMemberStatus.CANCELLED) {
                 callManager.onGoingCall = null
-                navManager.popBackStack(R.id.mainFragment, false)
             }
         }
 

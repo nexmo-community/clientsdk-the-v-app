@@ -65,6 +65,10 @@ class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
             viewModel.createConversation()
         }
 
+        binding.showUsersFab.setOnClickListener {
+            viewModel.nagivateToUsers()
+        }
+
         binding.swipeRefreshLayout.setOnRefreshListener {
             binding.swipeRefreshLayout.isRefreshing = false
             viewModel.loadConversations()
@@ -76,7 +80,7 @@ class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
             val userNames = users.map { it.displayName }.toTypedArray()
             val selectedUsers = mutableSetOf<User>()
 
-            val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+            val builder: AlertDialog.Builder = AlertDialog.Builder(context, R.style.AlertDialog)
             builder.setTitle("Select users")
             builder.setMultiChoiceItems(userNames, null) { _, index, checked ->
                 val user = users[index]
