@@ -80,7 +80,7 @@ class ConversationsFragment : Fragment(R.layout.fragment_conversations) {
             val userNames = users.map { it.displayName }.toTypedArray()
             val selectedUsers = mutableSetOf<User>()
 
-            val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+            val builder: AlertDialog.Builder = AlertDialog.Builder(context, R.style.AlertDialog)
             builder.setTitle("Select users")
             builder.setMultiChoiceItems(userNames, null) { _, index, checked ->
                 val user = users[index]
