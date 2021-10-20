@@ -80,7 +80,7 @@ vonageRoutes.get('/conversations', async (req, res) => {
   const pool = new Pool({ connectionString: process.env.postgresDatabaseUrl });
   pool.connect(async (err, client, done) => {
     if (err) throw err
-    const vonageConversations = await Data.conversations.getAllForUser(client, req.user.user_id);
+    const vonageConversations = await Data.conversations.getAllForUser(client, req.user.user_id, true);
     client.release();
     return res.status(200).json(vonageConversations);
   });
