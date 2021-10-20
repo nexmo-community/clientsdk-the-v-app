@@ -5,9 +5,9 @@ const Events = require('./events');
 const Users = require('./users');
 
 
-const getAllForUser = async function (client, userId) {
+const getAllForUser = async function (client, userId, isChat) {
   try {
-    const res = await client.query('SELECT conversations.vonage_id, conversations.state, conversations.created_at FROM conversations JOIN members ON conversations.vonage_id = members.conversation_id WHERE user_id=$1', [userId]);
+    const res = await client.query('SELECT conversations.vonage_id, conversations.state, conversations.created_at FROM conversations JOIN members ON conversations.vonage_id = members.conversation_id WHERE user_id=$1 AND conversations.is_chat=$2', [userId, isChat]);
     if (res.rowCount > 0 ) {
       let conversations = await Promise.all(res.rows.map(async (conv) => {
         return await buildConversation(client, conv, userId, false);
@@ -22,7 +22,7 @@ const getAllForUser = async function (client, userId) {
 
 const getConversationForUser = async function (client, conversationId, userId) {
   try {
-    const res = await client.query('SELECT conversations.vonage_id, conversations.state, conversations.created_at FROM conversations JOIN members ON conversations.vonage_id = members.conversation_id WHERE conversations.vonage_id=$1 AND user_id=$2', [conversationId, userId]);
+    const res = await client.query('SELECT conversations.vonage_id, conversations.state, conversations.created_at FROM conversations JOIN members ON conversations.vonage_id = members.conversation_id WHERE conversations.vonage_id=$1 AND conversations.is_chat=TRUE AND user_id=$2', [conversationId, userId]);
     if(res.rowCount != 1) {
       return null;
     }
@@ -135,7 +135,7 @@ const get = async (client, vonage_id) => {
 const create = async (client, vonage_id, name, display_name, state, createdAt) => {
   let conversation;
   try {
-    const res = await client.query('INSERT INTO conversations(vonage_id, name, display_name, state, created_at, updated_at) VALUES($1, $2, $3, $4, $5, NOW()) RETURNING vonage_id, name, display_name, state', [vonage_id, name, display_name || name, state, createdAt]);
+    const res = await client.query('INSERT INTO conversations(vonage_id, name, display_name, state, created_at, updated_at, is_chat) VALUES($1, $2, $3, $4, $5, NOW(), TRUE) RETURNING vonage_id, name, display_name, state', [vonage_id, name, display_name || name, state, createdAt]);
     if (res.rowCount === 1) {
       conversation = res.rows[0];
     }
@@ -162,7 +162,6 @@ const createConversationForUserWithInterlocutors  = async (client, userId, users
   for(let i = 0; i < users.length; i++) {
     let user = users[i];
     const member = await Vonage.conversations.createMember(newConversation.id, user);
-    // console.dir(member);
     if(member) {
       await Members.createOrUpdate(client, newConversation.id, member.id, user, member.state);
     }

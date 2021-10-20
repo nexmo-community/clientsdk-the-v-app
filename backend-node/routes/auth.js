@@ -166,7 +166,7 @@ authRoutes.post('/login', async (req, res) => {
       delete user.vonage_id;
       const token = JWT.getUserJWT(user.name, user.id);
       let users = await Data.users.getInterlocutorsFor(client, user.name);
-      const conversations = await Data.conversations.getAllForUser(client, user.id);
+      const conversations = await Data.conversations.getAllForUser(client, user.id, true);
       jsonResponse = {
         user,
         token,
