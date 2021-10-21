@@ -212,11 +212,11 @@ const syncAll = async () => {
   pool.connect(async (err, client, done) => {
     if (err) throw err
     const { vonageConversations, error} = await Vonage.conversations.getAll();
-    console.log("retrieved " + vonageConversations.length + " conversations");
     if(!vonageConversations) {
       console.log(`NO CONVERSATIONS - ERROR:${JSON.stringify(error)}`);
       return 
     }
+    console.log("retrieved " + vonageConversations.length + " conversations");
     for (const vonageConversationLight of vonageConversations) {
      await syncConversation(client, vonageConversationLight);
     };

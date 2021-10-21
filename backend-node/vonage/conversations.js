@@ -1,5 +1,6 @@
 const axios = require('axios');
 const JWT = require('../jwt');
+const Pagination = require('./pagination');
 const vonageAPIUrl = 'https://api.nexmo.com/v0.3';
 
 
@@ -18,12 +19,13 @@ const getAll = async () => {
   console.log(`VONAGE: Retrieving conversations`);
   try {
     const config = getConfig(JWT.getAdminJWT());
-    const response = await axios.get(`${vonageAPIUrl}/conversations?page_size=100`, config);
-    if (response && response.status === 200 && response.data && response.data._embedded) {
-      vonageConversations = response.data._embedded.conversations;
-    } else {
-      error = "Unexpected error";
-    }
+    await Pagination.paginatedRequest('conversations', `${vonageAPIUrl}/conversations?page_size=100`, config, [], (response) => {
+      if (response) {
+        vonageConversations = response;
+      } else {
+        error = "Unexpected error";
+      }
+    });
   }
   catch (err) {
     if (err && err.response) {
@@ -38,7 +40,7 @@ const getAll = async () => {
 const get = async (conversationId) => {
   let vonageConversation;
   let error;
-  // console.log(`VONAGE: Retrieving conversation ${JSON.stringify(conversationId)}`);
+
   try {
     const config = getConfig(JWT.getAdminJWT());
     const response = await axios.get(`${vonageAPIUrl}/conversations/${conversationId}`, config);
@@ -58,7 +60,6 @@ const get = async (conversationId) => {
   return { vonageConversation, error};
 }
 
-
 const create = async (ownerId, usersIds) => {
   let vonageConversation;
   try {
@@ -75,20 +76,19 @@ const create = async (ownerId, usersIds) => {
   return vonageConversation;
 }
 
-
-
 const getMembers = async (conversationId) => {
   let vonageMembers;
   let error;
-  // console.log(`VONAGE: Retrieving conversation members ${JSON.stringify(conversationId)}`);
+
   try {
     const config = getConfig(JWT.getAdminJWT());
-    const response = await axios.get(`${vonageAPIUrl}/conversations/${conversationId}/members`, config);
-    if (response && response.status === 200 && response.data && response.data._embedded) {
-      vonageMembers = response.data._embedded.members;
-    } else {
-      error = "Unexpected error";
-    }
+    await Pagination.paginatedRequest('members', `${vonageAPIUrl}/conversations/${conversationId}/members?page_size=100`, config, [], (response) => {
+      if (response) {
+        vonageMembers = response;
+      } else {
+        error = "Unexpected error";
+      }
+    });
   }
   catch (err) {
     if (err && err.response) {
@@ -127,15 +127,16 @@ const createMember = async (conversationId, userId) => {
 const getEvents = async (conversationId) => {
   let vonageEvents;
   let error;
-  // console.log(`VONAGE: Retrieving conversation events ${JSON.stringify(conversationId)}`);
+
   try {
     const config = getConfig(JWT.getAdminJWT());
-    const response = await axios.get(`${vonageAPIUrl}/conversations/${conversationId}/events`, config);
-    if (response && response.status === 200 && response.data && response.data._embedded) {
-      vonageEvents = response.data._embedded.events;
-    } else {
-      error = "Unexpected error";
-    }
+    await Pagination.paginatedRequest('events', `${vonageAPIUrl}/conversations/${conversationId}/events?page_size=100`, config, [], (response) => {
+      if (response) {
+        vonageEvents = response;
+      } else {
+        error = "Unexpected error";
+      }
+    });
   }
   catch (err) {
     if (err && err.response) {
