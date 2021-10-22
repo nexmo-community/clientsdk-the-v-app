@@ -24,7 +24,7 @@ const getInterlocutorsFor = async function (client, user_name) {
 }
 
 
-const create = async function (client, vonage_id, name, display_name, image_url, password) {
+const create = async function (client, vonage_id, name, display_name, password) {
   let user;
   user = await getByName(client, name);
   if (user) {
@@ -40,7 +40,7 @@ const create = async function (client, vonage_id, name, display_name, image_url,
     if(!vonage_id) { 
       vonage_id = '';
     }
-    const res = await client.query('INSERT INTO users(vonage_id, name, display_name, image_url, password_digest, created_at, updated_at) VALUES($1, $2, $3, $4, $5, NOW(), NOW()) RETURNING vonage_id, name, display_name, image_url', [vonage_id, name, display_name, image_url, passwordHash]);
+    const res = await client.query('INSERT INTO users(vonage_id, name, display_name, password_digest, created_at, updated_at) VALUES($1, $2, $3, $4, NOW(), NOW()) RETURNING vonage_id, name, display_name', [vonage_id, name, display_name, passwordHash]);
     if (res.rowCount === 1) {
       user = res.rows[0];
     }
