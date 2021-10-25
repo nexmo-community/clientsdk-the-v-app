@@ -40,7 +40,7 @@ const create = async function (client, vonage_id, name, display_name, password) 
     if(!vonage_id) { 
       vonage_id = '';
     }
-    const res = await client.query('INSERT INTO users(vonage_id, name, display_name, password_digest, created_at, updated_at) VALUES($1, $2, $3, $4, NOW(), NOW()) RETURNING vonage_id, name, display_name', [vonage_id, name, display_name, passwordHash]);
+    const res = await client.query('INSERT INTO users(vonage_id, name, display_name, password_digest, image_url, created_at, updated_at) VALUES($1, $2, $3, $4, NULL, NOW(), NOW()) RETURNING vonage_id, name, display_name, image_url', [vonage_id, name, display_name, passwordHash]);
     if (res.rowCount === 1) {
       user = res.rows[0];
     }
