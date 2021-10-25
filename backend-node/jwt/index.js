@@ -15,7 +15,8 @@ const aclPaths = {
     "/*/media/**": {},
     "/*/applications/**": {},
     "/*/push/**": {},
-    "/*/knocking/**": {}
+    "/*/knocking/**": {},
+    "/*/legs/**": {}
   }
 };
 
