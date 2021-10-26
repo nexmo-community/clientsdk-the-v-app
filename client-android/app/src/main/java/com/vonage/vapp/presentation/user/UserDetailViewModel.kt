@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexmo.client.NexmoCall
-import com.nexmo.client.NexmoCallHandler
 import com.nexmo.client.NexmoClient
 import com.nexmo.client.request_listener.NexmoApiError
 import com.nexmo.client.request_listener.NexmoRequestListener
@@ -18,6 +17,8 @@ import com.vonage.vapp.data.model.ErrorResponseModel
 import com.vonage.vapp.data.model.User
 import com.vonage.vapp.presentation.user.UserDetailViewModel.Action.ShowError
 import kotlinx.coroutines.launch
+import android.os.Handler
+import android.os.Looper
 
 class UserDetailViewModel : ViewModel() {
     private lateinit var user: User
@@ -43,8 +44,10 @@ class UserDetailViewModel : ViewModel() {
 
             viewActionMutableLiveData.postValue(Action.ShowContent(user))
 
-            val navDirections = UserDetailFragmentDirections.actionUserDetailFragmentToOnCallFragment()
-            navManager.navigate(navDirections)
+            Handler(Looper.getMainLooper()).post {
+                val navDirections = UserDetailFragmentDirections.actionUserDetailFragmentToOnCallFragment()
+                navManager.navigate(navDirections)
+            }
         }
 
         override fun onError(apiError: NexmoApiError) {
@@ -71,7 +74,7 @@ class UserDetailViewModel : ViewModel() {
     @SuppressLint("MissingPermission")
     fun startCall() {
         viewActionMutableLiveData.postValue(Action.ShowLoading)
-        client.call(user.name, NexmoCallHandler.IN_APP, callListener)
+        client.serverCall(user.name, null, callListener)
     }
 
     fun startConversation() {
