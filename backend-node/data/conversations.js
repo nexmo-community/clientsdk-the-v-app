@@ -180,10 +180,7 @@ const update = async (client, vonage_id, name, display_name, state, createdAt) =
       conversation = res.rows[0];
     }
     console.log('  | - updated');
-    console.log(`CONVERSATION UPDATED: 
-  - id:           ${conversation.vonage_id}
-  - name:         ${conversation.name}
-  - display_name: ${conversation.display_name}`);
+    console.dir(conversation);
   } catch (err) {
     console.log(err);
   }
