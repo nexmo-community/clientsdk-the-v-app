@@ -178,9 +178,9 @@ const update = async (client, vonage_id, name, display_name, state, createdAt) =
     const res = await client.query('UPDATE conversations SET name=$2, display_name=$3, state=$4, created_at=$5, updated_at=NOW() WHERE vonage_id=$1 RETURNING vonage_id, name, display_name, state', [vonage_id, name, display_name, state, createdAt]);
     if (res.rowCount === 1) {
       conversation = res.rows[0];
+      console.log('  | - updated');
+      console.dir(conversation);
     }
-    console.log('  | - updated');
-    console.dir(conversation);
   } catch (err) {
     console.log(err);
   }

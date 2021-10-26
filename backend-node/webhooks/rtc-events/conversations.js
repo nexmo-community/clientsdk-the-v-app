@@ -24,7 +24,12 @@ async function update(client, body) {
   }
 
   const conversation = await Data.conversations.update(client, id, name, display_name, state, timestamp.created);
-  return `updated conversation: ${conversation.vonage_id}`;
+
+  if (conversation) {
+    return `updated conversation: ${conversation.vonage_id}`;
+  } else {
+    return 'Conversation not found';
+  }
 }
 
 async function destroy(client, body) {
