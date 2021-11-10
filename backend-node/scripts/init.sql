@@ -17,6 +17,7 @@ CREATE TABLE conversations (
     name character varying NOT NULL,
     display_name character varying,
     state character varying NOT NULL,
+    is_chat boolean DEFAULT FALSE,
     vonage_created_at timestamp without time zone,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
