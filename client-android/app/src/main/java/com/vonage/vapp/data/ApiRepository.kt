@@ -33,7 +33,7 @@ object ApiRepository {
     private val moshi = Moshi.Builder().build();
 
     private val retrofit = Retrofit.Builder()
-        .baseUrl("https://v-app-companion.herokuapp.com/")
+        .baseUrl("VAPP_BASE_URL/")
         .addConverterFactory(MoshiConverterFactory.create(moshi))
         .client(client)
         .build()

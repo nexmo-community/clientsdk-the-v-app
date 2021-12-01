@@ -9,7 +9,7 @@ enum RemoteLoaderError: Error {
 
 final class RemoteLoader {
     
-    static let baseURL = ""
+    static let baseURL = "VAPP_BASE_URL"
         
     static func load<T: Codable, U: Codable>(path: String,
                                              authToken: String? = nil,
