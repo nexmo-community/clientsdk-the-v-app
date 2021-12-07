@@ -18,12 +18,12 @@ if (process.env.USE_LOCALTUNNEL == 0 || process.env.USE_LOCALTUNNEL == null) {
     console.log(`App listening at http://localhost:${port}`)
   });
 } else {
-  app.listen(3000);
+  app.listen(port);
   const localtunnel = require('localtunnel');
   (async () => {
     const tunnel = await localtunnel({ 
         subdomain: process.env.vonageAppId, 
-        port: 3000
+        port: port
       });
     console.log(`App available at: ${tunnel.url}`);
   })();
