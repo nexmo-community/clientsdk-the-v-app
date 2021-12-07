@@ -13,7 +13,7 @@ app.use('/', require('./routes/auth'));
 app.use('/', require('./routes/vonage'));
 app.use('/', require('./routes/webhooks'));
 
-if (process.env.USE_LOCALTUNNEL == 0 || process.env.USE_LOCALTUNNEL == null) {
+if (process.env.USE_LOCALTUNNEL === 'FALSE' || process.env.USE_LOCALTUNNEL == null) {
   app.listen(port, () => {
     console.log(`App listening at http://localhost:${port}`)
   });
