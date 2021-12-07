@@ -13,6 +13,18 @@ app.use('/', require('./routes/auth'));
 app.use('/', require('./routes/vonage'));
 app.use('/', require('./routes/webhooks'));
 
-app.listen(port, () => {
-  console.log(`App listening at http://localhost:${port}`)
-});
+if (process.env.USE_LOCALTUNNEL === 'FALSE' || process.env.USE_LOCALTUNNEL == null) {
+  app.listen(port, () => {
+    console.log(`App listening at http://localhost:${port}`)
+  });
+} else {
+  app.listen(port);
+  const localtunnel = require('localtunnel');
+  (async () => {
+    const tunnel = await localtunnel({ 
+        subdomain: process.env.vonageAppId, 
+        port: port
+      });
+    console.log(`App available at: ${tunnel.url}`);
+  })();
+}
