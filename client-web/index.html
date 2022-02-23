@@ -6,30 +6,113 @@
     <meta name="description" content="Thee ONLY V-app across ALL platforms.">
     <title>Thee V-app</title>
     <link rel="stylesheet" href="style.css">
+    <!-- ******* Load nexmoClient from a CDN ****** -->
+    <script src="https://unpkg.com/nexmo-client@latest/dist/nexmoClient.js?module"></script>
+
 </head>
 <body>
-    <form id="login">
-        <h1>Login</h1>
-        <label for="username">Enter your username: </label>
-        <input type="text" id="username" name="username" value="" class="textbox">
-        <button type="submit">Login</button>
-    </form>
-    <section id="messages">
-        <h1 id="sessionName"></h1>
-        <div id="loadSection">
-            <button id="loadMessages">
-                Load Previous Messages
-            </button>
-            &nbsp; &nbsp;<h2>Showing <span id="messagesCount"></span> starting at <span id="messageDate"></span></h2>
-        </div>
-        <div id="messageFeed"></div>
-        <div>
-            <textarea id="messageTextarea"></textarea>
-            <button id="send">Send</button>
-            <div id="status"></div>
+    <section id="login-signup">
+        <div class="tabs-container">
+            <div class="tabs">
+                <div role="tablist" aria-label="Sample Tabs">
+                    <button role="tab" aria-selected="true" aria-controls="panel-1" id="tab-1" tabindex="0">
+                        Log In
+                    </button>
+                    <button role="tab" aria-selected="false" aria-controls="panel-2" id="tab-2" tabindex="-1">
+                        Sign Up
+                    </button>
+                </div>
+                <div id="panel-1" role="tabpanel" tabindex="0" aria-labelledby="tab-1">
+                    <form id="login">
+                        <h1>Log In</h1>
+                        <label for="username-login">Enter your username: </label>
+                        <input type="text" id="username-login" name="username-login" value="" class="textbox">
+                        <label for="password-login">Enter your password: </label>
+                        <input type="password" id="password-login" name="password-login" value="" class="textbox">
+                        <button type="submit">Log In</button>
+                    </form>
+                </div>
+                <div id="panel-2" role="tabpanel" tabindex="0" aria-labelledby="tab-2" hidden>
+                    <form id="signup">
+                        <h1>Create an account</h1>
+                        <label for="username-signup">Enter your username: </label>
+                        <input type="text" id="username-signup" name="username-signup" value="" class="textbox">
+                        <label for="display-name-signup">Enter your display name: </label>
+                        <input type="text" id="display-name-signup" name="display-name-signup" value="" class="textbox">
+                        <label for="password-signup">Enter your password: </label>
+                        <input type="password" id="password-signup" name="password-signup" value="" class="textbox">
+                        <button type="submit">Sign Up</button>
+                    </form>
+                </div>
+                <div id="login-signup-status" class="error"></div>
+            </div>
         </div>
     </section>
-    <script src="./node_modules/nexmo-client/dist/nexmoClient.js"></script>
-    <script src="./chat.js"></script>    
+
+    <section id="dashboard">
+        <div id="sidebar">
+            <div class="tabs-container">
+                <div class="tabs">
+                    <div role="tablist" aria-label="Sample Tabs">
+                        <button role="tab" aria-selected="true" aria-controls="panel-3" id="tab-3" tabindex="0">
+                            Chats
+                        </button>
+                        <button role="tab" aria-selected="false" aria-controls="panel-4" id="tab-4" tabindex="-1">
+                            Users
+                        </button>
+                        <button role="tab" aria-selected="false" aria-controls="panel-5" id="tab-5" tabindex="-1">
+                            Settings
+                        </button>
+                    </div>
+                    <div id="panel-3" role="tabpanel" tabindex="0" aria-labelledby="tab-3">
+                        chats
+                    </div>
+                    <div id="panel-4" role="tabpanel" tabindex="0" aria-labelledby="tab-4" hidden>
+                        <div id="users-list"></div>
+                    </div>
+                    <div id="panel-5" role="tabpanel" tabindex="0" aria-labelledby="tab-5" hidden>
+                        <div id="settings"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div id="content">content</div>
+    </section>
+
+    <template id="users-list-item-template">
+        <button></button><br/>
+    </template>
+
+    <template id="selected-user-profile-template">
+        <img src=""/>
+        <br/><div id="display-name"></div>
+        <br/><button id="call-user">Call</button>
+    </template>
+
+    <template id="settings-template">
+        <img src=""/>
+        <br/><div id="user-display-name"></div>
+        <br/><button id="logout">logout</button>
+    </template>
+
+
+    <!--    <section id="messages">-->
+<!--        <h1 id="sessionName"></h1>-->
+<!--        <div id="loadSection">-->
+<!--            <button id="loadMessages">-->
+<!--                Load Previous Messages-->
+<!--            </button>-->
+<!--            &nbsp; &nbsp;<h2>Showing <span id="messagesCount"></span> starting at <span id="messageDate"></span></h2>-->
+<!--        </div>-->
+<!--        <div id="messageFeed"></div>-->
+<!--        <div>-->
+<!--            <textarea id="messageTextarea"></textarea>-->
+<!--            <button id="send">Send</button>-->
+<!--            <div id="status"></div>-->
+<!--        </div>-->
+<!--    </section>-->
+<!--    <script src="./node_modules/nexmo-client/dist/nexmoClient.js"></script>-->
+    <script src="./chat.js"></script>
 </body>
 </html>
