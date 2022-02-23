@@ -5,6 +5,8 @@ console.log('window NexmoClient: ', NexmoClient);
 const BASE_URL = "https://v-app-companion.herokuapp.com";
 // const BASE_URL = "https://abdulajet.ngrok.io"
 
+
+
 // Constants that should from the server
 // const USER1_JWT = "USER 1 JWT GOES HERE";
 // const USER2_JWT = "USER 2 JWT GOES HERE";
@@ -60,6 +62,8 @@ let users = [];
 
 let selectedConversation = {};
 let selectedUser = {};
+
+let currentCall;
 
 // Set up tabs. Code based on: https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/Tab_Role
 const tabs = document.querySelectorAll('[role="tab"]');
@@ -162,8 +166,9 @@ function displayError(element, error){
 function callButtonClickHandler(e){
     console.log("callButtonClickHandler: ",e.target.dataset.username);
     app.callServer(e.target.dataset.username,"app").then((nxmCall) => {
-    // app.inAppCall([e.target.dataset.username]).then((nxmCall) => {
+        // app.inAppCall([e.target.dataset.username]).then((nxmCall) => {
         console.log('Calling user(s)...', nxmCall);
+        currentCall = nxmCall;
         // callServerHangUpButton.addEventListener("click", ()=>{
         //     nxmCall.hangUp({reason_code:'404', reason_text:'User hung up'}).then((event) => {
         //         console.log('hang up event', event);
@@ -177,6 +182,33 @@ function callButtonClickHandler(e){
     });
 }
 
+function hangupButtonClickHandler(){
+    currentCall.hangUp({reason_code:'404', reason_text:'User hung up'}).then((event) => {
+        console.log('hang up event', event);
+    }).catch((error) => {
+        console.error(error);
+    });
+}
+
+
+function answerCallHandler(caller){
+    console.log("answerCallHandler caller: ", caller);
+    contentDiv.innerHTML = "";
+    const selectedUserProfileClone = selectedUserProfileTemplate.content.cloneNode(true);
+    const img = selectedUserProfileClone.querySelector("img");
+    const name = selectedUserProfileClone.querySelector("#display-name");
+    const callButton = selectedUserProfileClone.querySelector("#call-user");
+    callButton.dataset.username = caller.name;
+    callButton.style.display = "none";
+    const hangupButton = selectedUserProfileClone.querySelector("#hangup-user");
+    img.src = caller.image_url === null ? `https://robohash.org/${caller.name}` : caller.image_url;
+    name.innerText = caller.display_name;
+    callButton.addEventListener("click", callButtonClickHandler);
+    hangupButton.addEventListener("click", hangupButtonClickHandler);
+    contentDiv.appendChild(selectedUserProfileClone);
+
+}
+
 function userClickHandler(e) {
     contentDiv.innerHTML = "";
     console.log("userClickHandler: ", e.target.innerText);
@@ -188,10 +220,12 @@ function userClickHandler(e) {
     const name = selectedUserProfileClone.querySelector("#display-name");
     const callButton = selectedUserProfileClone.querySelector("#call-user");
     callButton.dataset.username = e.target.dataset.username;
+    const hangupButton = selectedUserProfileClone.querySelector("#hangup-user");
+    hangupButton.style.display = "none";
     img.src = e.target.dataset.userProfileImage === "null" ? `https://robohash.org/${e.target.dataset.username}` : e.target.dataset.userProfileImage;
     name.innerText = e.target.innerText;
     callButton.addEventListener("click", callButtonClickHandler);
-
+    hangupButton.addEventListener("click", hangupButtonClickHandler);
     contentDiv.appendChild(selectedUserProfileClone);
 }
 
@@ -209,10 +243,76 @@ async function setupApplication(){
 
         app.on("call:status:changed", (nxmCall) => {
             console.log('call:status:changed nxmCall: ', nxmCall);
-            // document.querySelector("#callStatus").innerText = nxmCall.status;
-            call = nxmCall;
-            if (nxmCall.status === nxmCall.CALL_STATUS.STARTED) {
-                console.log('the call has started');
+            const callButton = document.querySelector("#call-user");
+            const hangupButton = document.querySelector("#hangup-user");
+            const callStatus = document.querySelector("#call-status");
+            if (callStatus){
+                callStatus.innerText = nxmCall.status
+            }
+            // call = nxmCall;
+            if (callButton || hangupButton){
+                if (nxmCall.status === nxmCall.CALL_STATUS.RINGING) {
+                    console.log('the call is ringing');
+                    callButton.disabled = true;
+                    hangupButton.style.display = "none";
+                }
+
+                if (nxmCall.status === nxmCall.CALL_STATUS.ANSWERED) {
+                    console.log('the call has been answered');
+                    callButton.disabled = false;
+                    callButton.style.display = "none";
+                    hangupButton.style.display = "block";
+                }
+
+                if (nxmCall.status === nxmCall.CALL_STATUS.STARTED) {
+                    console.log('the call has started');
+                    callButton.disabled = false;
+                    callButton.style.display = "none";
+                    hangupButton.style.display = "block";
+                }
+
+                if (nxmCall.status === nxmCall.CALL_STATUS.COMPLETED) {
+                    console.log('the call has completed');
+                    callButton.disabled = false;
+                    callButton.style.display = "block";
+                    hangupButton.style.display = "none";
+                }
+
+                if (nxmCall.status === nxmCall.CALL_STATUS.BUSY) {
+                    console.log('the call is busy');
+                    callButton.disabled = false;
+                    callButton.style.display = "block";
+                    hangupButton.style.display = "none";
+                }
+
+                if (nxmCall.status === nxmCall.CALL_STATUS.FAILED) {
+                    console.log('the call has failed');
+                    callButton.disabled = false;
+                    callButton.style.display = "block";
+                    hangupButton.style.display = "none";
+                }
+
+                if (nxmCall.status === nxmCall.CALL_STATUS.TIMEOUT) {
+                    console.log('the call has timed out');
+                    callButton.disabled = false;
+                    callButton.style.display = "block";
+                    hangupButton.style.display = "none";
+                }
+
+                if (nxmCall.status === nxmCall.CALL_STATUS.UNANSWERED) {
+                    console.log('the call has timed out');
+                    callButton.disabled = false;
+                    callButton.style.display = "block";
+                    hangupButton.style.display = "none";
+                }
+
+                if (nxmCall.status === nxmCall.CALL_STATUS.REJECTED) {
+                    console.log('the call was rejected');
+                    callButton.disabled = false;
+                    callButton.style.display = "block";
+                    hangupButton.style.display = "none";
+                }
+
             }
             // This is a test to see if I can call a person on a phone from the app and connect another application user
             // conv = nxmCall.conversation;
@@ -222,17 +322,23 @@ async function setupApplication(){
         app.on("member:call", (member, nxmCall) => {
             console.log("member:call member: ", member);
             console.log("member:call NXMCall answer: ", nxmCall);
+            currentCall = nxmCall;
+            //Get other member of conversation
+            let otherMember;
+            for (let [key, value] of nxmCall.conversation.members) {
+                if (key !== member.id){
+                    console.log('other member: ', value);
+                    otherMember = value;
+                    // otherMemberSetup();
+                }
+            }
 
             if (member.state === "INVITED"){
                 // Need this for inAppCall & callSever doesn't send member.invited_by
-                const membersArray = Array.from(nxmCall.conversation.members, ([name, value]) => ({name, value}));
-                console.log("members: ", membersArray);
-                const otherMember = membersArray.find( ({ value }) => value.display_name !== myUser.display_name ).value.display_name;
-                // const otherMember = membersArray.filter( member => member.value.display_name !==myUser.display_name )[0].value.display_name;
-                console.log("other member: ", otherMember);
                 if (!member.initiator.invited.isSystem){
                     if (window.confirm(`Accept invite from ${member.invited_by}?`)) {
                         nxmCall.answer();
+                        //display onGoingCall template
                     } else {
                         nxmCall.reject({reason_code:'403', reason_text:'User turned down request'}).then(() => {
                             console.log('Call rejected.');
@@ -249,8 +355,13 @@ async function setupApplication(){
                     // })
 
                 } else {
-                    if (window.confirm(`Join audio call with ${otherMember}?`)) {
+                    console.log("myUser: ", myUser);
+                    console.log("users: ", users);
+                    const otherUser = users.find(user => otherMember.user.id === user.id);
+                    if (window.confirm(`Join audio call with ${otherMember.display_name}?`)) {
                         nxmCall.answer();
+                        answerCallHandler(otherUser);
+
                     } else {
                         nxmCall.reject({reason_code:'403', reason_text:'User turned down request'}).then(() => {
                             console.log('Call rejected.');
@@ -273,39 +384,39 @@ async function setupApplication(){
 
         });
 
-        app.on("member:invited",(member, event) => {
-            console.log("member:invited member: ", member);
-            // otherMember = member;
-            console.log("my member id: ",member.id);
-            console.log("member:invited event: ", event);
-            //Get other member of conversation
-            for (let [key, value] of event.conversation.members) {
-                if (key !== member.id){
-                    console.log('other member: ', value);
-                    // otherMember = value;
-                    // otherMemberSetup();
-                }
-            }
-            // console.log("Invited to the conversation: " + event.conversation.display_name || event.conversation.name);
-            console.log("Invited to the conversation display_name: " + event.conversation.display_name);
-            console.log("Invited to the conversation: name" + event.conversation.name);
-            // identify the sender.
-            console.log("Invited by: " + member.invited_by);
-            // **May not need this**Need this for callServer. Looks like it doesn't say who is the invite from
-            if (event.conversation.display_name.includes('CONV_')){
-                if (window.confirm(`Join conversation chat with ${member.invited_by}`)){
-                    //accept an invitation.
-                    // conv = event.conversation;
-                    app.conversations.get(event.conversation.id).join();
-                } else {
-                    //decline the invitation.
-                    app.conversations.get(event.conversation.id).leave();
-                }
-                // callServerHangUpButton.addEventListener("click", ()=>{
-                //   app.conversations.get(event.conversation.id).leave();
-                // })
-            }
-        });
+        // app.on("member:invited",(member, event) => {
+        //     console.log("member:invited member: ", member);
+        //     // otherMember = member;
+        //     console.log("my member id: ",member.id);
+        //     console.log("member:invited event: ", event);
+        //     //Get other member of conversation
+        //     for (let [key, value] of event.conversation.members) {
+        //         if (key !== member.id){
+        //             console.log('other member: ', value);
+        //             // otherMember = value;
+        //             // otherMemberSetup();
+        //         }
+        //     }
+        //     // console.log("Invited to the conversation: " + event.conversation.display_name || event.conversation.name);
+        //     console.log("Invited to the conversation display_name: " + event.conversation.display_name);
+        //     console.log("Invited to the conversation: name" + event.conversation.name);
+        //     // identify the sender.
+        //     console.log("Invited by: " + member.invited_by);
+        //     // **May not need this**Need this for callServer. Looks like it doesn't say who is the invite from
+        //     if (event.conversation.display_name.includes('CONV_')){
+        //         if (window.confirm(`Join conversation chat with ${member.invited_by}`)){
+        //             //accept an invitation.
+        //             // conv = event.conversation;
+        //             app.conversations.get(event.conversation.id).join();
+        //         } else {
+        //             //decline the invitation.
+        //             app.conversations.get(event.conversation.id).leave();
+        //         }
+        //         // callServerHangUpButton.addEventListener("click", ()=>{
+        //         //   app.conversations.get(event.conversation.id).leave();
+        //         // })
+        //     }
+        // });
 
 
         return;
@@ -497,27 +608,27 @@ loginForm.addEventListener('submit', event => {
 // }
 
 function listMessages(events) {
-  // console.log(events);
-  let listMessages = "";
-  if (events.hasNext()) {
-      loadMessagesButton.style.display = "block";
-  } else {
-      loadMessagesButton.style.display = "none";
-  };
+    // console.log(events);
+    let listMessages = "";
+    if (events.hasNext()) {
+        loadMessagesButton.style.display = "block";
+    } else {
+        loadMessagesButton.style.display = "none";
+    };
 
-  // Replace current with new page of events
-  listedEvents = events;
+    // Replace current with new page of events
+    listedEvents = events;
 
-  events.items.forEach(event => {
-      console.log("event: ",event);
-      const formattedMessage = formatMessage(conversation.members.get(event.from), event, conversation.me);
-      listMessages = formattedMessage + listMessages; 
-  });
+    events.items.forEach(event => {
+        console.log("event: ",event);
+        const formattedMessage = formatMessage(conversation.members.get(event.from), event, conversation.me);
+        listMessages = formattedMessage + listMessages;
+    });
 
-  //Update the UI
-  messageFeed.innerHTML = listMessages + messageFeed.innerHTML;
-  messagesCountSpan.textContent = messagesCount;
-  messageDateSpan.textContent = messageDate;
+    //Update the UI
+    messageFeed.innerHTML = listMessages + messageFeed.innerHTML;
+    messagesCountSpan.textContent = messagesCount;
+    messageDateSpan.textContent = messageDate;
 };
 
 function formatMessage(sender, message, me){
