@@ -1,12 +1,34 @@
 body {
-    font: 13px Helvetica, Arial, sans-serif;
+    font: 23px Helvetica, Arial, sans-serif;
     margin: 0;
     height: 100vh;
     width: 100vw;
+  background-color: black;
 }
 
-button {
+input {
+  font-size: 20px;
+}
+
+h1 {
+  margin-bottom: 10px;
+}
+
+button, vc-text-input::part(button) {
     cursor: pointer;
+  border-radius: 10px;
+  color: white;
+  font-size: clamp(.75rem, 10vw, 1.15rem);
+}
+
+button, button.primary, vc-text-input::part(button)  {
+  background-color: #7f0080;
+  color: white;
+}
+
+vc-text-input::part(input) {
+  background-color: white;
+  color: black;
 }
 
 #login-signup {
@@ -34,6 +56,7 @@ button {
 
 .tabs {
     padding: 1em;
+  height: 100%;
 }
 
 .tabs form {
@@ -51,33 +74,38 @@ button {
 [role="tablist"] {
     margin-bottom: -1px;
 }
+
 [role="tab"] {
     color: black;
     position: relative;
     z-index: 1;
-    background: white;
+    background-color: #CCCCCC;
     border-radius: 5px 5px 0 0;
     border: 1px solid grey;
     border-bottom: 0;
     padding: 0.2em;
-    /*cursor: pointer;*/
+  width: 30%;
+  font-size: clamp(.75rem, 2vw, 1.5rem);
 }
+
 [role="tab"][aria-selected="true"] {
     z-index: 3;
 }
+
 [role="tabpanel"] {
     position: relative;
     padding: 0 0.5em 0.5em 0.7em;
     border: 1px solid grey;
-    border-radius: 0 0 5px 5px;
-    background: white;
+    background-color: #CCCCCC;
     z-index: 2;
-    height: 300px;
+    height: 50vh;
     overflow-y: auto;
+  border-radius: 0 6px 6px 6px;
 }
+
 [role="tabpanel"]:focus {
-    border-color: orange;
-    outline: 1px solid orange;
+    border-color: #7f0080;
+    outline: 1px solid #7f0080;
 }
 
 #dashboard {
@@ -87,46 +115,40 @@ button {
 }
 
 #sidebar {
-    width: 20%;
+  width: clamp(20%, 50vw, 50%);
+  height: 100%;
 }
 
 #content {
     width: 80%;
+}
+
+.center {
     display: grid;
     place-content: center;
+  height: 100%;
+  place-items: center;
 }
 
 #users-list button {
     color: black;
     background-color: transparent;
     border: none;
-    /*cursor: pointer;*/
 }
-/*#login, #messages {*/
-/*    width: 80%;*/
-/*    height: 500px;*/
-/*}*/
 
-form input {
-    font-size: 20px;
-    height: 35px;
-    padding: 0;
+form input[type="checkbox"]{
+  margin-top: 10px;
+}
+
+fieldset {
+  width: 100%;
+  color: white;
 }
 
 #settings img {
     width: 100%;
     max-width: 200px;
 }
-
-
-/*button {*/
-/*    height: 35px;*/
-/*    background-color: red;*/
-/*    color: white;*/
-/*    position: relative;*/
-/*    font-size: 15px;*/
-/*    cursor: pointer;*/
-/*}*/
 
 textarea {
     width: 85%;
@@ -164,10 +186,101 @@ textarea {
 }
 
 .profile-image {
-    width: 100%;
-    max-width: 300px;
+  width: 100%;
+  max-width: 300px;
 }
 
 #display-name, #user-display-name {
-    text-align: center;
+  text-align: center;
+}
+
+#display-name {
+  color: white;
+}
+
+#chat-application {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+}
+
+#chat-container {
+  width: 100%;
+  height: 100%;
+}
+
+#chat-section {
+  width: 100%;
+  height: 100%;
+}
+
+vc-messages, vc-members, vc-text-input, vc-typing-indicator {
+  padding: 0;
+}
+
+vc-messages {
+  height: 90%;
+}
+
+vc-messages::part(username){
+  color:white
+}
+
+vc-text-input {
+  font-size: 20px;
+}
+
+vc-tex-input::part(input){
+  color: white;
+}
+
+vc-typing-indicator {
+  color: white;
+}
+  
+#group-chat-users {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.vonage-spin {
+  width: 100%;
+}
+
+li {
+  cursor: pointer;
+  margin-bottom: 5px;
+}
+
+summary {
+  cursor: pointer;
+}
+
+.create-group-chat-container {
+  text-align: center;
+  margin: 10px;
+}
+
+details {
+  color: white;
+}
+
+vc-members::part(li) {
+  color: black;
+}
+
+vc-members::part(ul) {
+  padding: 0;
+  border-radius: 6px;  
+}
+
+vc-members {
+  color: #CCCCCC;
+  height: 300px;
+  width: 100%;
+  max-width: 200px;
+  --vc-members-nth-child-odd-color: #E6E6E6;
+  --vc-members-nth-child-even-color: #CCCCCC;
 }
