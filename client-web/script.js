@@ -2,8 +2,7 @@ const NexmoClient = window.NexmoClient;
 
 console.log('window NexmoClient: ', NexmoClient);
 
-const BASE_URL = "https://v-app-companion.herokuapp.com";
-// const BASE_URL = "https://abdulajet.ngrok.io"
+const BASE_URL = "VAPP_BASE_URL";
 
 // Get reference to elements
 const messageTextarea = document.querySelector("#messageTextarea");
