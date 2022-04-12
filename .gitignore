@@ -5,3 +5,4 @@ private.key
 Pods/
 xcuserdata/
 *.xcworkspace
+.idea/
