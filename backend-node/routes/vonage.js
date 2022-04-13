@@ -16,8 +16,6 @@ const fromHeaderOrQuerystring = (req) => {
   return null;
 }
 
-const uploadImage = multer({
-  storage: multerS3({
 const private_key = process.env.vonageAppPrivateKey;
 
 vonageRoutes.use(jwt({
