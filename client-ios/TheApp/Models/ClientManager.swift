@@ -92,6 +92,22 @@ final class ClientManager: NSObject {
         }
     }
     
+    func uploadImage(imageData: Data, completionHandler: @escaping ((Error?, String?) -> Void)) {
+        NXMClient.shared.uploadAttachment(with: .image, name: UUID().uuidString, data: imageData) { error, responseData in
+            if let error = error {
+                completionHandler(error, nil)
+                return
+            } else {
+                if let imageObject = responseData?["original"] as? [String: Any],
+                    let imageUrl = imageObject["url"] as? String {
+                    completionHandler(nil, imageUrl)
+                    return
+                }
+            }
+            completionHandler(nil, nil)
+        }
+    }
+    
     func logout() {
         deleteCredentials()
         NXMClient.shared.logout()

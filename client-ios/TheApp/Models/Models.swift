@@ -34,7 +34,7 @@ struct Setting: Hashable, ListViewPresentable {
 struct Image: Codable {
     static let path = "/image"
     
-    struct Response: Codable  {
+    struct Body: Codable  {
         let imageURL: String
         
         enum CodingKeys: String, CodingKey {

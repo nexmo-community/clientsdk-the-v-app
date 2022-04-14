@@ -124,21 +124,28 @@ extension SettingsViewController: UIImagePickerControllerDelegate, UINavigationC
             if let imageData = pickedImage.jpegData(compressionQuality: 0.1) {
                 toggleLoading()
                 spinnerView.setDetailText(text: "Uploading your image")
-                RemoteLoader.uploadImage(authToken: token, body: imageData) { result in
-                    DispatchQueue.main.async {
-                        self.toggleLoading()
-                        switch result {
-                        case .success:
-                            self.profilePicView.image = pickedImage
-                        case .failure(let error):
-                            self.showErrorAlert(message: error.localizedDescription)
-                        }
+                ClientManager.shared.uploadImage(imageData: imageData) { error, imageUrl in
+                    if let imageUrl = imageUrl {
+                        RemoteLoader.load(
+                            path: Image.path,
+                            authToken: ClientManager.shared.token,
+                            body: Image.Body(imageURL: imageUrl), responseType: Image.Body.self) { result in
+                                DispatchQueue.main.async {
+                                    self.toggleLoading()
+                                    switch result {
+                                    case .success:
+                                        self.profilePicView.image = pickedImage
+                                    case .failure(let error):
+                                        self.showErrorAlert(message: error.localizedDescription)
+                                    }
+                                }
+                            }
+                    } else {
+                        self.showErrorAlert(message: error?.localizedDescription ?? "")
                     }
-                    
                 }
             }
         }
-        
         dismiss(animated: true, completion: nil)
     }
     
