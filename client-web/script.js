@@ -163,7 +163,8 @@ async function postRequest(endpoint = "", data = {}) {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${jwt}`
+                'Authorization': `Bearer ${jwt}`,
+                'Bypass-Tunnel-Reminder': true // used for localtunnel only
             },
             body: JSON.stringify(data) // body data type must match "Content-Type" header
         });
@@ -185,7 +186,8 @@ async function getRequest(endpoint = "") {
             method: 'GET', // *GET, POST, PUT, DELETE, etc.
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${jwt}`
+                'Authorization': `Bearer ${jwt}`,
+                'Bypass-Tunnel-Reminder': true // used for localtunnel only
             }
         });
         if (!response.ok) {
