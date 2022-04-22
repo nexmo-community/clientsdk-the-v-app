@@ -25,29 +25,6 @@ vonageRoutes.use(jwt({
   getToken: fromHeaderOrQuerystring
 }));
 
-vonageRoutes.get('/voice/answer', async (req, res) => {
-  var ncco = [{"action": "talk", "text": "No destination user - hanging up"}];
-  var username = req.query.to;
-  if (username) {
-    ncco = [
-      {
-        "action": "talk",
-        "text": "Connecting you to " + username
-      },
-      {
-        "action": "connect",
-        "endpoint": [
-          {
-            "type": "app",
-            "user": username
-          }
-        ]
-      }
-    ]
-  }
-  res.json(ncco);
-});
-
 vonageRoutes.get('/users', async (req, res) => {
   const jwt = fromHeaderOrQuerystring(req);
   if (!jwt || !req.user || !req.user.sub) {

@@ -11,8 +11,8 @@ app.options('*', cors())
 
 app.use('/', require('./routes/general'));
 app.use('/', require('./routes/auth'));
-app.use('/', require('./routes/vonage'));
 app.use('/', require('./routes/webhooks'));
+app.use('/', require('./routes/vonage'));
 
 if (process.env.USE_LOCALTUNNEL === 'FALSE' || process.env.USE_LOCALTUNNEL == null) {
   app.listen(port, () => {

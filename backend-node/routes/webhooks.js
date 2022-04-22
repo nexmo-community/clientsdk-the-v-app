@@ -4,6 +4,29 @@ const {rtcEvents} = require('../webhooks');
 
 const webhookRoutes = express.Router();
 
+webhookRoutes.get('/voice/answer', async (req, res) => {
+  var ncco = [{"action": "talk", "text": "No destination user - hanging up"}];
+  var username = req.query.to;
+  if (username) {
+    ncco = [
+      {
+        "action": "talk",
+        "text": "Connecting you to " + username
+      },
+      {
+        "action": "connect",
+        "endpoint": [
+          {
+            "type": "app",
+            "user": username
+          }
+        ]
+      }
+    ]
+  }
+  res.json(ncco);
+});
+
 webhookRoutes.post('/rtc/events', async (req, res) => {
   const { application_id, timestamp, type, conversation_id, body } = req.body;
   
