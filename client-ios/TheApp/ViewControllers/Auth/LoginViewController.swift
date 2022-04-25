@@ -127,6 +127,7 @@ extension LoginViewController: ClientManagerDelegate {
     
     func clientManager(_ clientManager: ClientManager, authDidFail errorMessage: String?) {
         toggleLoading()
+        resetView()
         showErrorAlert(message: errorMessage)
     }
 }
