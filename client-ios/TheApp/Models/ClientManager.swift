@@ -60,6 +60,9 @@ final class ClientManager: NSObject {
             case .failure(let error):
                 switch error {
                 case .api(error: let apiError):
+                    if !storeCredentials {
+                        self.deleteCredentials(username: username)
+                    }
                     self.delegate?.clientManager(self, authDidFail: apiError.description)
                 default:
                     self.delegate?.clientManager(self, authDidFail: error.localizedDescription)
@@ -109,7 +112,7 @@ final class ClientManager: NSObject {
     }
     
     func logout() {
-        deleteCredentials()
+        deleteCredentials(username: user?.name ?? "")
         NXMClient.shared.logout()
     }
 }
@@ -154,12 +157,11 @@ extension ClientManager {
         }
     }
     
-    private func deleteCredentials() {
-        guard let user = user else { return }
+    private func deleteCredentials(username: String) {
         let query = [
             kSecClass: kSecClassInternetPassword,
             kSecAttrServer: Constants.keychainServer,
-            kSecAttrAccount: user.name
+            kSecAttrAccount: username
         ] as CFDictionary
         
         SecItemDelete(query)
