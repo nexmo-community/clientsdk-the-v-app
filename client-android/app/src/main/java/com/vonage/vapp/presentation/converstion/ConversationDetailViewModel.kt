@@ -126,8 +126,8 @@ class ConversationDetailViewModel : ViewModel() {
         viewActionMutableLiveData.postValue(Action.AddConversationLine(line + System.lineSeparator()))
     }
 
-    fun sendTextMessage(message: String) {
-        conversation?.sendMessage(NexmoMessage.fromText(message), object : NexmoRequestListener<Void> {
+    fun sendMessage(message: String) {
+        conversation?.sendText(message, object : NexmoRequestListener<Void> {
             override fun onSuccess(p0: Void?) {
             }
 
