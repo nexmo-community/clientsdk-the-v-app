@@ -3,7 +3,7 @@ package com.vonage.vapp.core
 import android.app.Application
 import com.nexmo.client.NexmoClient
 
-class VApplcation : Application() {
+class VApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
