@@ -30,7 +30,7 @@ object ApiRepository {
         .connectTimeout(60, SECONDS)
         .build()
 
-    private val moshi = Moshi.Builder().build();
+    private val moshi = Moshi.Builder().build()
 
     private val retrofit = Retrofit.Builder()
         .baseUrl("VAPP_BASE_URL/")
@@ -47,7 +47,7 @@ object ApiRepository {
         val response = apiService.signup(requestModel)
 
         return if (response.isSuccessful) {
-            var body = response.body()?.let {
+            val body = response.body()?.let {
                 it.copy(
                     // filterNotNull() is used due to API bug
                     conversations = it.conversations.filterNotNull(),
@@ -69,7 +69,7 @@ object ApiRepository {
         val response = apiService.login(requestModel)
 
         return if (response.isSuccessful) {
-            var body = response.body()?.let {
+            val body = response.body()?.let {
                 val addedUsers = it.otherUsers.distinctBy { it.id }.toMutableList()
                 addedUsers.add(User("Jan DN", "if", "Jan"))
 
@@ -124,7 +124,7 @@ object ApiRepository {
         }
     }
 
-    private suspend fun getErrorResponseModel(response: Response<*>): ErrorResponseModel? {
+    private fun getErrorResponseModel(response: Response<*>): ErrorResponseModel? {
         val source = response.errorBody()?.source() ?: return null
         return moshi.adapter(ErrorResponseModel::class.java).fromJson(source)
     }

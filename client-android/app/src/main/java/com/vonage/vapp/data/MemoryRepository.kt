@@ -18,16 +18,16 @@ object MemoryRepository {
     lateinit var allUsers: List<User>
         private set
 
-    private var _conversations: MutableList<Conversation> = mutableListOf()
+    private var mutableConversations: MutableList<Conversation> = mutableListOf()
 
-    val conversations get() = _conversations.toList()
+    val conversations get() = mutableConversations.toList()
 
     fun update(body: SignupResponseModel) {
         token = body.token
         user = body.user
         otherUsers = body.otherUsers
         allUsers = otherUsers + user
-        _conversations = body.conversations.toMutableList()
+        mutableConversations = body.conversations.toMutableList()
     }
 
     fun update(body: LoginResponseModel) {
@@ -35,14 +35,14 @@ object MemoryRepository {
         user = body.user
         otherUsers = body.otherUsers
         allUsers = otherUsers + user
-        _conversations = body.conversations.toMutableList()
+        mutableConversations = body.conversations.toMutableList()
     }
 
     fun addConversation(conversation: Conversation) {
-        _conversations.add(conversation)
+        mutableConversations.add(conversation)
     }
 
     fun setConversations(conversations: List<Conversation>) {
-        _conversations = conversations.toMutableList()
+        mutableConversations = conversations.toMutableList()
     }
 }

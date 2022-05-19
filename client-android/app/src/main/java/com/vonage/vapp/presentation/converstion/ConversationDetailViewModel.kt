@@ -2,20 +2,7 @@ package com.vonage.vapp.presentation.converstion
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.nexmo.client.NexmoAttachmentEvent
-import com.nexmo.client.NexmoClient
-import com.nexmo.client.NexmoConversation
-import com.nexmo.client.NexmoDeletedEvent
-import com.nexmo.client.NexmoDeliveredEvent
-import com.nexmo.client.NexmoEvent
-import com.nexmo.client.NexmoEventsPage
-import com.nexmo.client.NexmoMemberEvent
-import com.nexmo.client.NexmoMemberState
-import com.nexmo.client.NexmoMessageEventListener
-import com.nexmo.client.NexmoPageOrder
-import com.nexmo.client.NexmoSeenEvent
-import com.nexmo.client.NexmoTextEvent
-import com.nexmo.client.NexmoTypingEvent
+import com.nexmo.client.*
 import com.nexmo.client.request_listener.NexmoApiError
 import com.nexmo.client.request_listener.NexmoRequestListener
 import com.vonage.vapp.core.ext.asLiveData
@@ -40,11 +27,15 @@ class ConversationDetailViewModel : ViewModel() {
             addConversationLine(line)
         }
 
+        override fun onMessageEvent(messageEvent: NexmoMessageEvent) {
+        }
+
         override fun onSeenReceipt(seenEvent: NexmoSeenEvent) {}
-
         override fun onEventDeleted(deletedEvent: NexmoDeletedEvent) {}
-
         override fun onDeliveredReceipt(deliveredEvent: NexmoDeliveredEvent) {}
+        override fun onSubmittedReceipt(submittedEvent: NexmoSubmittedEvent) {}
+        override fun onRejectedReceipt(rejectedEvent: NexmoRejectedEvent) {}
+        override fun onUndeliverableReceipt(undeliverableEvent: NexmoUndeliverableEvent) {}
     }
 
     fun init(navArgs: ConversationDetailFragmentArgs) {
@@ -135,8 +126,8 @@ class ConversationDetailViewModel : ViewModel() {
         viewActionMutableLiveData.postValue(Action.AddConversationLine(line + System.lineSeparator()))
     }
 
-    fun sendMessage(message: String) {
-        conversation?.sendText(message, object : NexmoRequestListener<Void> {
+    fun sendTextMessage(message: String) {
+        conversation?.sendMessage(NexmoMessage.fromText(message), object : NexmoRequestListener<Void> {
             override fun onSuccess(p0: Void?) {
             }
 

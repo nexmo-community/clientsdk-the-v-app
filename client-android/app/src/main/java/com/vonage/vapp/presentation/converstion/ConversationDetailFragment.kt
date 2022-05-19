@@ -52,7 +52,7 @@ class ConversationDetailFragment : Fragment(R.layout.fragment_conversation_detai
             val message = binding.messageEditText.text.toString()
 
             if (message.isNotBlank()) {
-                viewModel.sendMessage(message)
+                viewModel.sendTextMessage(message)
             }
 
             binding.messageEditText.setText("")

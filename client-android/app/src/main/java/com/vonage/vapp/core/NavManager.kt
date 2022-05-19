@@ -14,7 +14,7 @@ object NavManager {
         navEventListener?.invoke(navDirections)
 }
     fun popBackStack(@IdRes destinationId: Int? = null, inclusive: Boolean? = null) {
-        popBackListener?.invoke(destinationId, inclusive);
+        popBackListener?.invoke(destinationId, inclusive)
     }
 
     fun setOnNavEvent(listener: (navDirections: NavDirections) -> Unit) {
@@ -27,7 +27,7 @@ object NavManager {
 
     // Nexmo SDK may fire callbacks on other thread, so it's safe to always use UI Thread
     private fun runOnUiThread(action: Runnable) {
-        val mainHandler: Handler = Handler(Looper.getMainLooper())
+        val mainHandler = Handler(Looper.getMainLooper())
 
         val runnable = Runnable {
             action.run()
