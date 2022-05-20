@@ -1,11 +1,16 @@
 package com.vonage.vapp.presentation.converstion
 
+import android.database.Cursor
+import android.net.Uri
+import android.provider.MediaStore
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.nexmo.client.*
 import com.nexmo.client.request_listener.NexmoApiError
 import com.nexmo.client.request_listener.NexmoRequestListener
 import com.vonage.vapp.core.ext.asLiveData
+import java.io.File
+
 
 class ConversationDetailViewModel : ViewModel() {
 
@@ -20,7 +25,9 @@ class ConversationDetailViewModel : ViewModel() {
     private val messageListener = object : NexmoMessageEventListener {
         override fun onTypingEvent(typingEvent: NexmoTypingEvent) {}
 
-        override fun onAttachmentEvent(attachmentEvent: NexmoAttachmentEvent) {}
+        override fun onAttachmentEvent(attachmentEvent: NexmoAttachmentEvent) {
+
+        }
 
         override fun onTextEvent(textEvent: NexmoTextEvent) {
             val line = getConversationLine(textEvent)
@@ -130,6 +137,16 @@ class ConversationDetailViewModel : ViewModel() {
         conversation?.sendText(message, object : NexmoRequestListener<Void> {
             override fun onSuccess(p0: Void?) {
             }
+
+            override fun onError(apiError: NexmoApiError) {
+                viewActionMutableLiveData.postValue(Action.Error(apiError.message))
+            }
+        })
+    }
+
+    fun sendImage(file: File) {
+        conversation?.sendAttachment(file, object : NexmoRequestListener<Void> {
+            override fun onSuccess(p0: Void?) {}
 
             override fun onError(apiError: NexmoApiError) {
                 viewActionMutableLiveData.postValue(Action.Error(apiError.message))

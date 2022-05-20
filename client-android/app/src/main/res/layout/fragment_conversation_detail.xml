@@ -50,16 +50,33 @@
                 app:layout_constraintTop_toBottomOf="@+id/conversationEventsScrollView"
                 tools:text="Message input" />
 
-        <Button
-                android:id="@+id/sendMessageButton"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:text="Send"
-                android:background="@color/colorAccent"
-                android:textColor="@color/colorPrimaryText"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/conversationEventsScrollView" />
+        <ImageButton
+            android:id="@+id/sendMessageButton"
+            android:layout_width="50dp"
+            android:layout_height="32dp"
+            android:layout_marginRight="4dp"
+            android:background="@color/colorAccent"
+            android:contentDescription="Send"
+            android:src="@android:drawable/ic_menu_send"
+            android:text="Send"
+            android:textColor="@color/colorPrimaryText"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/sendImageButton"
+            app:layout_constraintTop_toBottomOf="@+id/conversationEventsScrollView" />
+
+        <ImageButton
+            android:id="@+id/sendImageButton"
+            android:layout_width="50dp"
+            android:layout_height="32dp"
+            android:background="@color/colorAccent"
+            android:contentDescription="Image"
+            android:src="@android:drawable/ic_menu_gallery"
+            android:text="Image"
+            android:textColor="@color/colorPrimaryText"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/conversationEventsScrollView" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ProgressBar
