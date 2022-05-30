@@ -1,8 +1,5 @@
 package com.vonage.vapp.presentation.converstion
 
-import android.database.Cursor
-import android.net.Uri
-import android.provider.MediaStore
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.nexmo.client.*
@@ -133,8 +130,8 @@ class ConversationDetailViewModel : ViewModel() {
         viewActionMutableLiveData.postValue(Action.AddConversationLine(line + System.lineSeparator()))
     }
 
-    fun sendMessage(message: String) {
-        conversation?.sendText(message, object : NexmoRequestListener<Void> {
+    fun sendMessage(message: NexmoMessage) {
+        conversation?.sendMessage(message, object : NexmoRequestListener<Void> {
             override fun onSuccess(p0: Void?) {
             }
 
@@ -144,13 +141,20 @@ class ConversationDetailViewModel : ViewModel() {
         })
     }
 
-    fun sendImage(file: File) {
-        conversation?.sendAttachment(file, object : NexmoRequestListener<Void> {
-            override fun onSuccess(p0: Void?) {}
-
+    fun uploadImage(file: File) {
+        client.uploadAttachment(file, object : NexmoRequestListener<NexmoImage> {
             override fun onError(apiError: NexmoApiError) {
                 viewActionMutableLiveData.postValue(Action.Error(apiError.message))
             }
+
+            override fun onSuccess(result: NexmoImage?) {
+                if (result != null) {
+                    sendMessage(NexmoMessage.fromImage(result.original.url))
+                } else {
+                    viewActionMutableLiveData.postValue(Action.Error("Image wasn't returned on upload"))
+                }
+            }
+
         })
     }
 

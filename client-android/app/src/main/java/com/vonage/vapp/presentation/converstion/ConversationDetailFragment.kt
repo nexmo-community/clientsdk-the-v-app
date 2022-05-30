@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
 import com.nexmo.client.NexmoClient
+import com.nexmo.client.NexmoMessage
 import com.vonage.vapp.R
 import com.vonage.vapp.core.ext.observe
 import com.vonage.vapp.core.ext.toast
@@ -31,7 +32,7 @@ class ConversationDetailFragment : Fragment(R.layout.fragment_conversation_detai
 
     private val getImageContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         if (uri != null) {
-            fileFromURI(uri)?.let { viewModel.sendImage(it) }
+            fileFromURI(uri)?.let { viewModel.uploadImage(it) }
         }
     }
 
@@ -63,7 +64,7 @@ class ConversationDetailFragment : Fragment(R.layout.fragment_conversation_detai
             val message = binding.messageEditText.text.toString()
 
             if (message.isNotBlank()) {
-                viewModel.sendMessage(message)
+                viewModel.sendMessage(NexmoMessage.fromText(message))
             }
 
             binding.messageEditText.setText("")
