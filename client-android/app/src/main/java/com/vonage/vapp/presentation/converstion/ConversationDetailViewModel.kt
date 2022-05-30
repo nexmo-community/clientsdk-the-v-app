@@ -5,12 +5,12 @@ import androidx.lifecycle.ViewModel
 import com.nexmo.client.*
 import com.nexmo.client.request_listener.NexmoApiError
 import com.nexmo.client.request_listener.NexmoRequestListener
+import com.nexmo.clientcore.model.enums.EMessageEventType
 import com.vonage.vapp.core.ext.asLiveData
 import java.io.File
 
 
 class ConversationDetailViewModel : ViewModel() {
-
     // should be injected
     private val client = NexmoClient.get()
 
@@ -20,20 +20,17 @@ class ConversationDetailViewModel : ViewModel() {
     private var conversation: NexmoConversation? = null
 
     private val messageListener = object : NexmoMessageEventListener {
-        override fun onTypingEvent(typingEvent: NexmoTypingEvent) {}
-
-        override fun onAttachmentEvent(attachmentEvent: NexmoAttachmentEvent) {
-
-        }
-
-        override fun onTextEvent(textEvent: NexmoTextEvent) {
-            val line = getConversationLine(textEvent)
-            addConversationLine(line)
-        }
 
         override fun onMessageEvent(messageEvent: NexmoMessageEvent) {
+            if (messageEvent.message.messageType == EMessageEventType.TEXT) {
+                val line = getTextConversationLine(messageEvent)
+                addConversationLine(line)
+            }
         }
 
+        override fun onTextEvent(textEvent: NexmoTextEvent) {}
+        override fun onTypingEvent(typingEvent: NexmoTypingEvent) {}
+        override fun onAttachmentEvent(attachmentEvent: NexmoAttachmentEvent) {}
         override fun onSeenReceipt(seenEvent: NexmoSeenEvent) {}
         override fun onEventDeleted(deletedEvent: NexmoDeletedEvent) {}
         override fun onDeliveredReceipt(deliveredEvent: NexmoDeliveredEvent) {}
@@ -86,10 +83,14 @@ class ConversationDetailViewModel : ViewModel() {
         for (event in events) {
             val line = when (event) {
                 is NexmoMemberEvent -> {
-                    getConversationLine(event)
+                    getTextConversationLine(event)
                 }
-                is NexmoTextEvent -> {
-                    getConversationLine(event)
+                is NexmoMessageEvent -> {
+                    if (event.message.messageType == EMessageEventType.TEXT) {
+                        getTextConversationLine(event)
+                    } else {
+                        "EMPTY"
+                    }
                 }
                 else -> {
                     null
@@ -109,7 +110,7 @@ class ConversationDetailViewModel : ViewModel() {
         viewActionMutableLiveData.postValue(Action.SetConversation(linesString))
     }
 
-    private fun getConversationLine(memberEvent: NexmoMemberEvent): String {
+    private fun getTextConversationLine(memberEvent: NexmoMemberEvent): String {
         // Bug in SDK 3.0.1 - embeddedInfo can be null for JOINED events
         val userName = memberEvent.embeddedInfo?.user?.name ?: "Unknown"
 
@@ -121,9 +122,9 @@ class ConversationDetailViewModel : ViewModel() {
         }
     }
 
-    private fun getConversationLine(textEvent: NexmoTextEvent): String {
+    private fun getTextConversationLine(textEvent: NexmoMessageEvent): String {
         val userName = textEvent.embeddedInfo?.user?.name ?: "Unknown"
-        return "$userName said: ${textEvent.text}"
+        return "$userName said: ${textEvent.message.text}"
     }
 
     private fun addConversationLine(line: String?) {
