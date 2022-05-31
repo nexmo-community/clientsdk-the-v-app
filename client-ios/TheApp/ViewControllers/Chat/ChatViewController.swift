@@ -189,11 +189,16 @@ class ChatViewController: UIViewController, LoadingViewController {
                       let eventID = Int(event.id),
                       let eventDate = VDateFormatter.dateFor(event.timestamp) else { return nil }
                 
-                if let text = event.content, event.type == "text" {
-                    return ChatMessage(id: eventID, sender: user.displayName, content: .text(content: text), date: eventDate)
-                } else if let urlString = event.content, event.type == "image" {
-                    return ChatMessage(id: eventID, sender: user.displayName, content: .image(urlString: urlString), date: eventDate)
-                } else {
+                if event.type.contains("message") {
+                    switch event.type {
+                    case "message.text":
+                        return ChatMessage(id: eventID, sender: user.displayName, content: .text(content: event.content!), date: eventDate)
+                    case "message.image":
+                        return ChatMessage(id: eventID, sender: user.displayName, content: .image(urlString: event.content!), date: eventDate)
+                    default:
+                        return nil
+                    }
+                } else if event.type.contains("member") {
                     var action = event.type.split(separator: ":")[1]
                     
                     if action == "invited" {
@@ -201,6 +206,8 @@ class ChatViewController: UIViewController, LoadingViewController {
                     }
                     let content = "\(user.displayName) \(action)."
                     return ChatMessage(id: eventID, sender: user.displayName, content: .info(content: content), date: eventDate)
+                } else {
+                    return nil
                 }
             }
             .sorted { $0.id < $1.id }
@@ -209,7 +216,7 @@ class ChatViewController: UIViewController, LoadingViewController {
     }
     
     @objc private func sendMessage() {
-        guard let message = inputField.text else { return }
+        guard let text = inputField.text else { return }
         // set current state for input field
         DispatchQueue.main.async { [weak self] in
             self?.inputField.text = ""
@@ -218,7 +225,8 @@ class ChatViewController: UIViewController, LoadingViewController {
         }
         
         // send message
-        nxmConversation?.sendText(message, completionHandler: { [weak self] (error) in
+        let message = NXMMessage(text: text)
+        nxmConversation?.sendMessage(message, completionHandler: { [weak self] error in
             DispatchQueue.main.async { [weak self] in
                 self?.inputField.isEnabled = true
             }
@@ -230,11 +238,17 @@ class ChatViewController: UIViewController, LoadingViewController {
     }
     
     private func sendImage(imageData: Data) {
-        nxmConversation?.sendAttachment(with: .image, name: Date().description, data: imageData, completionHandler: { error in
+        ClientManager.shared.uploadImage(imageData: imageData) { error, imageURL in
             if error != nil {
                 self.showErrorAlert(message: error?.localizedDescription)
+                return
             }
-        })
+            
+            let message = NXMMessage(fileUrl: imageURL!)
+            self.nxmConversation?.sendMessage(message, completionHandler: { [weak self] error in
+                self?.showErrorAlert(message: error?.localizedDescription)
+            })
+        }
     }
 }
 
@@ -263,6 +277,10 @@ extension ChatViewController: NXMConversationDelegate {
     }
     
     func conversation(_ conversation: NXMConversation, didReceive event: NXMImageEvent) {
+        chatListViewController.appendMessage(event.asChatMessage())
+    }
+    
+    func conversation(_ conversation: NXMConversation, didReceive event: NXMMessageEvent) {
         chatListViewController.appendMessage(event.asChatMessage())
     }
 }

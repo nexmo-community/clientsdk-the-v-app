@@ -88,6 +88,24 @@ extension NSMutableData {
   }
 }
 
+extension NXMMessageEvent {
+    func asChatMessage() -> ChatMessage {
+        let displayName = embeddedInfo?.user.displayName ?? ""
+        switch self.messageType {
+        case .image:
+            return ChatMessage(id: uuid,
+                               sender: displayName,
+                               content: .image(urlString: imageUrl!),
+                               date: Date(timeIntervalSinceReferenceDate: creationDate.timeIntervalSinceReferenceDate))
+        default:
+            return ChatMessage(id: uuid,
+                               sender: displayName,
+                               content: .text(content: text ?? ""),
+                               date: Date(timeIntervalSinceReferenceDate: creationDate.timeIntervalSinceReferenceDate))
+        }
+    }
+}
+
 extension NXMTextEvent {
     func asChatMessage() -> ChatMessage {
         let displayName = embeddedInfo?.user.displayName ?? ""
