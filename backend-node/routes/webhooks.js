@@ -30,7 +30,6 @@ webhookRoutes.get('/voice/answer', async (req, res) => {
 webhookRoutes.post('/rtc/events', async (req, res) => {
   const { application_id, timestamp, type, conversation_id, body } = req.body;
   
-
   if(application_id !== process.env.vonageAppId) {
     res.status(403).json({status: "Invalid application id"});
     return;
@@ -74,6 +73,9 @@ webhookRoutes.post('/rtc/events', async (req, res) => {
         break;
       case  "image":
         status = await rtcEvents.image.create(client, req.body);
+        break;
+      case "message":
+        status = await rtcEvents.message.create(client, req.body);
         break;
       default:
         console.log(`🚨🚨🚨 UNHANDLED TYPE: ${type}`);

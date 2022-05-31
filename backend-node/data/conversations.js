@@ -29,7 +29,7 @@ const getConversationForUser = async function (client, conversationId, userId) {
     let conv = await buildConversation(client, res.rows[0], userId, true);
     let events = await getEvents(client, conv.id);
     // console.dir(events);
-    conv.events = events.filter( event => ['text', 'image', 'member:joined','member:left'].includes(event.vonage_type)).map( event => {
+    conv.events = events.filter( event => ['text', 'image', 'member:joined','member:left', 'message.text', 'message.image'].includes(event.vonage_type)).map( event => {
       return {
         id: event.vonage_id,
         from: event.user_id,
@@ -261,7 +261,6 @@ const syncMembers = async (client, conversation_id) => {
       return;
     }
     let member = await Members.createOrUpdate(client, conversation_id, id, _embedded.user.id, state);
-    // console.dir(member);
   };
 }
 
@@ -279,6 +278,7 @@ const syncEvents = async (client, conversation_id) => {
     if(["member:invited", "member:joined", "member:left"].includes(type)) {
       let event = await Events.create(client, id, type, conversation_id, from, null, null, timestamp);
       // console.dir(event);
+      return;
     }
     if(type == "text") {
       const {to} = vonageEvent;
@@ -295,7 +295,25 @@ const syncEvents = async (client, conversation_id) => {
       }
       return;
     }
-    
+    if (type == "message") {
+      const {to} = vonageEvent;
+      if (body.message_type) {
+        let content;
+        switch(body.message_type) {
+          case "text":
+            content = body.text;
+            break;
+          case "image":
+            content = body.image.url;
+            break;
+          default:
+            console.log(`🚨🚨🚨 UNHANDLED MESSAGE TYPE: ${body.message_type}`);
+            console.log(body);
+        }
+        let event = await Events.create(client, id, `${type}.${body.message_type}`, conversation_id, from, to, content, timestamp);
+        return;
+      }
+    }
   }
 }
 
