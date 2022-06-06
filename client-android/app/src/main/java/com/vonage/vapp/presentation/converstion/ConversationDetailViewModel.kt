@@ -1,5 +1,7 @@
 package com.vonage.vapp.presentation.converstion
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.nexmo.client.*
@@ -7,7 +9,12 @@ import com.nexmo.client.request_listener.NexmoApiError
 import com.nexmo.client.request_listener.NexmoRequestListener
 import com.nexmo.clientcore.model.enums.EMessageEventType
 import com.vonage.vapp.core.ext.asLiveData
+import com.vonage.vapp.data.model.Event
 import java.io.File
+import java.io.IOException
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
 
 
 class ConversationDetailViewModel : ViewModel() {
@@ -15,7 +22,10 @@ class ConversationDetailViewModel : ViewModel() {
     private val client = NexmoClient.get()
 
     private val viewActionMutableLiveData = MutableLiveData<Action>()
+    private val eventsMutableLiveData = MutableLiveData<MutableList<Event>?>()
+
     val viewActionLiveData = viewActionMutableLiveData.asLiveData()
+    val eventsLiveData = eventsMutableLiveData.asLiveData()
 
     private var conversation: NexmoConversation? = null
 
@@ -23,8 +33,9 @@ class ConversationDetailViewModel : ViewModel() {
 
         override fun onMessageEvent(messageEvent: NexmoMessageEvent) {
             if (messageEvent.message.messageType == EMessageEventType.TEXT) {
-                val line = getTextConversationLine(messageEvent)
-                addConversationLine(line)
+                val newEventData = eventsLiveData.value
+                newEventData?.add(getEventFromNexmoEvent(messageEvent))
+                eventsMutableLiveData.postValue(newEventData)
             }
         }
 
@@ -77,58 +88,65 @@ class ConversationDetailViewModel : ViewModel() {
             })
     }
 
-    private fun displayConversationEvents(events: List<NexmoEvent>) {
-        val lines = ArrayList<String>()
+    private fun displayConversationEvents(nexmoEvents: List<NexmoEvent>) {
+        val events = ArrayList<Event>()
 
-        for (event in events) {
-            val line = when (event) {
+        for (nexmoEvent in nexmoEvents) {
+            var event: Event? = null
+
+            when (nexmoEvent) {
                 is NexmoMemberEvent -> {
-                    getTextConversationLine(event)
+                    event = getEventFromNexmoEvent(nexmoEvent)
                 }
                 is NexmoMessageEvent -> {
-                    if (event.message.messageType == EMessageEventType.TEXT) {
-                        getTextConversationLine(event)
-                    } else {
-                        "EMPTY"
-                    }
-                }
-                else -> {
-                    null
+                    event = getEventFromNexmoEvent(nexmoEvent)
                 }
             }
 
-            line?.let { lines.add(it) }
+            if (event != null) {
+                events.add(event)
+            }
         }
 
-        // Production-ready application should utilise RecyclerView to provide better UX
-        val linesString = if (lines.isNullOrEmpty()) {
-            "Conversation has No messages"
-        } else {
-            lines.joinToString(separator = System.lineSeparator(), postfix = System.lineSeparator())
-        }
-
-        viewActionMutableLiveData.postValue(Action.SetConversation(linesString))
+        eventsMutableLiveData.postValue(events)
     }
 
-    private fun getTextConversationLine(memberEvent: NexmoMemberEvent): String {
-        // Bug in SDK 3.0.1 - embeddedInfo can be null for JOINED events
+    private fun getEventFromNexmoEvent(memberEvent: NexmoMemberEvent): Event {
         val userName = memberEvent.embeddedInfo?.user?.name ?: "Unknown"
+        val profileImageURL = memberEvent.embeddedInfo?.user?.imageUrl ?: ""
+        val profileImage = getBitmapFromURL(profileImageURL)
 
-        return when (memberEvent.state) {
+        val content = when (memberEvent.state) {
             NexmoMemberState.JOINED -> "$userName joined"
             NexmoMemberState.INVITED -> "$userName invited"
             NexmoMemberState.LEFT -> "$userName left"
             else -> "Error: Unknown member event state"
         }
+        return Event(memberEvent.memberId,
+            memberEvent.fromMemberId,
+            memberEvent.eventType.name,
+            content,
+            null,
+            profileImage,
+            memberEvent.creationDate.toString() )
     }
 
-    private fun getTextConversationLine(textEvent: NexmoMessageEvent): String {
-        val userName = textEvent.embeddedInfo?.user?.name ?: "Unknown"
-        return "$userName said: ${textEvent.message.text}"
-    }
+    private fun getEventFromNexmoEvent(messageEvent: NexmoMessageEvent): Event {
+        val userName = messageEvent.embeddedInfo?.user?.name ?: "Unknown"
+        val profileImageURL = messageEvent.embeddedInfo?.user?.imageUrl ?: ""
+        val profileImage = getBitmapFromURL(profileImageURL)
+        val text = "$userName said: ${messageEvent.message.text}"
 
-    private fun addConversationLine(line: String?) {
-        viewActionMutableLiveData.postValue(Action.AddConversationLine(line + System.lineSeparator()))
+        val imageURL = messageEvent.message.imageUrl
+        val image = getBitmapFromURL(imageURL)
+
+        return Event(messageEvent.id.toString(),
+            messageEvent.fromMemberId,
+            messageEvent.eventType.name,
+            text,
+            image,
+            profileImage,
+            messageEvent.creationDate.toString() )
     }
 
     fun sendMessage(message: NexmoMessage) {
@@ -157,6 +175,21 @@ class ConversationDetailViewModel : ViewModel() {
             }
 
         })
+    }
+
+    //Thread blocking, shouldn't be used in a production app!!
+    private fun getBitmapFromURL(src: String?): Bitmap? {
+        return try {
+            val url = URL(src)
+            val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
+            connection.doInput = true
+            connection.connect()
+            val input: InputStream = connection.inputStream
+            BitmapFactory.decodeStream(input)
+        } catch (e: IOException) {
+            // Log exception
+            null
+        }
     }
 
     sealed interface Action {

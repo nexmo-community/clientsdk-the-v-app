@@ -9,11 +9,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.ConcatAdapter
 import com.nexmo.client.NexmoClient
 import com.nexmo.client.NexmoMessage
 import com.vonage.vapp.R
 import com.vonage.vapp.core.ext.observe
 import com.vonage.vapp.core.ext.toast
+import com.vonage.vapp.data.model.Event
 import com.vonage.vapp.databinding.FragmentConversationDetailBinding
 import com.vonage.vapp.presentation.converstion.ConversationDetailViewModel.Action.*
 import com.vonage.vapp.utils.viewBinding
@@ -45,20 +47,27 @@ class ConversationDetailFragment : Fragment(R.layout.fragment_conversation_detai
             is Loading -> binding.progressBar.visibility = View.VISIBLE
             is AddConversationLine -> {
                 binding.contentContainer.visibility = View.VISIBLE
-                binding.conversationEventsTextView.append(it.line)
             }
             is SetConversation -> {
                 binding.contentContainer.visibility = View.VISIBLE
-                binding.conversationEventsTextView.text = it.conversation
             }
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val eventAdapter = EventAdapter()
 
         observe(viewModel.viewActionLiveData, actionObserver)
         viewModel.init(navArgs)
+
+        binding.conversationEventsRecyclerView.adapter = eventAdapter
+
+        viewModel.eventsLiveData.observe(viewLifecycleOwner) {
+            it?.let {
+                eventAdapter.submitList(it)
+            }
+        }
 
         binding.sendMessageButton.setOnClickListener {
             val message = binding.messageEditText.text.toString()
