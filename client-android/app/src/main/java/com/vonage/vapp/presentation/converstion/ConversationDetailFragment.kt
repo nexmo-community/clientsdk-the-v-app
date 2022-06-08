@@ -9,13 +9,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.ConcatAdapter
 import com.nexmo.client.NexmoClient
 import com.nexmo.client.NexmoMessage
 import com.vonage.vapp.R
 import com.vonage.vapp.core.ext.observe
 import com.vonage.vapp.core.ext.toast
-import com.vonage.vapp.data.model.Event
 import com.vonage.vapp.databinding.FragmentConversationDetailBinding
 import com.vonage.vapp.presentation.converstion.ConversationDetailViewModel.Action.*
 import com.vonage.vapp.utils.viewBinding
@@ -56,16 +54,16 @@ class ConversationDetailFragment : Fragment(R.layout.fragment_conversation_detai
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val eventAdapter = EventAdapter()
+        val conversationMessageAdapter = ConversationMessageAdapter()
 
         observe(viewModel.viewActionLiveData, actionObserver)
         viewModel.init(navArgs)
 
-        binding.conversationEventsRecyclerView.adapter = eventAdapter
+        binding.conversationEventsRecyclerView.adapter = conversationMessageAdapter
 
-        viewModel.eventsLiveData.observe(viewLifecycleOwner) {
+        viewModel.conversationMessageLiveData.observe(viewLifecycleOwner) {
             it?.let {
-                eventAdapter.submitList(it)
+                conversationMessageAdapter.submitList(it)
             }
         }
 
