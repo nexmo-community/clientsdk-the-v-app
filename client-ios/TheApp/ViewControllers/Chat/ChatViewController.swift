@@ -270,18 +270,6 @@ extension ChatViewController: NXMConversationDelegate {
         showErrorAlert(message: error.localizedDescription)
     }
     
-    func conversation(_ conversation: NXMConversation, didReceive event: NXMTextEvent) {
-        chatListViewController.appendMessage(event.asChatMessage())
-    }
-    
-    func conversation(_ conversation: NXMConversation, didReceive event: NXMMemberEvent) {
-        chatListViewController.appendMessage(event.asChatMessage())
-    }
-    
-    func conversation(_ conversation: NXMConversation, didReceive event: NXMImageEvent) {
-        chatListViewController.appendMessage(event.asChatMessage())
-    }
-    
     func conversation(_ conversation: NXMConversation, didReceive event: NXMMessageEvent) {
         chatListViewController.appendMessage(event.asChatMessage())
     }
