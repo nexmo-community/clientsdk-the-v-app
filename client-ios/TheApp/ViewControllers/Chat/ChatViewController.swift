@@ -244,9 +244,11 @@ class ChatViewController: UIViewController, LoadingViewController {
                 return
             }
             
-            let message = NXMMessage(fileUrl: imageURL!)
+            let message = NXMMessage(imageUrl: imageURL!)
             self.nxmConversation?.sendMessage(message, completionHandler: { [weak self] error in
-                self?.showErrorAlert(message: error?.localizedDescription)
+                if error != nil {
+                    self?.showErrorAlert(message: error?.localizedDescription)
+                }
             })
         }
     }
