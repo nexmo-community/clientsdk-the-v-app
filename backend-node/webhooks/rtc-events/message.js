@@ -16,6 +16,7 @@ async function create(client, reqBody) {
       break;
     case "image":
       content = body.image.url;
+      break;
     default:
       console.log(`🚨🚨🚨 UNHANDLED MESSAGE TYPE: ${message_type}`);
       console.log(req.body);
