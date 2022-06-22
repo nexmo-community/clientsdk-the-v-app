@@ -41,7 +41,10 @@ class ConversationDetailFragment : Fragment(R.layout.fragment_conversation_detai
         binding.contentContainer.visibility = View.INVISIBLE
 
         when (it) {
-            is Error -> toast { it.message }
+            is Error -> {
+                toast { it.message }
+                binding.contentContainer.visibility = View.VISIBLE
+            }
             is Loading -> binding.progressBar.visibility = View.VISIBLE
             is AddConversationLine -> {
                 binding.contentContainer.visibility = View.VISIBLE

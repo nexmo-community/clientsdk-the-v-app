@@ -66,7 +66,7 @@ class ConversationDetailViewModel : ViewModel() {
 
             override fun onError(apiError: NexmoApiError) {
                 this@ConversationDetailViewModel.conversation = null
-                viewActionMutableLiveData.postValue(Action.Error("NexmoConversation load error"))
+                viewActionMutableLiveData.postValue(Action.Error("NexmoConversation load error: ${apiError.message}"))
             }
         })
     }
@@ -107,7 +107,7 @@ class ConversationDetailViewModel : ViewModel() {
                 conversationMessages.add(conversationMessage)
             }
         }
-
+        viewActionMutableLiveData.postValue(Action.SetConversation("Test"))
         conversationMessageMutableLiveData.postValue(conversationMessages)
     }
 
