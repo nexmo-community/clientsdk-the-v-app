@@ -5,31 +5,37 @@ import androidx.lifecycle.ViewModel
 import com.nexmo.client.*
 import com.nexmo.client.request_listener.NexmoApiError
 import com.nexmo.client.request_listener.NexmoRequestListener
+import com.nexmo.clientcore.model.enums.EMessageEventType
 import com.vonage.vapp.core.ext.asLiveData
+import com.vonage.vapp.data.model.ConversationMessage
+import java.io.File
+
 
 class ConversationDetailViewModel : ViewModel() {
-
     // should be injected
     private val client = NexmoClient.get()
 
     private val viewActionMutableLiveData = MutableLiveData<Action>()
+    private val conversationMessageMutableLiveData = MutableLiveData<MutableList<ConversationMessage>?>()
+
     val viewActionLiveData = viewActionMutableLiveData.asLiveData()
+    val conversationMessageLiveData = conversationMessageMutableLiveData.asLiveData()
 
     private var conversation: NexmoConversation? = null
 
     private val messageListener = object : NexmoMessageEventListener {
-        override fun onTypingEvent(typingEvent: NexmoTypingEvent) {}
-
-        override fun onAttachmentEvent(attachmentEvent: NexmoAttachmentEvent) {}
-
-        override fun onTextEvent(textEvent: NexmoTextEvent) {
-            val line = getConversationLine(textEvent)
-            addConversationLine(line)
-        }
 
         override fun onMessageEvent(messageEvent: NexmoMessageEvent) {
+            if (messageEvent.message.messageType == EMessageEventType.TEXT) {
+                val newConversationMessageData = conversationMessageLiveData.value
+                newConversationMessageData?.add(getEventFromNexmoEvent(messageEvent))
+                conversationMessageMutableLiveData.postValue(newConversationMessageData)
+            }
         }
 
+        override fun onTextEvent(textEvent: NexmoTextEvent) {}
+        override fun onTypingEvent(typingEvent: NexmoTypingEvent) {}
+        override fun onAttachmentEvent(attachmentEvent: NexmoAttachmentEvent) {}
         override fun onSeenReceipt(seenEvent: NexmoSeenEvent) {}
         override fun onEventDeleted(deletedEvent: NexmoDeletedEvent) {}
         override fun onDeliveredReceipt(deliveredEvent: NexmoDeliveredEvent) {}
@@ -54,7 +60,7 @@ class ConversationDetailViewModel : ViewModel() {
 
             override fun onError(apiError: NexmoApiError) {
                 this@ConversationDetailViewModel.conversation = null
-                viewActionMutableLiveData.postValue(Action.Error("NexmoConversation load error"))
+                viewActionMutableLiveData.postValue(Action.Error("NexmoConversation load error: ${apiError.message}"))
             }
         })
     }
@@ -76,64 +82,77 @@ class ConversationDetailViewModel : ViewModel() {
             })
     }
 
-    private fun displayConversationEvents(events: List<NexmoEvent>) {
-        val lines = ArrayList<String>()
+    private fun displayConversationEvents(nexmoEvents: List<NexmoEvent>) {
+        val conversationMessages = ArrayList<ConversationMessage>()
 
-        for (event in events) {
-            val line = when (event) {
+        for (nexmoEvent in nexmoEvents) {
+            var conversationMessage: ConversationMessage? = null
+
+            when (nexmoEvent) {
                 is NexmoMemberEvent -> {
-                    getConversationLine(event)
+                    conversationMessage = getEventFromNexmoEvent(nexmoEvent)
                 }
-                is NexmoTextEvent -> {
-                    getConversationLine(event)
-                }
-                else -> {
-                    null
+                is NexmoMessageEvent -> {
+                    conversationMessage = getEventFromNexmoEvent(nexmoEvent)
                 }
             }
 
-            line?.let { lines.add(it) }
+            if (conversationMessage != null) {
+                conversationMessages.add(conversationMessage)
+            }
         }
-
-        // Production-ready application should utilise RecyclerView to provide better UX
-        val linesString = if (lines.isNullOrEmpty()) {
-            "Conversation has No messages"
-        } else {
-            lines.joinToString(separator = System.lineSeparator(), postfix = System.lineSeparator())
-        }
-
-        viewActionMutableLiveData.postValue(Action.SetConversation(linesString))
+        viewActionMutableLiveData.postValue(Action.SetConversation("Test"))
+        conversationMessageMutableLiveData.postValue(conversationMessages)
     }
 
-    private fun getConversationLine(memberEvent: NexmoMemberEvent): String {
-        // Bug in SDK 3.0.1 - embeddedInfo can be null for JOINED events
+    private fun getEventFromNexmoEvent(memberEvent: NexmoMemberEvent): ConversationMessage {
         val userName = memberEvent.embeddedInfo?.user?.name ?: "Unknown"
+        val profileImageURL = memberEvent.embeddedInfo?.user?.imageUrl ?: ""
 
-        return when (memberEvent.state) {
+        val content = when (memberEvent.state) {
             NexmoMemberState.JOINED -> "$userName joined"
             NexmoMemberState.INVITED -> "$userName invited"
             NexmoMemberState.LEFT -> "$userName left"
             else -> "Error: Unknown member event state"
         }
+        return ConversationMessage(memberEvent.memberId, content, null, profileImageURL)
     }
 
-    private fun getConversationLine(textEvent: NexmoTextEvent): String {
-        val userName = textEvent.embeddedInfo?.user?.name ?: "Unknown"
-        return "$userName said: ${textEvent.text}"
+    private fun getEventFromNexmoEvent(messageEvent: NexmoMessageEvent): ConversationMessage {
+        val userName = messageEvent.embeddedInfo?.user?.name ?: "Unknown"
+        val profileImageURL = messageEvent.embeddedInfo?.user?.imageUrl ?: ""
+        val text = "$userName said: ${messageEvent.message.text}"
+
+        val imageURL = messageEvent.message.imageUrl
+
+        return ConversationMessage(messageEvent.id.toString(), text, imageURL, profileImageURL)
     }
 
-    private fun addConversationLine(line: String?) {
-        viewActionMutableLiveData.postValue(Action.AddConversationLine(line + System.lineSeparator()))
-    }
-
-    fun sendMessage(message: String) {
-        conversation?.sendText(message, object : NexmoRequestListener<Void> {
+    fun sendMessage(message: NexmoMessage) {
+        conversation?.sendMessage(message, object : NexmoRequestListener<Void> {
             override fun onSuccess(p0: Void?) {
             }
 
             override fun onError(apiError: NexmoApiError) {
                 viewActionMutableLiveData.postValue(Action.Error(apiError.message))
             }
+        })
+    }
+
+    fun uploadImage(file: File) {
+        client.uploadAttachment(file, object : NexmoRequestListener<NexmoImage> {
+            override fun onError(apiError: NexmoApiError) {
+                viewActionMutableLiveData.postValue(Action.Error(apiError.message))
+            }
+
+            override fun onSuccess(result: NexmoImage?) {
+                if (result != null) {
+                    sendMessage(NexmoMessage.fromImage(result.original.url))
+                } else {
+                    viewActionMutableLiveData.postValue(Action.Error("Image wasn't returned on upload"))
+                }
+            }
+
         })
     }
 
