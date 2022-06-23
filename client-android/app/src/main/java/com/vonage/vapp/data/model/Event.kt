@@ -1,6 +1,5 @@
 package com.vonage.vapp.data.model
 
-import android.graphics.Bitmap
 import android.os.Parcelable
 import com.squareup.moshi.Json
 import kotlinx.parcelize.Parcelize
