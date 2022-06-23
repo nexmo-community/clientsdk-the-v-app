@@ -1,7 +1,5 @@
 package com.vonage.vapp.presentation.converstion
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.nexmo.client.*
@@ -11,10 +9,6 @@ import com.nexmo.clientcore.model.enums.EMessageEventType
 import com.vonage.vapp.core.ext.asLiveData
 import com.vonage.vapp.data.model.ConversationMessage
 import java.io.File
-import java.io.IOException
-import java.io.InputStream
-import java.net.HttpURLConnection
-import java.net.URL
 
 
 class ConversationDetailViewModel : ViewModel() {
@@ -114,7 +108,6 @@ class ConversationDetailViewModel : ViewModel() {
     private fun getEventFromNexmoEvent(memberEvent: NexmoMemberEvent): ConversationMessage {
         val userName = memberEvent.embeddedInfo?.user?.name ?: "Unknown"
         val profileImageURL = memberEvent.embeddedInfo?.user?.imageUrl ?: ""
-        val profileImage = getBitmapFromURL(profileImageURL)
 
         val content = when (memberEvent.state) {
             NexmoMemberState.JOINED -> "$userName joined"
@@ -122,19 +115,17 @@ class ConversationDetailViewModel : ViewModel() {
             NexmoMemberState.LEFT -> "$userName left"
             else -> "Error: Unknown member event state"
         }
-        return ConversationMessage(memberEvent.memberId, content, null, profileImage)
+        return ConversationMessage(memberEvent.memberId, content, null, profileImageURL)
     }
 
     private fun getEventFromNexmoEvent(messageEvent: NexmoMessageEvent): ConversationMessage {
         val userName = messageEvent.embeddedInfo?.user?.name ?: "Unknown"
         val profileImageURL = messageEvent.embeddedInfo?.user?.imageUrl ?: ""
-        val profileImage = getBitmapFromURL(profileImageURL)
         val text = "$userName said: ${messageEvent.message.text}"
 
         val imageURL = messageEvent.message.imageUrl
-        val image = getBitmapFromURL(imageURL)
 
-        return ConversationMessage(messageEvent.id.toString(), text, image, profileImage)
+        return ConversationMessage(messageEvent.id.toString(), text, imageURL, profileImageURL)
     }
 
     fun sendMessage(message: NexmoMessage) {
@@ -163,21 +154,6 @@ class ConversationDetailViewModel : ViewModel() {
             }
 
         })
-    }
-
-    //Thread blocking, shouldn't be used in a production app!!
-    private fun getBitmapFromURL(src: String?): Bitmap? {
-        return try {
-            val url = URL(src)
-            val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
-            connection.doInput = true
-            connection.connect()
-            val input: InputStream = connection.inputStream
-            BitmapFactory.decodeStream(input)
-        } catch (e: IOException) {
-            // Log exception
-            null
-        }
     }
 
     sealed interface Action {
