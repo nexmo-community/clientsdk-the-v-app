@@ -88,13 +88,21 @@ extension NSMutableData {
   }
 }
 
-extension NXMTextEvent {
+extension NXMMessageEvent {
     func asChatMessage() -> ChatMessage {
         let displayName = embeddedInfo?.user.displayName ?? ""
-        return ChatMessage(id: uuid,
-                           sender: displayName,
-                           content: .text(content: text ?? ""),
-                           date: Date(timeIntervalSinceReferenceDate: creationDate.timeIntervalSinceReferenceDate))
+        switch self.messageType {
+        case .image:
+            return ChatMessage(id: uuid,
+                               sender: displayName,
+                               content: .image(urlString: imageUrl!),
+                               date: Date(timeIntervalSinceReferenceDate: creationDate.timeIntervalSinceReferenceDate))
+        default:
+            return ChatMessage(id: uuid,
+                               sender: displayName,
+                               content: .text(content: text ?? ""),
+                               date: Date(timeIntervalSinceReferenceDate: creationDate.timeIntervalSinceReferenceDate))
+        }
     }
 }
 
@@ -119,15 +127,5 @@ extension NXMMemberEvent {
                            sender: displayName,
                            content: .info(content: text),
                            date: Date(timeIntervalSinceReferenceDate: self.creationDate.timeIntervalSinceReferenceDate))
-    }
-}
-
-extension NXMImageEvent {
-    func asChatMessage() -> ChatMessage {
-        let displayName = embeddedInfo?.user.displayName ?? ""
-        return ChatMessage(id: uuid,
-                           sender: displayName,
-                           content: .image(urlString: mediumImage.url.absoluteString),
-                           date: Date(timeIntervalSinceReferenceDate: creationDate.timeIntervalSinceReferenceDate))
     }
 }

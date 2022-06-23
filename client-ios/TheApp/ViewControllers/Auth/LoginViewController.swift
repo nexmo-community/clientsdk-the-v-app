@@ -90,9 +90,11 @@ class LoginViewController: UIViewController, LoadingViewController {
     }
     
     private func toggleViewVisibility(hidden: Bool) {
-        stackView.isHidden = hidden
-        usernameField.isHidden = hidden
-        passwordField.isHidden = hidden
+        DispatchQueue.main.async {
+            self.stackView.isHidden = hidden
+            self.usernameField.isHidden = hidden
+            self.passwordField.isHidden = hidden
+        }
     }
     
     private func resetView() {
