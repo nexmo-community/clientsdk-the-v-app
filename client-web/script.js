@@ -328,7 +328,7 @@ function logoutClickHandler(e) {
 async function setupApplication() {
     try {
         client = new NexmoClient({ debug: false });
-        app = await client.login(jwt);
+        app = await client.createSession(jwt);
         console.log('app: ', app);
 
         app.on("call:status:changed", (nxmCall) => {
