@@ -4,7 +4,6 @@ const Members = require('./members');
 const Events = require('./events');
 const Users = require('./users');
 
-
 const getAllForUser = async function (client, userId, isChat) {
   try {
     const res = await client.query('SELECT conversations.vonage_id, conversations.state, conversations.created_at FROM conversations JOIN members ON conversations.vonage_id = members.conversation_id WHERE user_id=$1 AND conversations.is_chat=$2', [userId, isChat]);
@@ -28,8 +27,8 @@ const getConversationForUser = async function (client, conversationId, userId) {
     }
     let conv = await buildConversation(client, res.rows[0], userId, true);
     let events = await getEvents(client, conv.id);
-    // console.dir(events);
-    conv.events = events.filter( event => ['text', 'image', 'member:joined','member:left', 'message.text', 'message.image'].includes(event.vonage_type)).map( event => {
+
+    conv.events = events.filter( event => ['member:joined','member:left', 'message.text', 'message.image'].includes(event.vonage_type)).map( event => {
       return {
         id: event.vonage_id,
         from: event.user_id,
@@ -82,7 +81,6 @@ async function buildConversation(client, conv, userId, loadEvents) {
   return conv;
 }
 
-
 const getMembers = async function (client, conversationId) {
   try {
     const res = await client.query('SELECT vonage_id as member_id, conversation_id, user_id, state FROM members where conversation_id=$1', [conversationId]);
@@ -115,8 +113,6 @@ const getEvents = async function (client, conversationId) {
   return [];
 }
 
-
-
 const get = async (client, vonage_id) => {
   let conversation;
   try {
@@ -130,8 +126,6 @@ const get = async (client, vonage_id) => {
   return conversation;
 }
 
-
-
 const create = async (client, vonage_id, name, display_name, state, createdAt) => {
   let conversation;
   try {
@@ -140,16 +134,12 @@ const create = async (client, vonage_id, name, display_name, state, createdAt) =
       conversation = res.rows[0];
     }
     console.log('  | - created');
-  //   console.log(`CONVERSATION CREATED:
-  // - id:           ${conversation.vonage_id}
-  // - name:         ${conversation.name}
-  // - display_name: ${conversation.display_name}`);
+    console.dir(conversation);
   } catch (err) {
     console.log(err);
   }
   return conversation;
 }
-
 
 const createConversationForUserWithInterlocutors  = async (client, userId, users) => {
   const newConversation = await Vonage.conversations.create(userId, users);
@@ -171,7 +161,6 @@ const createConversationForUserWithInterlocutors  = async (client, userId, users
   return conv;
 }
 
-
 const update = async (client, vonage_id, name, display_name, state, createdAt) => {
   let conversation;
   try {
@@ -187,10 +176,9 @@ const update = async (client, vonage_id, name, display_name, state, createdAt) =
   return conversation;
 }
 
-
 const destroy = async (client, vonage_id) => {
   let conversation = await get(vonage_id);
-  // console.log(conversation);
+
   if(!conversation) {
     return;
   }
@@ -226,7 +214,7 @@ const syncAll = async () => {
 const syncConversation = async (client, vonageConversationLight) => {
   if(!vonageConversationLight.id) { return }
   const { vonageConversation, error} = await Vonage.conversations.get(vonageConversationLight.id);
-  // console.dir(vonageConversation);
+
   if(error) {
     console.log(`ERROR: ${JSON.stringify(error)}`);
     console.log(vonageConversationLight);
@@ -277,22 +265,6 @@ const syncEvents = async (client, conversation_id) => {
     }
     if(["member:invited", "member:joined", "member:left"].includes(type)) {
       let event = await Events.create(client, id, type, conversation_id, from, null, null, timestamp);
-      // console.dir(event);
-      return;
-    }
-    if(type == "text") {
-      const {to} = vonageEvent;
-      if(body.text) {
-        let event = await Events.create(client, id, type, conversation_id, from, to, body.text, timestamp);
-        // console.dir(event);
-      }
-      return;
-    }
-    if (type == "image") {
-      const {to} = vonageEvent;
-      if (body.representations.original.url) {
-        let event = await Events.create(client, id, type, conversation_id, from, to, body.representations.original.url, timestamp);
-      }
       return;
     }
     if (type == "message") {
@@ -316,7 +288,6 @@ const syncEvents = async (client, conversation_id) => {
     }
   }
 }
-
 
 module.exports = {
   getAllForUser,

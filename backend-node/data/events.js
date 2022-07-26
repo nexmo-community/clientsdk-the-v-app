@@ -5,8 +5,6 @@ const pool = new Pool({
   connectionString
 });
 
-const Vonage = require('../vonage');
-
 const get = async (conversation_id, vonage_id) => {
   let event;
   try {
@@ -28,10 +26,6 @@ const create = async (client, event_id, event_type, conversation_id, from_member
       event = res.rows[0];
     }
     console.log(`      | - EVENT CREATED: #${event.vonage_id} [${event.vonage_type}]: ${event.content}`);
-  //   console.log(`EVENT CREATED:
-  // - id:           ${event.vonage_id}
-  // - type:         ${event.vonage_type}
-  // - content:      ${event.content}`);
   } catch (err) {
     console.log(err);
   }

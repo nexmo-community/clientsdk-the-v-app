@@ -119,11 +119,11 @@ vonageRoutes.post('/image', async (req, res) => {
   pool.connect(async (err, client, done) => {
     if (err) throw err
 
-    // Set the image on the DB
+  // Set the image on the DB
     await Data.users.addImage(client, req.user.sub, req.body.image_url)
   });
 
-  // upload the image to vonage
+  // Upload the image to vonage
   const imageResponse = await Vonage.users.addImage(req.user.user_id, req.body.image_url);
   
   if (imageResponse.responseId) {

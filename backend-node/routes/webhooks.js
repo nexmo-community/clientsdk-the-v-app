@@ -44,7 +44,6 @@ webhookRoutes.post('/rtc/events', async (req, res) => {
   console.log("----------------------------");
 
 
-
   const pool = new Pool({ connectionString: process.env.postgresDatabaseUrl });
   pool.connect(async (err, client, done) => {
     if (err) throw err
@@ -67,12 +66,6 @@ webhookRoutes.post('/rtc/events', async (req, res) => {
         break;
       case  "member:left":
         status = await rtcEvents.members.statusUpdate(client, 'LEFT', req.body);
-        break;
-      case  "text":
-        status = await rtcEvents.text.create(client, req.body);
-        break;
-      case  "image":
-        status = await rtcEvents.image.create(client, req.body);
         break;
       case "message":
         status = await rtcEvents.message.create(client, req.body);

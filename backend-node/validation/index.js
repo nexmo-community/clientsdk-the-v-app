@@ -1,4 +1,3 @@
-
 const validateSignupParameters = (name, password, display_name) => {
   const invalid_parameters = [];
   validateName(name, invalid_parameters);

@@ -2,7 +2,6 @@ const crypto = require('crypto');
 const { Pool } = require('pg');
 const Vonage = require('../vonage');
 
-
 const getAll = async function (client) {
   try {
     const res = await client.query('SELECT vonage_id, name, display_name, image_url FROM users');
@@ -15,14 +14,12 @@ const getAll = async function (client) {
   return [];
 }
 
-
 const getInterlocutorsFor = async function (client, user_name) {
   const users = await getAll(client);
   return users.filter(f => f.name !== user_name).map(u => { 
     return { 'id': u.vonage_id, 'name': u.name, 'display_name': u.display_name, "image_url": u.image_url } 
   })
 }
-
 
 const create = async function (client, vonage_id, name, display_name, password) {
   let user;
@@ -74,7 +71,6 @@ const addImage = async function (client, name, image_url) {
   }
 }
 
-
 const authenticate = async function (client, name, password) {
   let user;
   try {
@@ -92,7 +88,6 @@ const authenticate = async function (client, name, password) {
   return user;
 }
 
-
 const getByName = async function (client, name) {
   let user;
   try {
@@ -106,7 +101,6 @@ const getByName = async function (client, name) {
   return user;
 }
 
-
 const getByVonageId = async function (client, vonageId) {
   let user;
   try {
@@ -119,7 +113,6 @@ const getByVonageId = async function (client, vonageId) {
   }
   return user;
 }
-
 
 const syncAll = async function () {
   const pool = new Pool({ connectionString: process.env.postgresDatabaseUrl });
@@ -141,11 +134,8 @@ const syncAll = async function () {
 }
 
 const syncUser = async function (client, vonageUser) {
-  // console.log(vonageUser);
-  // console.log(vonageUser.name);
   // find user in DB (use name as key)
   let user = await getByName(client, vonageUser.name);
-  // console.log("user", user);
   if(!user) {
     // if not present (insert)
     const res = await client.query('INSERT INTO users(vonage_id, name, display_name, created_at, updated_at) VALUES($1, $2, $3, NOW(), NOW()) RETURNING vonage_id, name, display_name', [vonageUser.vonage_id, vonageUser.name, vonageUser.display_name]);
@@ -155,7 +145,6 @@ const syncUser = async function (client, vonageUser) {
   } else {
     // if present (update)
     const res = await client.query('UPDATE users SET vonage_id=$1, display_name=$2, updated_at=NOW() WHERE name=$3 RETURNING vonage_id, name, display_name, image_url', [vonageUser.vonage_id, vonageUser.display_name, vonageUser.name]);
-    // console.log(res);
     if (res.rowCount === 1) {
       user = res.rows[0];
       console.log(`USER UPDATED - ${user.vonage_id}\t${user.name} \t ${user.display_name} \t ${user.image_url}`);
@@ -163,7 +152,6 @@ const syncUser = async function (client, vonageUser) {
   }
   return user
 }
-
 
 module.exports = {
   getAll,

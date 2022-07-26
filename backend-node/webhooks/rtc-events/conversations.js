@@ -1,6 +1,5 @@
 const Data = require('../../data');
 
-
 async function create(client, body) {
   const { id, name, display_name, state, timestamp } = body;
   if(!id || !name || !display_name || !state || !timestamp || !timestamp.created ) {
@@ -15,7 +14,6 @@ async function create(client, body) {
     return 'Could not add conversation to the DB';
   }
 }
-
 
 async function update(client, body) {
   const { id, name, display_name, state, timestamp } = body;
@@ -40,8 +38,6 @@ async function destroy(client, body) {
   await Data.conversations.destroy(client, id);
   return `deleted conversation: ${id}`;
 }
-
-
 
 module.exports = {
   create,

@@ -3,7 +3,6 @@ const JWT = require('../jwt');
 const Pagination = require('./pagination');
 const vonageAPIUrl = 'https://api.nexmo.com/v0.3';
 
-
 const getConfig = (jwt) => {
   return {
     headers: {
@@ -147,7 +146,6 @@ const getEvents = async (conversationId) => {
   }
   return { vonageEvents, error};
 }
-
 
 module.exports = {
   getAll,
