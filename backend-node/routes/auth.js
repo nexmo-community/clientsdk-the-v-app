@@ -73,7 +73,6 @@ authRoutes.post('/signup', async (req, res) => {
   pool.end();
 });
 
-
 const signupExistingUser = async function (res, client, user, name, password) {
   if(user.password_digest) {
     res.status(409).send({
@@ -113,7 +112,6 @@ const signupCreateVonageUserError = async function(res, client, error, name, pas
   }
   // find local user
   user = await Data.users.getByName(client, name);
-  // console.log(user);
   // no local user - THIS SHOULD NEVER HAPPEN
   if(!user) {
     res.status(500).send({
@@ -133,9 +131,6 @@ const signupCreateVonageUserError = async function(res, client, error, name, pas
     token
   });
 };
-
-
-
 
 authRoutes.post('/login', async (req, res) => {
   const { name, password } = req.body;
@@ -180,6 +175,5 @@ authRoutes.post('/login', async (req, res) => {
   });
   pool.end();
 });
-
 
 module.exports = authRoutes

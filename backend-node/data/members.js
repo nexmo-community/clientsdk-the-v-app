@@ -4,11 +4,6 @@ const pool = new Pool({
   connectionString
 });
 
-
-// const conversations = require('./conversations');
-const users = require('./users');
-
-
 const get = async function (client, member_id) {
   let member;
   try {
@@ -22,22 +17,12 @@ const get = async function (client, member_id) {
   return member;
 }
 
-
 const invited = async function (client, vonage_id, conversation_id, user_id) {
   let member = await get(vonage_id);
   if(member) {
     return member;
   }
-  // let conversation = await conversations.get(conversation_id);
-  // let user = await users.getByVonageId(user_id);
-  // if(!conversation || !user) {
-  //   console.log(`MEMBER INVITED ERROR: 
-  //   - conversation id: ${JSON.stringify(conversation_id)}
-  //   - conversation: ${JSON.stringify(conversation)}
-  //   - user id: ${JSON.stringify(user_id)}
-  //   - user: ${JSON.stringify(user)}`);
-  //   return member;
-  // }
+
   try {
     const res = await client.query('INSERT INTO members(vonage_id, conversation_id, user_id, state) VALUES($1, $2, $3, $4) RETURNING vonage_id, conversation_id, user_id, state', [vonage_id, conversation_id, user_id, 'INVITED']);
     if (res.rowCount === 1) {
@@ -53,8 +38,6 @@ const invited = async function (client, vonage_id, conversation_id, user_id) {
   return member;
 }
 
-
-
 const createOrUpdate = async function (client, conversation_id, member_id, user_id, state) {
   let member = await get(client, member_id);
   if(member) {
@@ -67,11 +50,6 @@ const createOrUpdate = async function (client, conversation_id, member_id, user_
       member = res.rows[0];
     }
     console.log(`      | - MEMBER CREATED: ${member.vonage_id} @ ${member.state}`);
-  //   console.log(`MEMBER CREATED:
-  // - id:              ${member.vonage_id}
-  // - state:           ${member.state}
-  // - user:            ${member.user_id}
-  // - conversation_id: ${member.conversation_id}`);
   } catch (err) {
     console.log(err);
   }
@@ -90,8 +68,6 @@ const statusUpdate = async function(client, member_id, newState) {
   }
   return member;
 }
-
-
 
 module.exports = {
   get,
