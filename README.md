@@ -83,4 +83,4 @@ To get started:
 
 
 ## License
-Distributed under **MIT** License.See `License` for more information.
+Distributed under **MIT** License. See [License](https://github.com/nexmo-community/clientsdk-the-v-app/blob/main/LICENSE) for more information.
