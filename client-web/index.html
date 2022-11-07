@@ -138,6 +138,35 @@
         <img class="profile-image" src="" />
         <br />
         <div id="user-display-name"></div>
+        <br/>
+        <div id="update-image-container">
+            <details>
+                <summary>Change profile image</summary>
+                <form id="profile-image-form">
+                    <fieldset>
+                        <legend>Select method:</legend>
+                        <div>
+                            <input type="radio" id="image-update-url" name="contact" value="url" />
+                            <label for="image-update-url">URL</label>
+
+                            <input type="radio" id="image-update-upload" name="contact" value="file" />
+                            <label for="image-update-upload">Upload</label>
+
+                            <div id="uploadlink">
+                                <label for="image-url">Enter a URL: </label>
+                                <input type="url" name="image-url" id="image-url" pattern="https://.*">
+                                <button type="submit">Update</button>
+                            </div>
+                            <div id="uploadform">
+                                <label for="image-file">Choose a profile image:</label>
+                                <input type="file" id="image-file" name="image-file" accept="image/*">
+                                <br/> Status: <strong id="image-upload-status"></strong>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+            </details>
+        </div>
         <br /><button id="logout">logout</button>
     </template>
 
@@ -172,7 +201,6 @@
             <div id="group-chat-status"></div>
         </form>
     </template>
-
 
     <template id="found-previous-chats-template">
         <section class="center">
