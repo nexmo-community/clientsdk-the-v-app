@@ -319,7 +319,7 @@ function showSelectedUser(user, answeringCall = false) {
 
 function logoutClickHandler(e) {
     console.log("logout!");
-    client.logout().then((response) => {
+    client.deleteSession().then((response) => {
         console.log("logout response: ", response);
         settingsDiv.innerHTML = "";
         contentDiv.innerHTML = "<div class='center'><img class='vonage-spin' src='https://cdn.glitch.global/41750a77-8d9a-4701-96f4-80f4ffcb5e31/vonage-spin.gif?v=1646775708339'></div>";
