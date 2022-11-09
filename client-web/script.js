@@ -158,7 +158,7 @@ tabLists.forEach(tabList => {
 async function postRequest(endpoint = "", data = {}) {
     try {
         const response = await fetch(BASE_URL + endpoint, {
-            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${jwt}`,
@@ -180,7 +180,7 @@ async function postRequest(endpoint = "", data = {}) {
 async function getRequest(endpoint = "") {
     try {
         const response = await fetch(BASE_URL + endpoint, {
-            method: 'GET', // *GET, POST, PUT, DELETE, etc.
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${jwt}`,
@@ -200,7 +200,7 @@ async function getRequest(endpoint = "") {
 async function getImageRequest(url= ""){
     try {
         const response = await fetch(url, {
-            method: 'GET', // *GET, POST, PUT, DELETE, etc.
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${jwt}`
