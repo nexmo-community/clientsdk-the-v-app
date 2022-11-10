@@ -149,18 +149,16 @@ tabLists.forEach(tabList => {
                     tabFocus = tabs.length - 1;
                 }
             }
-
             tabs[tabFocus].setAttribute("tabindex", 0);
             tabs[tabFocus].focus();
         }
     });
-
 });
 
 async function postRequest(endpoint = "", data = {}) {
     try {
         const response = await fetch(BASE_URL + endpoint, {
-            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${jwt}`,
@@ -172,7 +170,6 @@ async function postRequest(endpoint = "", data = {}) {
             throw await response.json();
         }
         return response.json();
-
     } catch (error) {
         console.error("postRequest error: ", error);
         throw error;
@@ -183,7 +180,7 @@ async function postRequest(endpoint = "", data = {}) {
 async function getRequest(endpoint = "") {
     try {
         const response = await fetch(BASE_URL + endpoint, {
-            method: 'GET', // *GET, POST, PUT, DELETE, etc.
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${jwt}`,
@@ -194,14 +191,30 @@ async function getRequest(endpoint = "") {
             throw await response.json();
         }
         return response.json();
-
     } catch (error) {
         console.error("postRequest error: ", error);
         throw error;
     }
 }
 
-
+async function getImageRequest(url= ""){
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${jwt}`
+            }
+        });
+        if (!response.ok) {
+            throw await response.json();
+        }
+        return response.blob();
+    } catch(error) {
+        console.error("getImageRequest error: ", error);
+        throw error;
+    }
+}
 
 function displayError(element, error) {
     let errorText = "Error: ";
@@ -285,7 +298,6 @@ function showSelectedUser(user, answeringCall = false) {
     }
 
     messageButton.dataset.convId = oneToOneChat.length > 0 ? oneToOneChat[0].id : "";
-
     messageButton.dataset.username = username;
     messageButton.dataset.userId = userId;
     messageButton.innerText = previousChats.length > 0 ? "Open Chat" : "Create Chat";
@@ -298,29 +310,24 @@ function showSelectedUser(user, answeringCall = false) {
     } else {
         hangupButton.style.display = "none";
     }
-    // img.src = profileImage === "null" ? `https://robohash.org/${username}` : profileImage;
     img.src = profileImage;
     name.innerText = displayName;
     callButton.addEventListener("click", callButtonClickHandler);
     hangupButton.addEventListener("click", hangupButtonClickHandler);
     contentDiv.appendChild(selectedUserProfileClone);
-
 }
-
 
 function logoutClickHandler(e) {
     console.log("logout!");
-    client.logout().then((response) => {
+    client.deleteSession().then((response) => {
         console.log("logout response: ", response);
         settingsDiv.innerHTML = "";
         contentDiv.innerHTML = "<div class='center'><img class='vonage-spin' src='https://cdn.glitch.global/41750a77-8d9a-4701-96f4-80f4ffcb5e31/vonage-spin.gif?v=1646775708339'></div>";
         dashboardSection.style.display = "none";
         loginSignUpSection.style.display = "flex";
-
     }).catch((error) => {
         console.log("logout error: ", error);
     });
-
 }
 
 
@@ -404,7 +411,6 @@ async function setupApplication() {
                     callButton.style.display = "block";
                     hangupButton.style.display = "none";
                 }
-
             }
         });
 
@@ -442,7 +448,6 @@ async function setupApplication() {
                     if (window.confirm(`Join audio call with ${otherMember.display_name}?`)) {
                         showSelectedUser(otherUser, true);
                         nxmCall.answer();
-
                     } else {
                         nxmCall.reject({ reason_code: '403', reason_text: 'User turned down request' }).then(() => {
                             console.log('Call rejected.');
@@ -450,12 +455,8 @@ async function setupApplication() {
                             console.error(error);
                         });
                     }
-
                 }
-
             }
-
-
         });
 
         app.on("member:invited", (member, event) => {
@@ -482,18 +483,13 @@ async function setupApplication() {
                 li.addEventListener("click", () => displayTextChat(textChat.id));
                 textChatList.appendChild(textChatListItemClone);
             }
-
         });
-
-
-
         return;
     }
     catch (error) {
         console.error('error in setup: ', error);
         return;
     }
-
 }
 
 async function displayTextChat(selectedConversationId) {
@@ -506,15 +502,13 @@ async function displayTextChat(selectedConversationId) {
     const vonageMembers = textChatClone.querySelector("vc-members");
     const vonageMessagesFeed = textChatClone.querySelector("vc-messages");
 
-
     contentDiv.appendChild(textChatClone);
 
     const selectedConversation = await getRequest(`/conversations/${selectedConversationId}`);
-
     console.log('selected conversation: ', selectedConversation);
+
     const conversationObj = await app.getConversation(selectedConversation.id);
     console.log("conversationObj: ", conversationObj);
-
 
     let convMembers = [];
     const params = {
@@ -569,8 +563,6 @@ async function displayTextChat(selectedConversationId) {
     vonageMessagesFeed.conversation = conversationObj;
     vonageMessagesFeed.myId = myMember[0].id
     vonageMessagesFeed.messages = formattedMessages;
-
-
 }
 
 async function textChatClickHandler(e) {
@@ -608,15 +600,12 @@ async function textChatClickHandler(e) {
             messageUser.disabled = false;
             callStatus.innerText = e;
         }
-
     }
 }
-
 
 async function showDashboard(data) {
     console.log("showDashboard: ", data);
     tabFocus = 2;
-
     loginSignUpSection.style.display = "none";
     myUser = data.user;
     conversations = data.conversations;
@@ -647,7 +636,6 @@ async function showDashboard(data) {
         usersList.appendChild(userClone);
     });
 
-
     // get text chat conversations and list
     const textChats = await getRequest("/conversations");
     console.log('textChats: ', textChats);
@@ -666,17 +654,97 @@ async function showDashboard(data) {
     const settingsDisplayName = settingsClone.querySelector("#user-display-name");
     const settingLogoutButton = settingsClone.querySelector("#logout");
 
-    settingsImg.src = myUser.image_url === null ? `https://robohash.org/${myUser.name}` : myUser.image_url;
+    // update profile picture
+    const profileImageForm = settingsClone.querySelector("#profile-image-form");
+    const profileImageURLInput = settingsClone.querySelector("#image-url");
+    const profileImageFileInput = settingsClone.querySelector("#image-file");
+    const imageUploadStatus = settingsClone.querySelector('#image-upload-status');
+    let uploadedImageURL = "";
+
+    // check if image hosted on Nexmo Media Server
+    if (myUser.image_url.includes("nexmo.com")){
+        const uploadedImageResponse = await getImageRequest(myUser.image_url);
+        console.log("uploadedImageResponse: ", uploadedImageResponse);
+        const objectURL = URL.createObjectURL(uploadedImageResponse);
+        settingsImg.src = objectURL;
+    } else {
+        settingsImg.src = myUser.image_url === null ? `https://robohash.org/${myUser.name}` : myUser.image_url;
+    }
     settingsDisplayName.innerText = myUser.display_name;
     settingLogoutButton.addEventListener("click", logoutClickHandler);
 
+    // handling profile image file input
+    profileImageFileInput.addEventListener('change', async() => {
+        console.log("profileImageFileInput files: ", profileImageFileInput.files);
+        imageUploadStatus.textContent = "starting...";
+        // create a conversation and upload to Nexmo Media Servers and return URL
+        const uploadImageConversationOptions = {
+            "display_name":"upload_images_only",
+            "properties": {
+                "ttl": 120
+            }
+        }
+        const newConversation = await app.newConversationAndJoin(uploadImageConversationOptions);
+        imageUploadStatus.textContent = "uploading...";
+        console.log("new conversation: ", newConversation);
+        const params = {
+            quality_ratio : "90",
+            medium_size_ratio: "40",
+            thumbnail_size_ratio: "20"
+        }
+        newConversation.uploadImage(profileImageFileInput.files[0], params).then((uploadImageRequest) => {
+            uploadImageRequest.onprogress = (e) => {
+                console.log("Image request progress: ", e);
+                console.log("Image progress: " + e.loaded + "/" + e.total);
+                imageUploadStatus.textContent = `${e.loaded}/${e.total}`;
+            };
+            uploadImageRequest.onabort = (e) => {
+                console.log("Image request aborted: ", e);
+                console.log("Image: " + e.type);
+                imageUploadStatus.textContent = `${e.type}`;
+            };
+            uploadImageRequest.onloadend = (e) => {
+                console.log("Image request successful: ", e);
+                console.log("Image: " + e.type);
+                imageUploadStatus.textContent = "uploaded!";
+            };
+            uploadImageRequest.onreadystatechange = async() => {
+                if (uploadImageRequest.readyState === 4 && uploadImageRequest.status === 200) {
+                    const representations = JSON.parse(uploadImageRequest.responseText);
+                    console.log("Original image url: ", representations.original.url);
+                    console.log("Medium image url: ", representations.medium.url);
+                    console.log("Thumbnail image url: ", representations.thumbnail.url);
+                    uploadedImageURL = representations.medium.url;
+                    // update profile image
+                    imageUploadStatus.textContent = "updating...";
+                    const responseData = await updateProfileImage(uploadedImageURL);
+                    imageUploadStatus.textContent = "updated!";
+                    const uploadedImageResponse = await getImageRequest(uploadedImageURL);
+                    console.log("uploadedImageResponse: ", uploadedImageResponse);
+                    const objectURL = URL.createObjectURL(uploadedImageResponse);
+                    settingsImg.src = objectURL;
+                    profileImageFileInput.value = null;
+                    uploadedImageURL = "";
+                    imageUploadStatus.textContent = "";
+                }
+            };
+        }).catch((error) => {
+            console.error("error uploading the image ", error);
+        });
+    });
+
+    profileImageForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        console.log("profileImageForm submitted");
+        if (profileImageURLInput.value !== ""){
+            const responseData = await updateProfileImage(profileImageURLInput.value);
+            settingsImg.src = responseData.image_url;
+            profileImageURLInput.value = "";
+        }
+    });
+
     settingsDiv.appendChild(settingsClone);
-
-
-
     dashboardSection.style.display = "flex";
-
-
 }
 
 async function createGroupHandler(e) {
@@ -711,7 +779,6 @@ async function createGroupHandler(e) {
 
             contentDiv.appendChild(foundPreviousChatsClone);
 
-
         } else {
             // set the group chats container to display none;
             try {
@@ -732,9 +799,6 @@ async function createGroupHandler(e) {
                 status.innerText = e;
             }
         }
-
-
-
     }
 }
 
@@ -800,3 +864,17 @@ loginForm.addEventListener('submit', event => {
     event.preventDefault();
     logIn();
 });
+
+async function updateProfileImage(imageURL){
+    console.log("imageURL: ", imageURL);
+    try {
+        const bodyData = {
+            image_url: imageURL
+        }
+        const data = await postRequest("/image",bodyData)
+        console.log("update profile image data: ", data);
+        return data;
+    } catch(error) {
+        console.error("log in error: ", error);
+    }
+}

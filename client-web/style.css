@@ -3,32 +3,32 @@ body {
     margin: 0;
     height: 100vh;
     width: 100vw;
-  background-color: black;
+    background-color: black;
 }
 
 input {
-  font-size: 20px;
+    font-size: 20px;
 }
 
 h1 {
-  margin-bottom: 10px;
+    margin-bottom: 10px;
 }
 
 button, vc-text-input::part(button) {
     cursor: pointer;
-  border-radius: 10px;
-  color: white;
-  font-size: clamp(.75rem, 10vw, 1.15rem);
+    border-radius: 10px;
+    color: white;
+    font-size: clamp(.75rem, 10vw, 1.15rem);
 }
 
 button, button.primary, vc-text-input::part(button)  {
-  background-color: #7f0080;
-  color: white;
+    background-color: #7f0080;
+    color: white;
 }
 
 vc-text-input::part(input) {
-  background-color: white;
-  color: black;
+    background-color: white;
+    color: black;
 }
 
 #login-signup {
@@ -56,7 +56,7 @@ vc-text-input::part(input) {
 
 .tabs {
     padding: 1em;
-  height: 100%;
+    height: 100%;
 }
 
 .tabs form {
@@ -84,8 +84,8 @@ vc-text-input::part(input) {
     border: 1px solid grey;
     border-bottom: 0;
     padding: 0.2em;
-  width: 30%;
-  font-size: clamp(.75rem, 2vw, 1.5rem);
+    width: 30%;
+    font-size: clamp(.75rem, 2vw, 1.5rem);
 }
 
 [role="tab"][aria-selected="true"] {
@@ -100,7 +100,7 @@ vc-text-input::part(input) {
     z-index: 2;
     height: 50vh;
     overflow-y: auto;
-  border-radius: 0 6px 6px 6px;
+    border-radius: 0 6px 6px 6px;
 }
 
 [role="tabpanel"]:focus {
@@ -115,8 +115,8 @@ vc-text-input::part(input) {
 }
 
 #sidebar {
-  width: clamp(20%, 50vw, 50%);
-  height: 100%;
+    width: clamp(20%, 50vw, 50%);
+    height: 100%;
 }
 
 #content {
@@ -126,8 +126,8 @@ vc-text-input::part(input) {
 .center {
     display: grid;
     place-content: center;
-  height: 100%;
-  place-items: center;
+    height: 100%;
+    place-items: center;
 }
 
 #users-list button {
@@ -137,17 +137,21 @@ vc-text-input::part(input) {
 }
 
 form input[type="checkbox"]{
-  margin-top: 10px;
+    margin-top: 10px;
 }
 
 fieldset {
-  width: 100%;
-  color: white;
+    width: 100%;
+    color: white;
 }
 
 #settings img {
-    width: 100%;
+    width: 20vw;
+    height: 20vw;
     max-width: 200px;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 100%;
 }
 
 textarea {
@@ -186,101 +190,150 @@ textarea {
 }
 
 .profile-image {
-  width: 100%;
-  max-width: 300px;
+    width: 100%;
+    max-width: 300px;
 }
 
 #display-name, #user-display-name {
-  text-align: center;
+    text-align: center;
 }
 
 #display-name {
-  color: white;
+    color: white;
 }
 
 #chat-application {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  width: 100%;
-  height: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
 }
 
 #chat-container {
-  width: 100%;
-  height: 100%;
+    width: 100%;
+    height: 100%;
 }
 
 #chat-section {
-  width: 100%;
-  height: 100%;
+    width: 100%;
+    height: 100%;
 }
 
 vc-messages, vc-members, vc-text-input, vc-typing-indicator {
-  padding: 0;
+    padding: 0;
 }
 
 vc-messages {
-  height: 90%;
+    height: 90%;
 }
 
 vc-messages::part(username){
-  color:white
+    color:white
 }
 
 vc-text-input {
-  font-size: 20px;
+    font-size: 20px;
 }
 
 vc-tex-input::part(input){
-  color: white;
+    color: white;
 }
 
 vc-typing-indicator {
-  color: white;
+    color: white;
 }
   
 #group-chat-users {
-  max-height: 400px;
-  overflow-y: auto;
+    max-height: 400px;
+    overflow-y: auto;
 }
 
 .vonage-spin {
-  width: 100%;
+    width: 100%;
 }
 
 li {
-  cursor: pointer;
-  margin-bottom: 5px;
-}
-
-summary {
-  cursor: pointer;
+    cursor: pointer;
+    margin-bottom: 5px;
 }
 
 .create-group-chat-container {
-  text-align: center;
-  margin: 10px;
+    text-align: center;
+    margin: 10px;
 }
 
 details {
-  color: white;
+    color: white;
 }
 
 vc-members::part(li) {
-  color: black;
+    color: black;
 }
 
 vc-members::part(ul) {
-  padding: 0;
-  border-radius: 6px;  
+    padding: 0;
+    border-radius: 6px;
 }
 
 vc-members {
-  color: #CCCCCC;
-  height: 300px;
-  width: 100%;
-  max-width: 200px;
-  --vc-members-nth-child-odd-color: #E6E6E6;
-  --vc-members-nth-child-even-color: #CCCCCC;
+    color: #CCCCCC;
+    height: 300px;
+    width: 100%;
+    max-width: 200px;
+    --vc-members-nth-child-odd-color: #E6E6E6;
+    --vc-members-nth-child-even-color: #CCCCCC;
+}
+
+details {
+    color: white;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    padding: .5em .5em 0;
+}
+
+summary {
+    cursor: pointer;
+    font-weight: bold;
+    margin: -.5em -.5em 0;
+    padding: .5em;
+}
+
+details[open] {
+    padding: .5em;
+}
+
+details[open] summary {
+    border-bottom: 1px solid #aaa;
+    margin-bottom: .5em;
+}
+
+#update-image-container {
+    width: 30vw;
+    font-size: 20px;
+}
+
+#update-image-container fieldset{
+    width: 90%;
+}
+
+#update-image-container input[type="file"]{
+    font-size: 1vw;
+}
+
+#profile-image-form {
+    text-align: center;
+}
+
+#uploadlink,
+#uploadform {
+    display: none;
+}
+
+#image-update-url:checked ~ #uploadlink {
+    display: block;
+}
+
+#image-update-upload:checked ~ #uploadform {
+    display: block;
 }
