@@ -3,7 +3,7 @@
 
 ## About this project
 
-This is "The V-app", a messaging multi-platform application that lets uses chat via text, voice and video. The app will be built on top of the [Vonage Conversation APIs](https://developer.nexmo.com/conversation/overview) using the [Vonage Client SDKs](https://developer.nexmo.com/client-sdk/overview).
+This is "The V-app", a messaging multi-platform application that lets users chat via text, voice and video. The app will be built on top of the [Vonage Conversation APIs](https://developer.nexmo.com/conversation/overview) using the [Vonage Client SDKs](https://developer.nexmo.com/client-sdk/overview).
 
 
 
@@ -41,9 +41,9 @@ Change Directory into client-web
 Install dependencies
 `npm install`
 
-Replace JWTs and Conversation ID in the index.html with ones generated for your application.
+Replace JWTs and Conversation ID in the `index.html` with ones generated for your application.
 
-Open index.html into a web bowser
+Open `index.html` into a web bowser
 
 Type either `Alice` or `Bob` into the input box and press the Login button.
 
@@ -83,4 +83,4 @@ To get started:
 
 
 ## License
-  Distributed under **MIT** License.See `License` for more information.
+Distributed under **MIT** License. See [License](https://github.com/nexmo-community/clientsdk-the-v-app/blob/main/LICENSE) for more information.
