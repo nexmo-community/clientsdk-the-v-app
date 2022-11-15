@@ -1,14 +1,12 @@
 # "The V-app"
 
-
 ## About this project
 
-This is "The V-app", a messaging multi-platform application that lets users chat via text, voice and video. The app will be built on top of the [Vonage Conversation APIs](https://developer.nexmo.com/conversation/overview) using the [Vonage Client SDKs](https://developer.nexmo.com/client-sdk/overview).
-
-
+This is "The V-app", a messaging multi-platform application that lets users chat via text, voice and video. The app will be built on top of the [Vonage Conversation APIs](https://developer.nexmo.com/conversation/overview) using the [Vonage Client SDKs](https://developer.nexmo.com/client-sdk/overview). The project requires an accompanying server to support the clients, view the [server guide](server.md) for more information and API specification.
 
 ## Installation Guide
 
+To seamlessly download, setup and run all 3 clients and the backend, you can install the [scaffold plugin](https://developer.vonage.com/blog/22/08/25/introducing-the-vonage-client-sdk-v-app-demo-projects#the-vonage-cli-scaffold-plugin) for the Vonage CLI. To manually run the applications:
 
 ### Server
 
@@ -22,15 +20,17 @@ npm install
 Create a new Vonage app:
 
 ```sh
-nexmo app:create "v-app-test" --capabilities=voice,rtc --voice-answer-url=https://example.com/voice/answer --voice-event-url=https://example.com/voice/events --rtc-event-url=https://example.com/rtc/events --keyfile=private.key
+vonage apps:create "v-app-test" --capabilities=voice,rtc --voice_answer_url=https://example.com/voice/answer --voice_event_url=https://example.com/voice/events --rtc_event_url=https://example.com/rtc/events
 ```
 
 Create an `.env` file and add the app id and private key:
 
 ```sh
 cp .env-sample .env
-less .nexmo-app
+less vonage_app.json
 ```
+
+Once you have deployed the backend, open your application on the [Vonage API dashboard](https://dashboard.nexmo.com) and update the webhook URLs.
 
 
 ### Web Client
