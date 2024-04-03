@@ -67,7 +67,9 @@ const validateDisplayName = (display_name, invalid_parameters) => {
   }
 }
 
-module.exports = {
+const Validation = {
   validateSignupParameters,
   validateLoginParameters
 }
+
+export default Validation;

@@ -1,31 +1,27 @@
-require('dotenv').config();
+import 'dotenv/config'
+import express from 'express';
 
-const express = require('express');
-const cors = require('cors');
+import auth from './routes/auth.js';
+import users from './routes/users.js';
+import webhooks from './routes/webhooks.js';
+
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.VCR_PORT || process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(cors());
-app.options('*', cors())
 
-app.use('/', require('./routes/general'));
-app.use('/', require('./routes/auth'));
-app.use('/', require('./routes/webhooks'));
-app.use('/', require('./routes/vonage'));
+app.use('/', auth);
+app.use('/', users);
+app.use('/', webhooks);
 
-if (process.env.USE_LOCALTUNNEL === 'FALSE' || process.env.USE_LOCALTUNNEL == null) {
-  app.listen(port, () => {
-    console.log(`App listening at http://localhost:${port}`)
-  });
-} else {
-  app.listen(port);
-  const localtunnel = require('localtunnel');
-  (async () => {
-    const tunnel = await localtunnel({ 
-        subdomain: process.env.vonageAppId, 
-        port: port
-      });
-    console.log(`App available at: ${tunnel.url}`);
-  })();
-}
+app.get('/_/health', async (req, res) => {
+  res.sendStatus(200);
+});
+
+app.get('/_/metrics', async (req, res) => {
+  res.sendStatus(200);
+});
+
+app.listen(port, () => {
+  console.log(`App listening at http://localhost:${port}`)
+});

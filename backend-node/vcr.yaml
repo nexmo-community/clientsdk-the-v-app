@@ -1,0 +1,17 @@
+project:
+    name: vapp
+instance:
+    name: dev
+    runtime: nodejs18
+    region: aws.euw1
+    application-id: 41280a42-6664-4041-8789-ad1271689813
+    entrypoint: [npm, run, start]
+    capabilities: [voice, rtc]
+    environment:
+        - name: STORAGE_TYPE
+          value: "VCR"
+    build-script: ./build.sh
+
+debug:
+    name: debug
+    entrypoint: [nodemon, index.js]
