@@ -1,5 +1,10 @@
+import { Assets, vcr } from '@vonage/vcr-sdk';
 import bcrypt from 'bcrypt';
-import { vcr } from '@vonage/vcr-sdk';
+import crypto from 'crypto';
+import path from 'path';
+import fs from 'fs';
+import os from 'os';
+
 const tableName = 'users';
 
 const getUser = async (name) => {
@@ -7,6 +12,18 @@ const getUser = async (name) => {
 
     if (process.env.STORAGE_TYPE === 'VCR') {
         user = await getUserVCR(name);
+    }
+
+    return user;
+}
+
+const updateUser = async (name, imageUrl) => {
+    let user;
+
+    if (process.env.STORAGE_TYPE === 'VCR') {
+        user = await getUserVCR(name);
+        user.imageUrl = imageUrl;
+        await storeUserVCR(user);
     }
 
     return user;
@@ -20,7 +37,7 @@ const getAllUsers = async () => {
     }
 
     let mappedUsers = users.map(user => ({
-        id: user.id, name: user.name, display_name: user.displayName
+        id: user.id, name: user.name, display_name: user.displayName, image_url: user.imageUrl
     }));
 
     return mappedUsers
@@ -43,10 +60,24 @@ const storeUser = async (id, name, displayName, password) => {
     return { id: id, name: name, display_name: displayName };
 }
 
+const storeUserImage = async (userId, imageBuffer) => {
+    if (process.env.STORAGE_TYPE === 'VCR') {
+        const imageUrl = await storeImageVCR(`vapp/profiles/${userId}`, imageBuffer);
+        return imageUrl;
+    }
+}
+
+const storeImage = async (imageBuffer) => {
+    if (process.env.STORAGE_TYPE === 'VCR') {
+        const imageUrl = await storeImageVCR('vapp/chat/images', imageBuffer);
+        return imageUrl;
+    }
+}
+
 const authUser = async (user, password) => {
     const isAuthed = await bcrypt.compare(password, user.password);
     if (isAuthed) {
-        return { id: user.id, name: user.name, display_name: user.displayName };
+        return { id: user.id, name: user.name, display_name: user.displayName, image_url: user.imageUrl };
     } else {
         return null;
     }
@@ -70,13 +101,46 @@ async function getAllUsersVCR() {
 
 async function storeUserVCR(user) {
     const state = vcr.getInstanceState();
-    await state.mapSet(tableName, { [user.name]: JSON.stringify(user) } )
+    await state.mapSet(tableName, { [user.name]: JSON.stringify(user) })
 }
+
+async function storeImageVCR(basePath, imageFile) {
+    const assets = new Assets(vcr.getGlobalSession());
+
+    const fileExtension = mimeTypeToExtension(imageFile.mimetype);
+    const filename = `${generateRandomString(10)}.${fileExtension}`;
+    const filePath = path.join(os.tmpdir(), filename);
+
+    await fs.writeFileSync(filePath, imageFile.buffer);
+    await assets.uploadFiles([filePath], basePath);
+
+    let link = await assets.generateLink(`${basePath}/${filename}`);
+    return link.downloadUrl;
+}
+
+function mimeTypeToExtension(mimeType) {
+    const parts = mimeType.split('/');
+    if (parts.length === 2) {
+        return parts[1];
+    } else {
+        return null;
+    }
+}
+
+function generateRandomString(length) {
+    return crypto.randomBytes(Math.ceil(length / 2))
+        .toString('hex')
+        .slice(0, length);
+}
+
 
 const Storage = {
     getUser,
+    updateUser,
     getAllUsers,
     storeUser,
+    storeUserImage,
+    storeImage,
     authUser
 }
 

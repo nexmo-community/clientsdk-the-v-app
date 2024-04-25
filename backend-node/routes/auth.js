@@ -1,26 +1,14 @@
 import express from 'express';
 
-import JWT from '../helpers/jwt.js';
 import Validation from '../helpers/validation.js';
 import Storage from '../helpers/storage.js';
 import Users from '../helpers/users.js';
+import JWT from '../helpers/jwt.js';
 
 const authRoutes = express.Router();
 
-authRoutes.post('/token', async (req, res) => {
+authRoutes.post('/token', Validation.validateLoginParameters, async (req, res) => {
   const { name, password } = req.body;
-
-  // Validate parameters
-  const invalid_parameters = Validation.validateLoginParameters(name, password);
-  if (invalid_parameters.length > 0) {
-    res.status(400).send({
-      "type": "data:validation",
-      "title": "Bad Request",
-      "detail": "The request failed due to validation errors",
-      invalid_parameters
-    });
-    return;
-  }
 
   // Check if user exists
   const storedUser = await Storage.getUser(name);
@@ -44,25 +32,13 @@ authRoutes.post('/token', async (req, res) => {
     return;
   }
 
-  // Login successful
+  // Refresh successful
   const token = JWT.getUserJWT(authenticatedUser.name, authenticatedUser.id);
   res.status(200).send({ token: token });
 });
 
-authRoutes.post('/signup', async (req, res) => {
+authRoutes.post('/signup', Validation.validateSignupParameters, async (req, res) => {
   const { name, password, display_name } = req.body;
-
-  // Validate parameters
-  const invalid_parameters = Validation.validateSignupParameters(name, password, display_name);
-  if (invalid_parameters.length > 0) {
-    res.status(400).send({
-      "type": "data:validation",
-      "title": "Bad Request",
-      "detail": "The request failed due to validation errors",
-      invalid_parameters
-    });
-    return;
-  }
 
   // Check if user exists
   const storedUser = await Storage.getUser(name);
@@ -102,28 +78,16 @@ authRoutes.post('/signup', async (req, res) => {
       "detail": "There was an issue with the database.",
     });
     return;
-  } 
+  }
 
   // New User created successfully
   const jsonResponse = await authJSONResponse(user);
   res.status(201).json(jsonResponse);
-  
+
 });
 
-authRoutes.post('/login', async (req, res) => {
+authRoutes.post('/login', Validation.validateLoginParameters, async (req, res) => {
   const { name, password } = req.body;
-
-  // Validate parameters
-  const invalid_parameters = Validation.validateLoginParameters(name, password);
-  if (invalid_parameters.length > 0) {
-    res.status(400).send({
-      "type": "data:validation",
-      "title": "Bad Request",
-      "detail": "The request failed due to validation errors",
-      invalid_parameters
-    });
-    return;
-  }
 
   // Check if user exists
   const storedUser = await Storage.getUser(name);
@@ -156,7 +120,7 @@ async function authJSONResponse(user) {
   const token = JWT.getUserJWT(user.name, user.id);
   const users = await Storage.getAllUsers();
 
-  const currentUserIndex = users.findIndex( u => u.id === user.id);
+  const currentUserIndex = users.findIndex(u => u.id === user.id);
 
   if (currentUserIndex !== -1) {
     users.splice(currentUserIndex, 1);

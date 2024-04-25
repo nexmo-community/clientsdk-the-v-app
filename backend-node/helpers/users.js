@@ -15,19 +15,32 @@ const create = async (name, displayName) => {
   let error;
 
   try {
-    vonageUser = await vonage.users.createUser({name: name, displayName: displayName});
+    vonageUser = await vonage.users.createUser({ name: name, displayName: displayName });
   }
   catch (err) {
     error = err.response.data || err;
   }
 
-  return { vonageUser, error};
+  return { vonageUser, error };
 }
 
-// const addImage = async (user_id, image_url) => {}
+const updateImage = async (userId, imageUrl) => {
+  let vonageUser;
+  let error;
+
+  try {
+    vonageUser = await vonage.users.updateUser({ id: userId, imageUrl: imageUrl });
+  }
+  catch (err) {
+    error = err.response.data || err;
+  }
+
+  return { vonageUser, error };
+}
 
 const Users = {
-  create
+  create,
+  updateImage
 };
 
 export default Users;
