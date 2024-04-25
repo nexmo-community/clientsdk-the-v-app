@@ -114,7 +114,7 @@ async function storeImageVCR(basePath, imageFile) {
     await fs.writeFileSync(filePath, imageFile.buffer);
     await assets.uploadFiles([filePath], basePath);
 
-    let link = await assets.generateLink(`${basePath}/${filename}`);
+    let link = await assets.generateLink(`${basePath}/${filename}`, '999d');
     return link.downloadUrl;
 }
 
