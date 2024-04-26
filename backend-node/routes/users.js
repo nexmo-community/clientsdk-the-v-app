@@ -16,8 +16,18 @@ const imageUpload = upload.fields(
   ]
 );
 
-userRoutes.get('/users', async (req, res, next) => {
+userRoutes.get('/users', Validation.decodeJWT, async (req, res, next) => {
   try {
+    const user = await Storage.getUser(req.userJWT.sub);
+    if (!user) {
+        res.status(403).send({
+            "type": "auth:unauthorized",
+            "title": "Bad Request",
+            "detail": "The request failed due to invalid credentials"
+        });
+        return;
+    }
+
     const users = await Storage.getAllUsers();
     res.json(users);
   } catch (e) {
@@ -31,14 +41,31 @@ userRoutes.post('/users/image', Validation.decodeJWT, imageUpload, async (req, r
     const username = req.userJWT.sub;
     const imageFile = req.files.image[0];
 
+    const user = await Storage.getUser(username);
+    if (!user) {
+        res.status(403).send({
+            "type": "auth:unauthorized",
+            "title": "Bad Request",
+            "detail": "The request failed due to invalid credentials"
+        });
+        return;
+    }
+
     const imageUrl = await Storage.storeUserImage(userId, imageFile);
     const vonageUser = await Users.updateImage(userId, imageUrl);
 
     if (vonageUser) {
-      await Storage.updateUser(username, imageUrl)
+      await Storage.updateUser(username, imageUrl);
+      res.json({ imageUrl: imageUrl });
+      return;
+    } else {
+      res.status(500).send({
+        "type": "internal",
+        "title": "Internal Server Error",
+        "detail": "The request failed, try again"
+    });
     }
 
-    res.json({ imageUrl: imageUrl });
   } catch (e) {
     next(e);
   }
