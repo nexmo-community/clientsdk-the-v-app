@@ -30,7 +30,7 @@ imageRoutes.post('/image', Validation.decodeJWT, imageUpload, async (req, res, n
         const imageFile = req.files.image[0];
         const imageUrl = await Storage.storeImage(imageFile);
 
-        res.json({ imageUrl: imageUrl });
+        res.json({ image_url: imageUrl });
     } catch (e) {
         next(e);
     }

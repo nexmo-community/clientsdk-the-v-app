@@ -56,7 +56,7 @@ userRoutes.post('/users/image', Validation.decodeJWT, imageUpload, async (req, r
 
     if (vonageUser) {
       await Storage.updateUser(username, imageUrl);
-      res.json({ imageUrl: imageUrl });
+      res.json({ image_url: imageUrl });
       return;
     } else {
       res.status(500).send({
