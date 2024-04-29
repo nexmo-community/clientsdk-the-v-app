@@ -35,7 +35,13 @@ final class HomeViewModel: ObservableObject {
     var incomingConversationId: String!
     var incomingInviter: String!
     
+    var user: Users.User?
+    var token: String?
+    
     init() {
+        self.user = clientManager.user
+        self.token = clientManager.token
+        
         clientManager.onCall
             .receive(on: DispatchQueue.main)
             .sink { [weak self] call in
@@ -56,7 +62,7 @@ final class HomeViewModel: ObservableObject {
             .filter { !($0.from is VGSystem) }
             .map { $0 as! VGMemberInvitedEvent }
             .sink { [weak self] event in
-                guard event.body.user.name == self?.clientManager.username else { return }
+                guard event.body.user.name == self?.clientManager.user?.name else { return }
                 self?.incomingConversationId = event.conversationId
                 self?.incomingInviter = "Unknown"
                 
@@ -136,5 +142,11 @@ final class HomeViewModel: ObservableObject {
         } catch {
             errorContainer = (true, error.localizedDescription)
         }
+    }
+    
+    func updateUser(imageURL: String?) {
+        guard let user = user, let imageURL = imageURL else { return }
+        let newUser = Users.User(id: user.id, name: user.name, displayName: user.displayName, imageURL: imageURL)
+        self.user = newUser
     }
 }

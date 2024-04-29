@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import ExyteChat
 import VonageClientSDK
 
 extension VGConversation: Identifiable {}
@@ -56,6 +55,19 @@ struct Auth: Codable {
     
     struct RefreshResponse: Codable {
         let token: String
+    }
+}
+
+struct ImageUpload: Codable {
+    static let profilePath = "/users/image"
+    static let chatPath = "/image"
+    
+    struct Response: Codable {
+        let imageURL: String
+        
+        enum CodingKeys: String, CodingKey {
+            case imageURL = "image_url"
+        }
     }
 }
 

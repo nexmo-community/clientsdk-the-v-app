@@ -12,8 +12,8 @@ import VonageClientSDK
 final class ClientManager: NSObject, ObservableObject {
     static let shared = ClientManager()
     
+    public var user: Users.User? = nil
     public var token: String? = nil
-    public var username = ""
     public var client: VGVonageClient!
     
     @Published var isAuthed = false
@@ -60,7 +60,7 @@ final class ClientManager: NSObject, ObservableObject {
         
         let authResponse: Auth.Response = try await RemoteLoader.post(path: path, body: body)
         self.token = authResponse.token
-        self.username = username
+        self.user = authResponse.user
         try await client?.createSession(authResponse.token)
         
         if shouldStoreCredentials {
@@ -80,15 +80,19 @@ final class ClientManager: NSObject, ObservableObject {
     }
     
     public func logout() async throws {
-        try await client.deleteSession()
-        deleteCredentials(username: username)
+        if let username = user?.name {
+            try await client.deleteSession()
+            deleteCredentials(username: username)
+        } else {
+            // TODO: throw error
+        }
     }
     
     // MARK: - Private
     
     private func initializeClient() {
         VGVonageClient.isUsingCallKit = false
-        let config = VGClientInitConfig(loggingLevel: .error, enableWebSocketInvites: true, rtcStatsTelemetry: false)
+        let config = VGClientInitConfig(loggingLevel: .error, region: .EU, enableWebSocketInvites: true, rtcStatsTelemetry: false)
         self.client = VGVonageClient(config)
         client.delegate = self
     }

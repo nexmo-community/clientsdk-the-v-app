@@ -69,7 +69,7 @@ final class ChatInviteViewModel: ObservableObject {
         await withThrowingTaskGroup(of: Void.self) { group in
             for username in usernames {
                 group.addTask {
-                    let memberId = try await self.clientManager.client.inviteToConversation(self.conversationId, username: username)
+                    _ = try await self.clientManager.client.inviteToConversation(self.conversationId, username: username)
                 }
             }
         }

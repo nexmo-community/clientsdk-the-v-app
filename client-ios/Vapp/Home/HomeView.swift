@@ -90,7 +90,7 @@ struct HomeView: View {
                 dismiss()
             }
         }) {
-            SettingsView(viewModel: viewModel)
+            SettingsView(homeViewModel: viewModel)
         }
         .sheet(isPresented: $viewModel.showIncomingCall) {
             IncomingCallView(viewModel: viewModel)

@@ -60,7 +60,6 @@ final class UsersViewModel: ObservableObject {
             self.callId = try await clientManager.client.serverCall(["to" : callee])
             self.callee = callee
             callCreated = true
-            
         } catch {
             errorContainer = (true, error.localizedDescription)
         }

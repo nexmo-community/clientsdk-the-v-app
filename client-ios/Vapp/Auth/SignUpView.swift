@@ -50,6 +50,7 @@ final class SignUpViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var errorContainer = (hasError: false, text: "")
     
+    @MainActor
     func signUp() async {
         do {
             try await ClientManager.shared.auth(username: username, password: password, displayName: displayName, path: Auth.signupPath)
