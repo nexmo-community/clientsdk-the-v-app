@@ -11,9 +11,9 @@ import PhotosUI
 struct SettingsView: View {
     @ObservedObject var homeViewModel: HomeViewModel
     @ObservedObject var viewModel = SettingsViewModel()
-    @Environment(\.dismiss) var dismiss
+    @Environment(\.dismiss) private var dismiss
     
-    @State var selectedPhoto: PhotosPickerItem?
+    @State private var selectedPhoto: PhotosPickerItem?
     
     var body: some View {
         NavigationStack {
@@ -21,7 +21,7 @@ struct SettingsView: View {
                 if viewModel.isLoading {
                   ProgressView()
                 } else {
-                    PhotosPicker(selection: $selectedPhoto) {
+                    PhotosPicker(selection: $selectedPhoto, matching: .images) {
                         ZStack {
                             if let url = viewModel.imageURL {
                                 AsyncImage(url: url) { phase in

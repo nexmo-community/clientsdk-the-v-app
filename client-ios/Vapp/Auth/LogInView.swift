@@ -9,7 +9,6 @@ import SwiftUI
 
 struct LogInView: View {
     @StateObject var viewModel = LogInViewModel()
-    @StateObject var clientManager = ClientManager.shared
     
     var body: some View {
         NavigationStack {
@@ -43,7 +42,7 @@ struct LogInView: View {
             .alert(isPresented: $viewModel.errorContainer.hasError) {
                 Alert(title: Text("Error"), message: Text(viewModel.errorContainer.text))
             }
-            .navigationDestination(isPresented: $clientManager.isAuthed) {
+            .navigationDestination(isPresented: $viewModel.showHomeView) {
                 HomeView()
             }
             .navigationDestination(isPresented: $viewModel.showSignUp) {
@@ -59,20 +58,30 @@ final class LogInViewModel: ObservableObject {
     
     @Published var isLoading = false
     @Published var showSignUp = false
+    @Published var showHomeView = false
     @Published var errorContainer = (hasError: false, text: "")
+    
+    private let clientManager = ClientManager.shared
     
     @MainActor
     func logIn() async {
         do {
-            try await ClientManager.shared.auth(username: username, password: password, path: Auth.loginPath)
+            try await clientManager.auth(username: username, password: password, path: Auth.loginPath)
             username = ""
             password = ""
+            if clientManager.isAuthed {
+                showHomeView = true
+            }
         } catch {
             errorContainer = (true, error.localizedDescription)
         }
     }
     
+    @MainActor
     func attemptStoredLogIn() async {
-        await ClientManager.shared.attemptStoredLogIn()
+        await clientManager.attemptStoredLogIn()
+        if clientManager.isAuthed {
+            showHomeView = true
+        }
     }
 }

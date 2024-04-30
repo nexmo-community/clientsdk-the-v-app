@@ -20,7 +20,7 @@ final class ClientManager: NSObject, ObservableObject {
     var users: [Users.User] = []
     
     // Chat Publisher
-    private var handledEventKinds: Set<VGEventKind> = [.memberInvited, .memberJoined, .memberLeft, .messageText]
+    private var handledEventKinds: Set<VGEventKind> = [.memberInvited, .memberJoined, .memberLeft, .messageText, .messageImage]
     private let messageSubject = PassthroughSubject<VGConversationEvent, Never>()
     public var onEvent: AnyPublisher<VGConversationEvent, Never> {
         messageSubject
@@ -55,7 +55,7 @@ final class ClientManager: NSObject, ObservableObject {
     
     // MARK: - Public
     
-    public func auth(username: String, password: String, displayName: String? = nil, path: String, shouldStoreCredentials: Bool = true) async throws {
+    public func auth(username: String, password: String, displayName: String? = nil, path: String) async throws {
         let body = Auth.Body(name: username, password: password, displayName: displayName)
         
         let authResponse: Auth.Response = try await RemoteLoader.post(path: path, body: body)
@@ -63,9 +63,7 @@ final class ClientManager: NSObject, ObservableObject {
         self.user = authResponse.user
         try await client?.createSession(authResponse.token)
         
-        if shouldStoreCredentials {
-            storeCredentials(username: username, password: password)
-        }
+        storeCredentials(username: username, password: password)
         
         await MainActor.run {
             isAuthed = true
@@ -75,17 +73,13 @@ final class ClientManager: NSObject, ObservableObject {
     
     public func attemptStoredLogIn() async {
         if let credentials = getCredentials() {
-            try? await auth(username: credentials.0, password: credentials.1, path: Auth.loginPath, shouldStoreCredentials: false)
+            try? await auth(username: credentials.0, password: credentials.1, path: Auth.loginPath)
         }
     }
     
     public func logout() async throws {
-        if let username = user?.name {
-            try await client.deleteSession()
-            deleteCredentials(username: username)
-        } else {
-            // TODO: throw error
-        }
+        try await client.deleteSession()
+        deleteCredentials()
     }
     
     // MARK: - Private
@@ -145,6 +139,7 @@ extension ClientManager: VGClientDelegate {
 
 extension ClientManager {
     private func storeCredentials(username: String, password: String) {
+        deleteCredentials()
         if let passwordData = password.data(using: .utf8) {
             let keychainItem = [
                 kSecClass: kSecClassInternetPassword,
@@ -183,13 +178,12 @@ extension ClientManager {
         }
     }
     
-    private func deleteCredentials(username: String) {
+    private func deleteCredentials() {
         let query = [
-            kSecClass: kSecClassInternetPassword,
-            kSecAttrServer: Constants.keychainServer,
-            kSecAttrAccount: username
+            kSecClass: kSecClassInternetPassword
         ] as CFDictionary
         
         SecItemDelete(query)
+        print("Keychain deleting attempted")
     }
 }

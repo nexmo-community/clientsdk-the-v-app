@@ -16,6 +16,28 @@ struct UsersView: View {
             VStack {
                 List(viewModel.users) { user in
                     HStack {
+                        if let url = user.imageURL {
+                            AsyncImage(url: URL(string: url)) { phase in
+                                if let image = phase.image {
+                                    image
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 50, height: 50)
+                                        .clipShape(Circle())
+                                        .padding(8)
+                                } else {
+                                    ProgressView()
+                                        .frame(width: 50, height: 50)
+                                }
+                            }
+                        } else {
+                            Image(systemName: "person.circle.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 50, height: 50)
+                                .clipShape(Circle())
+                                .padding(8)
+                        }
                         Text(user.name)
                         Spacer()
                         Button(action: {

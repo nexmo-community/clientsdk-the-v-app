@@ -13,7 +13,6 @@ struct CallView: View {
     @StateObject var viewModel: CallViewModel
     
     var body: some View {
-        
         NavigationStack {
             VStack {
                 Text(viewModel.callStatus)
