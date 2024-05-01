@@ -100,7 +100,11 @@ const decodeJWT = async (req, res, next) => {
   const token = req.headers.authorization;
 
   if (!token) {
-    return res.status(401).json({ message: 'No token provided' });
+    return res.status(400).send({
+      "type": "auth:missingtoken",
+      "title": "Bad Request",
+      "detail": "The request failed due to a missing token"
+    });
   }
 
   try {
@@ -108,12 +112,20 @@ const decodeJWT = async (req, res, next) => {
     req.userJWT = decoded.payload;
 
     if (!decoded.payload.user_id) {
-      return res.status(401).json({ message: 'Invalid token' });
+      return res.status(400).send({
+        "type": "auth:missinguserid",
+        "title": "Bad Request",
+        "detail": "The request failed due to an incorrect token"
+      });
     }
 
     next();
   } catch (error) {
-    return res.status(401).json({ message: 'Invalid token' });
+    return res.status(400).send({
+      "type": "auth:badtoken",
+      "title": "Bad Request",
+      "detail": "The request failed due to an incorrect token"
+    });
   }
 };
 

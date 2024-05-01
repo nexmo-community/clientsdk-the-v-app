@@ -7,36 +7,6 @@ import JWT from '../helpers/jwt.js';
 
 const authRoutes = express.Router();
 
-authRoutes.post('/token', Validation.validateLoginParameters, async (req, res) => {
-  const { name, password } = req.body;
-
-  // Check if user exists
-  const storedUser = await Storage.getUser(name);
-  if (!storedUser) {
-    res.status(403).send({
-      "type": "auth:unauthorized",
-      "title": "Bad Request",
-      "detail": "The request failed due to invalid credentials"
-    });
-    return;
-  }
-
-  // Authenticate user
-  const authenticatedUser = await Storage.authUser(storedUser, password);
-  if (!authenticatedUser) {
-    res.status(403).send({
-      "type": "auth:unauthorized",
-      "title": "Bad Request",
-      "detail": "The request failed due to invalid credentials"
-    });
-    return;
-  }
-
-  // Refresh successful
-  const token = JWT.getUserJWT(authenticatedUser.name, authenticatedUser.id);
-  res.status(200).send({ token: token });
-});
-
 authRoutes.post('/signup', Validation.validateSignupParameters, async (req, res) => {
   const { name, password, display_name } = req.body;
 
@@ -114,6 +84,36 @@ authRoutes.post('/login', Validation.validateLoginParameters, async (req, res) =
   // Login successful
   const jsonResponse = await authJSONResponse(authenticatedUser);
   res.status(200).send(jsonResponse);
+});
+
+authRoutes.post('/token', Validation.validateLoginParameters, async (req, res) => {
+  const { name, password } = req.body;
+
+  // Check if user exists
+  const storedUser = await Storage.getUser(name);
+  if (!storedUser) {
+    res.status(403).send({
+      "type": "auth:unauthorized",
+      "title": "Bad Request",
+      "detail": "The request failed due to invalid credentials"
+    });
+    return;
+  }
+
+  // Authenticate user
+  const authenticatedUser = await Storage.authUser(storedUser, password);
+  if (!authenticatedUser) {
+    res.status(403).send({
+      "type": "auth:unauthorized",
+      "title": "Bad Request",
+      "detail": "The request failed due to invalid credentials"
+    });
+    return;
+  }
+
+  // Refresh successful
+  const token = JWT.getUserJWT(authenticatedUser.name, authenticatedUser.id);
+  res.status(200).send({ token: token });
 });
 
 async function authJSONResponse(user) {

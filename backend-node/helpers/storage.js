@@ -7,6 +7,18 @@ import os from 'os';
 
 const tableName = 'users';
 
+/*
+If you are not using VCR for storage here are the objects and their fields
+
+User:
+
+{ id: "", name: "", display_name: "", image_url: "", password: "" }
+
+Users:
+
+[{ id: "", name: "", display_name: "", image_url: "", password: "" }]
+*/
+
 const getUser = async (name) => {
     let user;
 
