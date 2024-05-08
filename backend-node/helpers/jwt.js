@@ -5,6 +5,7 @@ const privateKey = process.env.VCR_PRIVATE_KEY || process.env.privateKey;
 
 const aclPaths = {
   "paths": {
+    "/*/rtc/**":{},
     "/*/users/**": {},
     "/*/conversations/**": {},
     "/*/sessions/**": {},
