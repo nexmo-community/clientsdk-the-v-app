@@ -1,12 +1,20 @@
-const express = require('express');
-const { Pool } = require('pg');
-const {rtcEvents} = require('../webhooks');
+import express from 'express';
+import { Voice, Conversation, vcr } from '@vonage/vcr-sdk';
 
 const webhookRoutes = express.Router();
 
-webhookRoutes.get('/voice/answer', async (req, res) => {
+if (process.env.STORAGE_TYPE === "VCR") {
+  const voice = new Voice(vcr.getGlobalSession());
+  await voice.onCall('/voice/answer');
+  await voice.onCallEvent({ callback: '/voice/events'});
+
+  const conversation = new Conversation(vcr.getGlobalSession());
+  await conversation.onConversationEvent('/rtc/events');
+}
+
+webhookRoutes.post('/voice/answer', async (req, res) => {
   var ncco = [{"action": "talk", "text": "No destination user - hanging up"}];
-  var username = req.query.to;
+  var username = req.body.to;
   if (username) {
     ncco = [
       {
@@ -27,60 +35,14 @@ webhookRoutes.get('/voice/answer', async (req, res) => {
   res.json(ncco);
 });
 
-webhookRoutes.post('/rtc/events', async (req, res) => {
-  const { application_id, timestamp, type, conversation_id, body } = req.body;
-  
-  if(application_id !== process.env.vonageAppId) {
-    res.status(403).json({status: "Invalid application id"});
-    return;
-  }
-  if(!type) {
-    res.status(404).json({status: "type not supplied"});
-    return;
-  }
-
-  console.log(`🎉🎉🎉🎉 TYPE: ${type}`);
-  console.log(JSON.stringify(req.body));
-  console.log("----------------------------");
-
-
-  const pool = new Pool({ connectionString: process.env.postgresDatabaseUrl });
-  pool.connect(async (err, client, done) => {
-    if (err) throw err
-    let status = ""
-    switch(type) {
-      case  "conversation:created":
-        status = await rtcEvents.conversations.create(client, body);
-        break;
-      case  "conversation:updated":
-        status = await rtcEvents.conversations.update(client, body);
-        break;
-      case  "conversation:deleted":
-        status = await rtcEvents.conversations.destroy(client, body);
-        break;
-      case  "member:invited":
-        status = await rtcEvents.members.invited(client, req.body);
-        break;
-      case  "member:joined":
-        status = await rtcEvents.members.statusUpdate(client, 'JOINED', req.body);
-        break;
-      case  "member:left":
-        status = await rtcEvents.members.statusUpdate(client, 'LEFT', req.body);
-        break;
-      case "message":
-        status = await rtcEvents.message.create(client, req.body);
-        break;
-      default:
-        console.log(`🚨🚨🚨 UNHANDLED TYPE: ${type}`);
-        console.log(req.body);
-        console.log(`BODY:  ${JSON.stringify(req.body)}`);
-        console.log("----------------------------");
-        status = `🚨🚨🚨 UNHANDLED TYPE: ${type}`;
-    }
-    res.status(200).json({status});
-    client.release();
-  });
-  pool.end();
+webhookRoutes.post('/voice/events', async (req, res) => {
+  console.log(`VOICE EVENT: ${req.body}`);
+  res.sendStatus(200);
 });
 
-module.exports = webhookRoutes
+webhookRoutes.post('/rtc/events', async (req, res) => {
+  console.log(`RTC EVENT: ${req.body}`);
+  res.sendStatus(200);
+});
+
+export default webhookRoutes;

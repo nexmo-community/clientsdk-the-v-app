@@ -1,80 +1,18 @@
-const { json } = require('express');
-const express = require('express');
-const { Pool } = require('pg');
+import express from 'express';
 
-const Data = require('../data');
-const JWT = require('../jwt');
-const Validation = require('../validation');
-const Vonage = require('../vonage');
+import Validation from '../helpers/validation.js';
+import Storage from '../helpers/storage.js';
+import Users from '../helpers/users.js';
+import JWT from '../helpers/jwt.js';
 
 const authRoutes = express.Router();
 
-authRoutes.post('/signup', async (req, res) => {
+authRoutes.post('/signup', Validation.validateSignupParameters, async (req, res) => {
   const { name, password, display_name } = req.body;
 
-  // validate that they done passed everything in
-  const invalid_parameters = Validation.validateSignupParameters(name, password, display_name);
-
-  if (invalid_parameters.length > 0) {
-    res.status(400).send({
-      "type": "data:validation",
-      "title": "Bad Request",
-      "detail": "The request failed due to validation errors",
-      invalid_parameters
-    });
-    return;
-  }
-
-  const pool = new Pool({ connectionString: process.env.postgresDatabaseUrl });
-  pool.connect(async (err, client, done) => {
-    if (err) throw err
-
-    // retrieve all users from Vonage into Data
-    await Data.users.syncAll();
-
-    let user = await Data.users.getByName(client, name);
-    // Check if a Vonage User exists in the local Data
-    if (user) {
-      await signupExistingUser(res, client, user, name, password);
-    } else {
-      // Create Vonage User (also does a sync of all users from Vonage)
-      const { vonageUser, error } = await Vonage.users.create(name, display_name);
-      if (error) {
-        await signupCreateVonageUserError(res, client, error, name, password);
-      } else {
-        let user = await Data.users.create(client, vonageUser.id, name, display_name, password);
-        if (!user) {
-          // Error creating New User
-          res.status(500).send({
-            "type": "system:error",
-            "title": "System Failure",
-            "detail": "There was an issue with the database.",
-          });
-        } else {
-          // New User created successfully
-          user.id = user.vonage_id;
-          delete user.vonage_id;
-          const token = JWT.getUserJWT(user.name, user.id);
-          let users = await Data.users.getInterlocutorsFor(client, user.name);
-          const conversations = await Data.conversations.getAllForUser(client, user.id);
-          jsonResponse = {
-            user,
-            token,
-            users,
-            conversations
-          }
-          console.log(jsonResponse);
-          res.status(201).send(jsonResponse);
-        }
-      }
-    }
-    client.release();
-  });
-  pool.end();
-});
-
-const signupExistingUser = async function (res, client, user, name, password) {
-  if(user.password_digest) {
+  // Check if user exists
+  const storedUser = await Storage.getUser(name);
+  if (storedUser) {
     res.status(409).send({
       "type": "data:validation",
       "title": "Bad Request",
@@ -86,23 +24,12 @@ const signupExistingUser = async function (res, client, user, name, password) {
         }
       ]
     });
-  } else {
-    user.id = user.vonage_id;
-    delete user.vonage_id;
-    await Data.users.addPassword(client, name, password);
-    const token = JWT.getUserJWT(user.name, user.id);
-    jsonResponse = {
-      user,
-      token
-    }
-    console.log(jsonResponse);
-    res.status(201).send(jsonResponse);
+    return;
   }
-};
 
-const signupCreateVonageUserError = async function(res, client, error, name, password) {
-  // return any error apart from user name duplicate
-  if(error.code != 'user:error:duplicate-name') {
+  // Create Vonage user
+  const { vonageUser, error } = await Users.create(name, display_name);
+  if (error) {
     res.status(500).send({
       "type": "system:error",
       "title": "System Failure",
@@ -110,70 +37,100 @@ const signupCreateVonageUserError = async function(res, client, error, name, pas
     });
     return;
   }
-  // find local user
-  user = await Data.users.getByName(client, name);
-  // no local user - THIS SHOULD NEVER HAPPEN
-  if(!user) {
+
+  // Store user
+  const user = await Storage.storeUser(vonageUser.id, name, display_name, password);
+  if (!user) {
+    // Error creating New User
     res.status(500).send({
       "type": "system:error",
       "title": "System Failure",
       "detail": "There was an issue with the database.",
     });
-    return
+    return;
   }
-  user.id = user.vonage_id;
-  delete user.vonage_id;
-  // The user existed on the Vonage server - we'll add the password
-  await Data.users.addPassword(client, name, password);
-  const token = JWT.getUserJWT(user.name, user.id);
-  res.status(201).send({
-    user,
-    token
-  });
-};
 
-authRoutes.post('/login', async (req, res) => {
+  // New User created successfully
+  const jsonResponse = await authJSONResponse(user);
+  res.status(201).json(jsonResponse);
+
+});
+
+authRoutes.post('/login', Validation.validateLoginParameters, async (req, res) => {
   const { name, password } = req.body;
-  const invalid_parameters = Validation.validateLoginParameters(name, password);
-  if (invalid_parameters.length > 0) {
-    res.status(400).send({
-      "type": "data:validation",
+
+  // Check if user exists
+  const storedUser = await Storage.getUser(name);
+  if (!storedUser) {
+    res.status(403).send({
+      "type": "auth:unauthorized",
       "title": "Bad Request",
-      "detail": "The request failed due to validation errors",
-      invalid_parameters
+      "detail": "The request failed due to invalid credentials"
     });
     return;
   }
 
-  const pool = new Pool({ connectionString: process.env.postgresDatabaseUrl });
-  pool.connect(async (err, client, done) => {
-    if (err) throw err
-    const user = await Data.users.authenticate(client, name, password);
+  // Authenticate user
+  const authenticatedUser = await Storage.authUser(storedUser, password);
+  if (!authenticatedUser) {
+    res.status(403).send({
+      "type": "auth:unauthorized",
+      "title": "Bad Request",
+      "detail": "The request failed due to invalid credentials"
+    });
+    return;
+  }
 
-    if (!user) {
-      res.status(403).send({
-        "type": "auth:unauthorized",
-        "title": "Bad Request",
-        "detail": "The request failed due to invalid credentials"
-      });
-    } else {
-      user.id = user.vonage_id;
-      delete user.vonage_id;
-      const token = JWT.getUserJWT(user.name, user.id);
-      let users = await Data.users.getInterlocutorsFor(client, user.name);
-      const conversations = await Data.conversations.getAllForUser(client, user.id, true);
-      jsonResponse = {
-        user,
-        token,
-        users,
-        conversations
-      }
-      console.log(jsonResponse);
-      res.status(200).send(jsonResponse);
-    }
-    client.release();
-  });
-  pool.end();
+  // Login successful
+  const jsonResponse = await authJSONResponse(authenticatedUser);
+  res.status(200).send(jsonResponse);
 });
 
-module.exports = authRoutes
+authRoutes.post('/token', Validation.validateLoginParameters, async (req, res) => {
+  const { name, password } = req.body;
+
+  // Check if user exists
+  const storedUser = await Storage.getUser(name);
+  if (!storedUser) {
+    res.status(403).send({
+      "type": "auth:unauthorized",
+      "title": "Bad Request",
+      "detail": "The request failed due to invalid credentials"
+    });
+    return;
+  }
+
+  // Authenticate user
+  const authenticatedUser = await Storage.authUser(storedUser, password);
+  if (!authenticatedUser) {
+    res.status(403).send({
+      "type": "auth:unauthorized",
+      "title": "Bad Request",
+      "detail": "The request failed due to invalid credentials"
+    });
+    return;
+  }
+
+  // Refresh successful
+  const token = JWT.getUserJWT(authenticatedUser.name, authenticatedUser.id);
+  res.status(200).send({ token: token });
+});
+
+async function authJSONResponse(user) {
+  const token = JWT.getUserJWT(user.name, user.id);
+  const users = await Storage.getAllUsers();
+
+  const currentUserIndex = users.findIndex(u => u.id === user.id);
+
+  if (currentUserIndex !== -1) {
+    users.splice(currentUserIndex, 1);
+  }
+
+  return {
+    user,
+    users,
+    token
+  }
+}
+
+export default authRoutes;

@@ -6,3 +6,4 @@ Pods/
 xcuserdata/
 *.xcworkspace
 .idea/
+node_modules
