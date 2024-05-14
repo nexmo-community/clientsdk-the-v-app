@@ -59,8 +59,8 @@ final class HomeViewModel: ObservableObject {
         clientManager.onEvent
             .receive(on: DispatchQueue.main)
             .filter { $0.kind == .memberInvited }
-            .filter { !($0.from is VGSystem) }
             .map { $0 as! VGMemberInvitedEvent }
+            .filter { $0.body.channel.id == nil  }
             .sink { [weak self] event in
                 guard event.body.user.name == self?.clientManager.user?.name else { return }
                 self?.incomingConversationId = event.conversationId
