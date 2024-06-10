@@ -1,3 +1,4 @@
+import cors from 'cors';
 import express from 'express';
 
 import auth from './routes/auth.js';
@@ -8,6 +9,7 @@ import webhooks from './routes/webhooks.js';
 const app = express();
 const port = process.env.VCR_PORT || process.env.PORT || 3000;
 
+app.use(cors())
 app.use(express.json());
 
 app.use('/', auth);
