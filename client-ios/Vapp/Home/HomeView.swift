@@ -24,22 +24,47 @@ struct HomeView: View {
                             viewModel.showNewConversation = true
                         }.buttonStyle(.bordered)
                     } else {
-                        List(viewModel.conversations) { conversation in
-                            HStack {
-                                Text(conversation.displayName ?? "")
-                                Spacer()
-                            }
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                selectedConversation = conversation
-                            }
-                            .swipeActions {
-                                Button("Delete") {
-                                    Task {
-                                        await viewModel.deleteConversation(conversation.id)
+                        List {
+                            Section(header: Text("Conversations")) {
+                                ForEach(viewModel.conversations[.joined] ?? []) { conversation in
+                                    HStack {
+                                        Text(conversation.displayName ?? "")
+                                        Spacer()
+                                    }
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
+                                        selectedConversation = conversation
+                                    }
+                                    .swipeActions {
+                                        Button("Delete") {
+                                            Task {
+                                                await viewModel.deleteConversation(conversation.id)
+                                            }
+                                        }
+                                        .tint(.red)
                                     }
                                 }
-                                .tint(.red)
+                            }
+                            
+                            Section(header: Text("Invites")) {
+                                ForEach(viewModel.conversations[.invited] ?? []) { conversation in
+                                    HStack {
+                                        Text(conversation.displayName ?? "")
+                                        Spacer()
+                                    }
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
+                                        selectedConversation = conversation
+                                    }
+                                    .swipeActions {
+                                        Button("Decline") {
+                                            Task {
+                                                await viewModel.declineInvite(conversation.id)
+                                            }
+                                        }
+                                        .tint(.red)
+                                    }
+                                }
                             }
                         }
                         .refreshable {

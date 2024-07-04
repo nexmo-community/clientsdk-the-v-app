@@ -14,7 +14,7 @@ final class HomeViewModel: ObservableObject {
     private var subscriptions = Set<AnyCancellable>()
     
     @Published var isLoading = false
-    @Published var conversations: [VGConversation] = []
+    @Published var conversations: [VGMemberState: [VGConversation]] = [:]
     
     @Published var showNewConversation = false
     @Published var showIncomingCall = false
@@ -78,7 +78,9 @@ final class HomeViewModel: ObservableObject {
     func loadConversations() async {
         do {
             let conversationPage = try await clientManager.client.getConversations()
-            conversations = conversationPage.conversations.filter { !$0.name.contains("NAM") }
+            let ungroupedConversations = conversationPage.conversations
+                .filter { !$0.name.contains("NAM") }
+            conversations = Dictionary(grouping: ungroupedConversations, by: { $0.memberState })
         } catch {
             errorContainer = (true, error.localizedDescription)
         }
@@ -88,7 +90,17 @@ final class HomeViewModel: ObservableObject {
     func deleteConversation(_ id: String) async {
         do {
             try await clientManager.client.deleteConversation(id)
-            conversations.removeAll { $0.id == id }
+            conversations[.joined]?.removeAll { $0.id == id }
+        } catch {
+            errorContainer = (true, error.localizedDescription)
+        }
+    }
+    
+    @MainActor
+    func declineInvite(_ id: String) async {
+        do {
+            try await clientManager.client.leaveConversation(id)
+            conversations[.invited]?.removeAll { $0.id == id }
         } catch {
             errorContainer = (true, error.localizedDescription)
         }

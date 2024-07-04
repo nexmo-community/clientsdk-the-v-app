@@ -79,6 +79,7 @@ final class ClientManager: NSObject, ObservableObject {
     
     public func logout() async throws {
         try await client.deleteSession()
+        isAuthed = false 
         deleteCredentials()
     }
     
