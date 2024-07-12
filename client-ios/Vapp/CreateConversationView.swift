@@ -20,7 +20,6 @@ struct CreateConversationView: View {
                 } else {
                     Form {
                         Section(header: Text("Conversation Details")) {
-                            TextField("Name", text: $viewModel.name)
                             TextField("Display Name", text: $viewModel.displayName)
                         }
                         
@@ -50,7 +49,6 @@ final class NewConversationViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var conversationCreated = false
     
-    @Published var name = ""
     @Published var displayName = ""
     
     @Published var errorContainer = (hasError: false, text: "")
@@ -59,12 +57,12 @@ final class NewConversationViewModel: ObservableObject {
     
     @MainActor
     func createConversation() async {
-        if (name.isEmpty || displayName.isEmpty) {
+        if (displayName.isEmpty) {
             errorContainer = (true, "Please provide a conversation name and display name.")
             return
         }
         
-        let params = VGCreateConversationParameters(name: name, displayName: displayName)
+        let params = VGCreateConversationParameters(displayName: displayName)
         
         do {
             let convId = try await clientManager.client.createConversation(params)

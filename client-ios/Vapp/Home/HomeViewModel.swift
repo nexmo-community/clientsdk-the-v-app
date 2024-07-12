@@ -79,7 +79,7 @@ final class HomeViewModel: ObservableObject {
         do {
             let conversationPage = try await clientManager.client.getConversations()
             let ungroupedConversations = conversationPage.conversations
-                .filter { !$0.name.contains("NAM") }
+                .filter { !($0.displayName?.isEmpty ?? false) }
             conversations = Dictionary(grouping: ungroupedConversations, by: { $0.memberState })
         } catch {
             errorContainer = (true, error.localizedDescription)
