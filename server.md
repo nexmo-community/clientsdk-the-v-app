@@ -139,7 +139,7 @@ Error (403):
 <details>
     <summary>Refresh Token</summary>
 
-The token returned during login/signup lasts for 15 minutes, after that you will need to get a new token.
+The token returned during login/signup lasts for 1 hour, after that you will need to get a new token.
 
 **Endpoint:** `/token`
 
