@@ -445,7 +445,7 @@
 			repositoryURL = "https://github.com/Vonage/vonage-client-sdk-ios";
 			requirement = {
 				kind = exactVersion;
-				version = 1.6.0;
+				version = 1.6.2;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
