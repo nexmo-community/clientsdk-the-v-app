@@ -1,63 +1,74 @@
-const NexmoClient = window.NexmoClient;
-
-console.log('window NexmoClient: ', NexmoClient);
-
 const BASE_URL = "VAPP_BASE_URL";
 
 // Get reference to elements
-const messageTextarea = document.querySelector("#messageTextarea");
-const messageFeed = document.querySelector("#messageFeed");
-const sendButton = document.querySelector("#send");
-const status = document.querySelector("#status");
-const messages = document.querySelector("#messages");
-const sessionName = document.querySelector("#sessionName");
-const loadMessagesButton = document.querySelector("#loadMessages");
-const messagesCountSpan = document.querySelector("#messagesCount");
-const messageDateSpan = document.querySelector("#messageDate");
+const messageTextarea = document.querySelector('#messageTextarea');
+const messageFeed = document.querySelector('#messageFeed');
+const sendButton = document.querySelector('#send');
+const status = document.querySelector('#status');
+const messages = document.querySelector('#messages');
+const sessionName = document.querySelector('#sessionName');
+const loadMessagesButton = document.querySelector('#loadMessages');
+const messagesCountSpan = document.querySelector('#messagesCount');
+const messageDateSpan = document.querySelector('#messageDate');
 
-const loginSignUpSection = document.querySelector("#login-signup");
+const loginSignUpSection = document.querySelector('#login-signup');
 
-const loginForm = document.querySelector("#login");
-const usernameLogin = document.querySelector("#username-login");
-const passwordLogin = document.querySelector("#password-login");
+const loginForm = document.querySelector('#login');
+const usernameLogin = document.querySelector('#username-login');
+const passwordLogin = document.querySelector('#password-login');
 
-const signupForm = document.querySelector("#signup");
-const usernameSignup = document.querySelector("#username-signup");
-const displayNameSignup = document.querySelector("#display-name-signup");
-const passwordSignup = document.querySelector("#password-signup");
+const signupForm = document.querySelector('#signup');
+const usernameSignup = document.querySelector('#username-signup');
+const displayNameSignup = document.querySelector('#display-name-signup');
+const passwordSignup = document.querySelector('#password-signup');
 
-const loginSignupStatus = document.querySelector("#login-signup-status");
+const loginSignupStatus = document.querySelector('#login-signup-status');
 
-const dashboardSection = document.querySelector("#dashboard");
-const contentDiv = document.querySelector("#content");
+const dashboardSection = document.querySelector('#dashboard');
+const contentDiv = document.querySelector('#content');
+const chatContainerDiv = document.querySelector('#chat-container');
 
-const usersList = document.querySelector("#users-list");
-const usersListItemTemplate = document.querySelector("#users-list-item-template");
+const usersList = document.querySelector('#users-list');
+const usersListItemTemplate = document.querySelector(
+  '#users-list-item-template'
+);
 
-const textChatList = document.querySelector("#text-chat-list");
-const textChatListItemTemplate = document.querySelector("#text-chat-list-item-template");
+const textChatListConversations = document.querySelector(
+  '#text-chat-list-conversations'
+);
+const textChatListInvites = document.querySelector('#text-chat-list-invites');
+const textChatListItemTemplate = document.querySelector(
+  '#text-chat-list-item-template'
+);
 
-const selectedUserProfileTemplate = document.querySelector("#selected-user-profile-template");
+const selectedUserProfileTemplate = document.querySelector(
+  '#selected-user-profile-template'
+);
 
-const settingsDiv = document.querySelector("#settings");
-const settingsTemplate = document.querySelector("#settings-template");
+const settingsDiv = document.querySelector('#settings');
+const settingsTemplate = document.querySelector('#settings-template');
 
-const textChatTemplate = document.querySelector("#text-chat-template");
+const textChatTemplate = document.querySelector('#text-chat-template');
 
-const chatContainer = document.querySelector("#chat-container");
-const vonageInput = document.querySelector("vc-text-input");
-const vonageTypingIndicator = document.querySelector("vc-typing-indicator");
-const vonageMembers = document.querySelector("vc-members");
-const vonageMessagesFeed = document.querySelector("vc-messages");
+const chatContainer = document.querySelector('#chat-container');
+const vonageInput = document.querySelector('vc-text-input');
+const vonageTypingIndicator = document.querySelector('vc-typing-indicator');
+const vonageMembers = document.querySelector('vc-members');
+const vonageMessagesFeed = document.querySelector('vc-messages');
+const imageUploadInput = document.querySelector('#image-message');
 
-const groupChatCreateTemplate = document.querySelector("#group-chat-create-template");
-const createGroupChatButton = document.querySelector("#create-group-chat");
+const groupChatCreateTemplate = document.querySelector(
+  '#group-chat-create-template'
+);
+const createGroupChatButton = document.querySelector('#create-group-chat');
 
-const foundPreviousChatsTemplate = document.querySelector("#found-previous-chats-template");
+const foundPreviousChatsTemplate = document.querySelector(
+  '#found-previous-chats-template'
+);
 
-const tab3 = document.querySelector("#tab-3");
-const tab4 = document.querySelector("#tab-4");
-const tab5 = document.querySelector("#tab-5");
+const tab3 = document.querySelector('#tab-3');
+const tab4 = document.querySelector('#tab-4');
+const tab5 = document.querySelector('#tab-5');
 
 // Global variables
 let client;
@@ -77,19 +88,30 @@ let selectedConversation = {};
 let selectedUser = {};
 
 let currentCall;
+let callId;
 
+let currentConversationId;
+
+let callButton;
+let hangupButton;
+
+// adds sending chat messages with Enter key
+vonageInput.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter' || e.keyCode === 13) {
+    vonageInput.__handleClickEvent();
+  }
+});
 
 function iconOrTextTab() {
-    console.log("window.innerWidth: ", window.innerWidth);
-    if (window.innerWidth > 950) {
-        tab3.innerText = "Chats";
-        tab4.innerText = "Contacts";
-        tab5.innerText = "Settings";
-    } else {
-        tab3.innerText = "💬";
-        tab4.innerText = "👥";
-        tab5.innerText = "⚙️";
-    }
+  if (window.innerWidth > 950) {
+    tab3.innerText = 'Chats';
+    tab4.innerText = 'Contacts';
+    tab5.innerText = 'Settings';
+  } else {
+    tab3.innerText = '💬';
+    tab4.innerText = '👥';
+    tab5.innerText = '⚙️';
+  }
 }
 iconOrTextTab();
 window.onresize = iconOrTextTab;
@@ -99,782 +121,602 @@ const tabs = document.querySelectorAll('[role="tab"]');
 const tabLists = document.querySelectorAll('[role="tablist"]');
 
 function changeTabs(e) {
-    const target = e.target;
-    const parent = target.parentNode;
-    const grandparent = parent.parentNode;
+  const target = e.target;
+  const parent = target.parentNode;
+  const grandparent = parent.parentNode;
 
-    // Remove all current selected tabs
-    parent
-        .querySelectorAll('[aria-selected="true"]')
-        .forEach(t => t.setAttribute("aria-selected", false));
+  // Remove all current selected tabs
+  parent
+    .querySelectorAll('[aria-selected="true"]')
+    .forEach((t) => t.setAttribute('aria-selected', false));
 
-    // Set this tab as selected
-    target.setAttribute("aria-selected", true);
+  // Set this tab as selected
+  target.setAttribute('aria-selected', true);
 
-    // Hide all tab panels
-    grandparent
-        .querySelectorAll('[role="tabpanel"]')
-        .forEach(p => p.setAttribute("hidden", true));
+  // Hide all tab panels
+  grandparent
+    .querySelectorAll('[role="tabpanel"]')
+    .forEach((p) => p.setAttribute('hidden', true));
 
-    // Show the selected panel
-    grandparent.parentNode
-        .querySelector(`#${target.getAttribute("aria-controls")}`)
-        .removeAttribute("hidden");
+  // Show the selected panel
+  grandparent.parentNode
+    .querySelector(`#${target.getAttribute('aria-controls')}`)
+    .removeAttribute('hidden');
 }
 
 // Add a click event handler to each tab
-tabs.forEach(tab => {
-    tab.addEventListener("click", changeTabs);
+tabs.forEach((tab) => {
+  tab.addEventListener('click', changeTabs);
 });
 
 // Enable arrow navigation between tabs in the tab list
 let tabFocus = 0;
 
-tabLists.forEach(tabList => {
-    tabList.addEventListener("keydown", e => {
-        // Move right
-        if (e.keyCode === 39 || e.keyCode === 37) {
-            tabs[tabFocus].setAttribute("tabindex", -1);
-            if (e.keyCode === 39) {
-                tabFocus++;
-                // If we're at the end, go to the start
-                if (tabFocus >= tabs.length) {
-                    tabFocus = 0;
-                }
-                // Move left
-            } else if (e.keyCode === 37) {
-                tabFocus--;
-                // If we're at the start, move to the end
-                if (tabFocus < 0) {
-                    tabFocus = tabs.length - 1;
-                }
-            }
-            tabs[tabFocus].setAttribute("tabindex", 0);
-            tabs[tabFocus].focus();
+tabLists.forEach((tabList) => {
+  tabList.addEventListener('keydown', (e) => {
+    // Move right
+    if (e.keyCode === 39 || e.keyCode === 37) {
+      tabs[tabFocus].setAttribute('tabindex', -1);
+      if (e.keyCode === 39) {
+        tabFocus++;
+        // If we're at the end, go to the start
+        if (tabFocus >= tabs.length) {
+          tabFocus = 0;
         }
-    });
+        // Move left
+      } else if (e.keyCode === 37) {
+        tabFocus--;
+        // If we're at the start, move to the end
+        if (tabFocus < 0) {
+          tabFocus = tabs.length - 1;
+        }
+      }
+      tabs[tabFocus].setAttribute('tabindex', 0);
+      tabs[tabFocus].focus();
+    }
+  });
 });
 
-async function postRequest(endpoint = "", data = {}) {
-    try {
-        const response = await fetch(BASE_URL + endpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${jwt}`,
-                'Bypass-Tunnel-Reminder': true // used for localtunnel only
-            },
-            body: JSON.stringify(data) // body data type must match "Content-Type" header
-        });
-        if (!response.ok) {
-            throw await response.json();
-        }
-        return response.json();
-    } catch (error) {
-        console.error("postRequest error: ", error);
-        throw error;
+async function postRequest(endpoint = '', data = {}) {
+  try {
+    const response = await fetch(BASE_URL + endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+        'Bypass-Tunnel-Reminder': true, // used for localtunnel only
+      },
+      body: JSON.stringify(data), // body data type must match "Content-Type" header
+    });
+    if (!response.ok) {
+      throw await response.json();
     }
+    return response.json();
+  } catch (error) {
+    console.error('postRequest error: ', error);
+    throw error;
+  }
 }
 
-
-async function getRequest(endpoint = "") {
-    try {
-        const response = await fetch(BASE_URL + endpoint, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${jwt}`,
-                'Bypass-Tunnel-Reminder': true // used for localtunnel only
-            }
-        });
-        if (!response.ok) {
-            throw await response.json();
-        }
-        return response.json();
-    } catch (error) {
-        console.error("postRequest error: ", error);
-        throw error;
+async function upload(formData, endpoint = '') {
+  try {
+    const response = await fetch(BASE_URL + endpoint, {
+      method: 'POST',
+      headers: {
+        // 'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${jwt}`,
+        'Bypass-Tunnel-Reminder': true, // used for localtunnel only
+      },
+      body: formData, // body data type must match "Content-Type" header
+    });
+    if (!response.ok) {
+      throw await response.json();
     }
-}
-
-async function getImageRequest(url= ""){
-    try {
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${jwt}`
-            }
-        });
-        if (!response.ok) {
-            throw await response.json();
-        }
-        return response.blob();
-    } catch(error) {
-        console.error("getImageRequest error: ", error);
-        throw error;
-    }
+    return response.json();
+  } catch (error) {
+    console.error('postRequest error: ', error);
+    throw error;
+  }
 }
 
 function displayError(element, error) {
-    let errorText = "Error: ";
-    if (error.type === "data:validation") {
-        errorText += "<ul>"
-        for (let i = 0; i < error.invalid_parameters.length; i++) {
-            errorText += `<li>${error.invalid_parameters[i].name} ${error.invalid_parameters[i].reason} </li>`;
-        }
-        errorText += "</ul>"
-    } else {
-        errorText += error.detail;
+  let errorText = 'Error: ';
+  if (error.type === 'data:validation') {
+    errorText += '<ul>';
+    for (let i = 0; i < error.invalid_parameters.length; i++) {
+      errorText += `<li>${error.invalid_parameters[i].name} ${error.invalid_parameters[i].reason} </li>`;
     }
-    element.innerHTML = errorText;
+    errorText += '</ul>';
+  } else {
+    errorText += error.detail;
+  }
+  element.innerHTML = errorText;
 }
 
 function callButtonClickHandler(e) {
-    console.log("callButtonClickHandler: ", e.target.dataset.username);
-    app.callServer(e.target.dataset.username, "app").then((nxmCall) => {
-        console.log('Calling user(s)...', nxmCall);
-        currentCall = nxmCall;
-    }).catch((error) => {
-        console.error(error);
+  callButton.innerText = 'Calling...';
+  callButton.disabled = true;
+  client
+    .serverCall({
+      to: e.target.dataset.username,
+      custom_data: { from: 'V-app web' },
+    })
+    .then((_callId) => {
+      callId = _callId;
+    })
+    .catch((error) => {
+      console.error('Error making call: ', error);
     });
 }
 
 function hangupButtonClickHandler() {
-    currentCall.hangUp({ reason_code: '404', reason_text: 'User hung up' }).then((event) => {
-        console.log('hang up event', event);
-    }).catch((error) => {
-        console.error(error);
+  client
+    .hangup(callId)
+    .then(() => {
+      hangupButton.style.display = 'none';
+      callButton.style.display = 'inline';
+    })
+    .catch((error) => {
+      console.error('Error hanging up call: ', error);
     });
 }
 
 function showSelectedUser(user, answeringCall = false) {
-    console.log("user: ", user);
-    console.log("answeringCall: ", answeringCall);
-    const username = answeringCall ? user.name : user.target.dataset.username;
-    let profileImage = answeringCall ? user.image_url : user.target.dataset.userProfileImage;
-    const displayName = answeringCall ? user.display_name : user.target.innerText;
-    const userId = answeringCall ? user.id : user.target.dataset.userId;
+  const username = answeringCall ? user.name : user.target.dataset.username;
+  let profileImage = answeringCall
+    ? user.image_url
+    : user.target.dataset.userProfileImage;
+  const displayName = answeringCall ? user.display_name : user.target.innerText;
+  const userId = answeringCall ? user.id : user.target.dataset.userId;
 
-    console.log("username: ", username);
-    console.log("profileImage: ", profileImage);
-    console.log("displayName: ", displayName);
-    console.log("userId: ", userId);
+  if (
+    profileImage === null ||
+    profileImage === 'null' ||
+    profileImage === undefined ||
+    profileImage === 'undefined'
+  ) {
+    profileImage = `https://robohash.org/${username}`;
+  }
 
-    if (profileImage === null || profileImage === "null") {
-        profileImage = `https://robohash.org/${username}`;
-    }
-    console.log("profileImage new: ", profileImage);
+  contentDiv.innerHTML = '';
 
-    contentDiv.innerHTML = "";
-    //See if there's already a text chat
-    const previousChats = conversations.filter((conversation) => conversation.users.some((user) => user.id === userId));
-    console.log("previousChats: ", previousChats);
-    // separate group chats from 1 to 1 chat
-    const groupChats = previousChats.filter((conversation) => conversation.users.length > 1);
-    console.log("groupChats: ", groupChats);
-    const oneToOneChat = previousChats.filter((conversation) => conversation.users.length === 1);
-    console.log("one to one chat: ", oneToOneChat);
-
-    const selectedUserProfileClone = selectedUserProfileTemplate.content.cloneNode(true);
-    const img = selectedUserProfileClone.querySelector("img");
-    const name = selectedUserProfileClone.querySelector("#display-name");
-    const messageButton = selectedUserProfileClone.querySelector("#message-user");
-    const groupChatsContainer = selectedUserProfileClone.querySelector("#group-chats-container");
-    const groupChatsList = selectedUserProfileClone.querySelector("#group-chats");
-    if (groupChats.length > 0) {
-        // list the group chats and add to ul
-        groupChats.forEach(textChat => {
-            const textChatListItemClone = textChatListItemTemplate.content.cloneNode(true);
-            const li = textChatListItemClone.querySelector("li");
-            li.textContent = textChat.name;
-            li.dataset.id = textChat.id;
-            li.addEventListener("click", () => displayTextChat(textChat.id));
-            groupChatsContainer.appendChild(textChatListItemClone);
-        });
-    } else {
-        // set the group chats container to display none;
-        groupChatsContainer.style.display = "none";
-    }
-
-    messageButton.dataset.convId = oneToOneChat.length > 0 ? oneToOneChat[0].id : "";
-    messageButton.dataset.username = username;
-    messageButton.dataset.userId = userId;
-    messageButton.innerText = previousChats.length > 0 ? "Open Chat" : "Create Chat";
-    messageButton.addEventListener("click", textChatClickHandler);
-    const callButton = selectedUserProfileClone.querySelector("#call-user");
-    callButton.dataset.username = username;
-    const hangupButton = selectedUserProfileClone.querySelector("#hangup-user");
-    if (answeringCall) {
-        callButton.style.display = "none";
-    } else {
-        hangupButton.style.display = "none";
-    }
-    img.src = profileImage;
-    name.innerText = displayName;
-    callButton.addEventListener("click", callButtonClickHandler);
-    hangupButton.addEventListener("click", hangupButtonClickHandler);
-    contentDiv.appendChild(selectedUserProfileClone);
+  const selectedUserProfileClone =
+    selectedUserProfileTemplate.content.cloneNode(true);
+  const img = selectedUserProfileClone.querySelector('img');
+  const name = selectedUserProfileClone.querySelector('#display-name');
+  callButton = selectedUserProfileClone.querySelector('#call-user');
+  callButton.dataset.username = username;
+  hangupButton = selectedUserProfileClone.querySelector('#hangup-user');
+  if (answeringCall) {
+    callButton.style.display = 'none';
+  } else {
+    hangupButton.style.display = 'none';
+  }
+  img.src = profileImage;
+  name.innerText = displayName;
+  callButton.addEventListener('click', callButtonClickHandler);
+  hangupButton.addEventListener('click', hangupButtonClickHandler);
+  contentDiv.appendChild(selectedUserProfileClone);
+  chatContainerDiv.style.display = 'none';
+  contentDiv.style.display = 'block';
 }
 
 function logoutClickHandler(e) {
-    console.log("logout!");
-    client.deleteSession().then((response) => {
-        console.log("logout response: ", response);
-        settingsDiv.innerHTML = "";
-        contentDiv.innerHTML = "<div class='center'><img class='vonage-spin' src='https://cdn.glitch.global/41750a77-8d9a-4701-96f4-80f4ffcb5e31/vonage-spin.gif?v=1646775708339'></div>";
-        dashboardSection.style.display = "none";
-        loginSignUpSection.style.display = "flex";
-    }).catch((error) => {
-        console.log("logout error: ", error);
+  client
+    .deleteSession()
+    .then((response) => {
+      settingsDiv.innerHTML = '';
+      usersList.innerHTML = '';
+      contentDiv.innerHTML =
+        "<div class='center'><img src='./VonageLogo_Primary_White-500px.png' /></div>";
+      dashboardSection.style.display = 'none';
+      loginSignUpSection.style.display = 'flex';
+    })
+    .catch((error) => {
+      console.error('logout error: ', error);
     });
 }
-
 
 // Set up Vonage Application
 async function setupApplication() {
-    try {
-        client = new NexmoClient({ debug: false });
-        app = await client.createSession(jwt);
-        console.log('app: ', app);
+  try {
+    client = new vonageClientSDK.VonageClient();
 
-        app.on("call:status:changed", (nxmCall) => {
-            console.log('call:status:changed nxmCall: ', nxmCall);
-            const callButton = document.querySelector("#call-user");
-            const hangupButton = document.querySelector("#hangup-user");
-            const callStatus = document.querySelector("#call-status");
-            if (callStatus) {
-                callStatus.innerText = nxmCall.status
-            }
-            console.log("callButton: ", callButton);
-            console.log("hangupButton: ", hangupButton);
-            // call = nxmCall;
-            if (callButton || hangupButton) {
-                if (nxmCall.status === nxmCall.CALL_STATUS.RINGING) {
-                    console.log('the call is ringing');
-                    callButton.disabled = true;
-                    hangupButton.style.display = "none";
-                }
+    const sessionId = await client.createSession(jwt);
 
-                if (nxmCall.status === nxmCall.CALL_STATUS.ANSWERED) {
-                    console.log('the call has been answered');
-                    callButton.disabled = false;
-                    callButton.style.display = "none";
-                    hangupButton.style.display = "block";
-                }
+    const params = {
+      order: 'asc', // "desc"
+      pageSize: 100,
+      cursor: null,
+      includeCustomData: true,
+      orderBy: null, // "CUSTOM_SORT_KEY"
+    };
 
-                if (nxmCall.status === nxmCall.CALL_STATUS.STARTED) {
-                    console.log('the call has started');
-                    callButton.disabled = false;
-                    callButton.style.display = "none";
-                    hangupButton.style.display = "block";
-                }
+    client
+      .getConversations(params)
+      .then(({ conversations: _conversations, nextCursor, previousCursor }) => {
+        conversations = _conversations;
+      })
+      .catch((error) => {
+        console.error('Error getting Conversations: ', error);
+      });
 
-                if (nxmCall.status === nxmCall.CALL_STATUS.COMPLETED) {
-                    console.log('the call has completed');
-                    callButton.disabled = false;
-                    callButton.style.display = "block";
-                    hangupButton.style.display = "none";
-                }
+    client.on('conversationEvent', (event) => {
+      if (event.body.channel.id === null) {
+        switch (event.kind) {
+          case 'member:invited':
+            updateTextChats();
+            break;
+          case 'member:joined':
+            updateTextChats();
+            break;
+          case 'member:left':
+            updateTextChats();
+            break;
+          default:
+            console.log('default event: ', event);
+        }
+      }
+    });
 
-                if (nxmCall.status === nxmCall.CALL_STATUS.BUSY) {
-                    console.log('the call is busy');
-                    callButton.disabled = false;
-                    callButton.style.display = "block";
-                    hangupButton.style.display = "none";
-                }
+    client.on('callInvite', (_callId, from) => {
+      callId = _callId;
+      const otherUser = users.find((user) => from === user.name);
+      if (window.confirm(`Join audio call with ${otherUser.display_name}?`)) {
+        showSelectedUser(otherUser, true);
+        client
+          .answer(callId)
+          .then(() => {})
+          .catch((error) => {
+            console.error('Error answering call: ', error);
+          });
+      } else {
+        client
+          .reject(callId)
+          .then(() => {})
+          .catch((error) => {
+            console.error('Error rejecting call: ', error);
+          });
+      }
+    });
 
-                if (nxmCall.status === nxmCall.CALL_STATUS.FAILED) {
-                    console.log('the call has failed');
-                    callButton.disabled = false;
-                    callButton.style.display = "block";
-                    hangupButton.style.display = "none";
-                }
+    client.on('legStatusUpdate', (callId, legId, status) => {
+      callButton.innerText = 'Call';
+      callButton.disabled = false;
+      if (status === 'ANSWERED') {
+        callButton.style.display = 'none';
+        hangupButton.style.display = 'inline';
+      }
+      if (status === 'COMPLETED') {
+        hangupButton.style.display = 'none';
+        callButton.style.display = 'inline';
+      }
+    });
 
-                if (nxmCall.status === nxmCall.CALL_STATUS.TIMEOUT) {
-                    console.log('the call has timed out');
-                    callButton.disabled = false;
-                    callButton.style.display = "block";
-                    hangupButton.style.display = "none";
-                }
+    client.on('callHangup', (callId, callQuality, reason) => {
+      callId = null;
+      hangupButton.style.display = 'none';
+      callButton.style.display = 'inline';
+    });
 
-                if (nxmCall.status === nxmCall.CALL_STATUS.UNANSWERED) {
-                    console.log('the call has timed out');
-                    callButton.disabled = false;
-                    callButton.style.display = "block";
-                    hangupButton.style.display = "none";
-                }
+    client.on('sessionError', async (error) => {
+      //get a refresh token
+      try {
+        const bodyData = {
+          name: usernameLogin.value,
+          password: passwordLogin.value,
+        };
+        const data = await postRequest('/token', bodyData);
+        jwt = data.token;
+        await client.createSession(jwt);
+      } catch (error) {
+        console.error('log in error: ', error);
+        displayError(loginSignupStatus, error);
+      }
+    });
+    return;
+  } catch (error) {
+    console.error('error in setup: ', error);
+    return;
+  }
+}
 
-                if (nxmCall.status === nxmCall.CALL_STATUS.REJECTED) {
-                    console.log('the call was rejected');
-                    callButton.disabled = false;
-                    callButton.style.display = "block";
-                    hangupButton.style.display = "none";
-                }
-            }
-        });
-
-        app.on("member:call", (member, nxmCall) => {
-            console.log("typeof: ", typeof nxmCall)
-            console.log("member:call member: ", member);
-            console.log("member:call NXMCall answer: ", nxmCall);
-            currentCall = nxmCall;
-            //Get other member of conversation
-            let otherMember;
-            for (let [key, value] of nxmCall.conversation.members) {
-                if (key !== member.id) {
-                    console.log('other member: ', value);
-                    otherMember = value;
-                }
-            }
-
-            if (member.state === "INVITED") {
-                // Need this for inAppCall & callSever doesn't send member.invited_by
-                if (!member.initiator.invited.isSystem) {
-                    if (window.confirm(`Accept invite from ${member.invited_by}?`)) {
-                        nxmCall.answer();
-                    } else {
-                        nxmCall.reject({ reason_code: '403', reason_text: 'User turned down request' }).then(() => {
-                            console.log('Call rejected.');
-                        }).catch((error) => {
-                            console.error(error);
-                        });
-                    }
-
-                } else {
-                    console.log("myUser: ", myUser);
-                    console.log("users: ", users);
-                    const otherUser = users.find(user => otherMember.user.id === user.id);
-                    if (window.confirm(`Join audio call with ${otherMember.display_name}?`)) {
-                        showSelectedUser(otherUser, true);
-                        nxmCall.answer();
-                    } else {
-                        nxmCall.reject({ reason_code: '403', reason_text: 'User turned down request' }).then(() => {
-                            console.log('Call rejected.');
-                        }).catch((error) => {
-                            console.error(error);
-                        });
-                    }
-                }
-            }
-        });
-
-        app.on("member:invited", (member, event) => {
-            console.log("member:invited member: ", member);
-            console.log("member:invited event: ", event);
-        });
-
-        app.on("member:joined", async (member, event) => {
-            console.log("member:joined member: ", member);
-            console.log("member:joined event: ", event);
-            console.log("member.conversation.callbacks['member:media']: ", member.conversation.callbacks['member:media']);
-            // check to see if it is an audio call
-            console.log("event.body.channel.legs: ", event.body.channel.legs.length)
-            if (!member.conversation.callbacks['member:media']) {
-                // make a call to get the name of the text chat
-                const textChat = await getRequest(`/conversations/${event.cid}`);
-                console.log("textChat: ", textChat);
-                conversations.push(textChat);
-                console.log("conversations: ", conversations);
-                const textChatListItemClone = textChatListItemTemplate.content.cloneNode(true);
-                const li = textChatListItemClone.querySelector("li");
-                li.textContent = textChat.name;
-                li.dataset.id = textChat.id;
-                li.addEventListener("click", () => displayTextChat(textChat.id));
-                textChatList.appendChild(textChatListItemClone);
-            }
-        });
-        return;
-    }
-    catch (error) {
-        console.error('error in setup: ', error);
-        return;
-    }
+async function handleImageUploadInputChange() {
+  const formData = new FormData();
+  formData.append('image', imageUploadInput.files[0]);
+  try {
+    const uploadResponse = await upload(formData, '/image');
+    imageUploadInput.value = null;
+    const timestamp = await client.sendMessageImageEvent(
+      currentConversationId,
+      uploadResponse.image_url
+    );
+  } catch (error) {
+    console.error('Error sending image message: ', error);
+  }
 }
 
 async function displayTextChat(selectedConversationId) {
-    console.log("displatyTextChat selectedConversationId: ", selectedConversationId);
+  currentConversationId = selectedConversationId;
+  vonageInput.client = client;
+  vonageInput.conversationId = selectedConversationId;
 
-    contentDiv.innerHTML = "";
-    const textChatClone = textChatTemplate.content.cloneNode(true);
-    const vonageInput = textChatClone.querySelector("vc-text-input");
-    const vonageTypingIndicator = textChatClone.querySelector("vc-typing-indicator");
-    const vonageMembers = textChatClone.querySelector("vc-members");
-    const vonageMessagesFeed = textChatClone.querySelector("vc-messages");
+  vonageTypingIndicator.client = client;
+  vonageTypingIndicator.conversationId = selectedConversationId;
 
-    contentDiv.appendChild(textChatClone);
+  vonageMembers.client = client;
+  vonageMembers.conversationId = selectedConversationId;
 
-    const selectedConversation = await getRequest(`/conversations/${selectedConversationId}`);
-    console.log('selected conversation: ', selectedConversation);
+  vonageMessagesFeed.client = client;
+  vonageMessagesFeed.conversationId = selectedConversationId;
 
-    const conversationObj = await app.getConversation(selectedConversation.id);
-    console.log("conversationObj: ", conversationObj);
+  contentDiv.style.display = 'none';
 
-    let convMembers = [];
-    const params = {
-        order: "desc",
-        page_size: 100
-    }
-    await conversationObj.getMembers(params).then((members_page) => {
-        console.log("members_page: ", members_page);
-        members_page.items.forEach(member => {
-            console.log("member: ", member)
-            convMembers.push(member);
-        })
-    }).catch((error) => {
-        console.error("error getting the members ", error);
-    });
-    let myMember = convMembers.filter((member) => myUser.id === member.user.id);
-    console.log("myMember: ", myMember);
-    const previousMessages = selectedConversation.events.reduce((previousValue, currentValue) => {
-        if (!previousValue.some((previous) => previous.id === currentValue.id)) {
-            if (currentValue.type === "text") {
-                previousValue.push(currentValue);
-            }
-        }
-        return previousValue
-    }, [{ id: "", type: "" }]);
-    const messages = previousMessages.filter(message => message.id !== "").sort(function (a, b) {
-        return a.id - b.id;
-    });;
-    console.log("messages: ", messages);
+  chatContainerDiv.style.display = 'block';
 
-    // format messages
-    console.log("convMembers: ", convMembers);
-    const formattedMessages = messages.map((message) => {
-        const matchingMember = convMembers.filter((member) => message.from === member.user.id);
-        console.log("matchingMember: ", matchingMember);
-        return {
-            message: {
-                body: { text: message.content },
-                from: matchingMember[0].id
-            },
-            sender: {
-                displayName: matchingMember[0].display_name
-            }
-        }
-    });
-    console.log("formattedMessages: ", formattedMessages);
-
-    vonageMembers.members = [];
-    vonageInput.conversation = conversationObj;
-    vonageTypingIndicator.conversation = conversationObj;
-    vonageMembers.conversation = conversationObj;
-    vonageMessagesFeed.conversation = conversationObj;
-    vonageMessagesFeed.myId = myMember[0].id
-    vonageMessagesFeed.messages = formattedMessages;
+  // handling profile image file input
+  imageUploadInput.removeEventListener('change', handleImageUploadInputChange);
+  imageUploadInput.addEventListener('change', handleImageUploadInputChange);
 }
 
-async function textChatClickHandler(e) {
-    console.log("textChatClickHandler: ", e.target.dataset.convId);
-    console.log("myUserL: ", myUser);
-    const messageUser = document.querySelector("#message-user");
-    const callStatus = document.querySelector("#call-status");
-    selectedConversation = "";
-    callStatus.innerText = "";
-    if (e.target.dataset.convId) {
-        callStatus.innerText = "Loading Chat...";
-        try {
-            messageUser.disabled = true;
-            displayTextChat(e.target.dataset.convId);
-        } catch (e) {
-            console.log("got an error: ", e);
-            messageUser.disabled = false;
-            callStatus.innerText = e;
-        }
-    } else {
-        console.log("need to create a conversation w/ ", e.target.dataset.username, e.target.dataset.userId);
-        callStatus.innerText = "Creating Chat...";
-        try {
-            messageUser.disabled = true;
+async function joinAndDisplayTextChat(invitedConversationId) {
+  // Join conversation
+  try {
+    await client.joinConversation(invitedConversationId);
+    displayTextChat(invitedConversationId);
+  } catch (e) {
+    console.error('error joining conversation: ', e);
+  }
+}
 
-            const bodyData = {
-                users: [e.target.dataset.userId]
-            }
-            selectedConversation = await postRequest("/conversations", bodyData)
-            console.log('selected conversation: ', selectedConversation.events);
-            displayTextChat(selectedConversation.id);
-
-        } catch (e) {
-            console.log("got an error: ", e);
-            messageUser.disabled = false;
-            callStatus.innerText = e;
-        }
+async function leaveTextChat(leaveConversationId) {
+  // Leave conversation
+  try {
+    await client.leaveConversation(leaveConversationId);
+    // if you leave a conversation you have open, clear the text chat
+    if (leaveConversationId === currentConversationId) {
+      chatContainerDiv.style.display = 'none';
+      contentDiv.style.display = 'block';
     }
+    updateTextChats();
+  } catch (e) {
+    console.error('error leaving conversation: ', e);
+  }
+}
+
+async function updateTextChats() {
+  const params = {
+    order: 'asc', // "desc"
+    pageSize: 100,
+    cursor: null,
+    includeCustomData: true,
+    orderBy: null, // "CUSTOM_SORT_KEY"
+  };
+
+  const { conversations: textChats } = await client.getConversations(params);
+  textChatListConversations.innerHTML = '';
+  textChatListInvites.innerHTML = '';
+  textChats.forEach((textChat) => {
+    const textChatListItemClone =
+      textChatListItemTemplate.content.cloneNode(true);
+    const li = textChatListItemClone.querySelector('li');
+    li.textContent = textChat.name;
+    if (textChat.memberState === 'JOINED') {
+      li.innerHTML = `${textChat.displayName} <br> <button onclick="displayTextChat('${textChat.id}')">Open</button>  <button onclick="leaveTextChat('${textChat.id}')">Leave</button> `;
+      li.dataset.id = textChat.id;
+      textChatListConversations.appendChild(textChatListItemClone);
+    } else if (textChat.memberState === 'INVITED') {
+      li.innerHTML = `${textChat.displayName} <br> <button onclick="joinAndDisplayTextChat('${textChat.id}')">Join</button>  <button onclick="leaveTextChat('${textChat.id}')">Reject</button> `;
+      li.dataset.id = textChat.id;
+      textChatListInvites.appendChild(textChatListItemClone);
+    }
+  });
 }
 
 async function showDashboard(data) {
-    console.log("showDashboard: ", data);
-    tabFocus = 2;
-    loginSignUpSection.style.display = "none";
-    myUser = data.user;
-    conversations = data.conversations;
-    console.log('conversations: ', conversations);
-    jwt = data.token;
-    await setupApplication();
-    users = data.users.sort(function (a, b) {
-        var nameA = a.display_name.toUpperCase(); // ignore upper and lowercase
-        var nameB = b.display_name.toUpperCase(); // ignore upper and lowercase
-        if (nameA < nameB) {
-            return -1;
-        }
-        if (nameA > nameB) {
-            return 1;
-        }
-        // names must be equal
-        return 0;
-    });
-
-    users.forEach(user => {
-        const userClone = usersListItemTemplate.content.cloneNode(true);
-        const button = userClone.querySelector("button");
-        button.textContent = user.display_name;
-        button.dataset.userId = user.id;
-        button.dataset.username = user.name;
-        button.dataset.userProfileImage = user.image_url;
-        button.addEventListener("click", showSelectedUser);
-        usersList.appendChild(userClone);
-    });
-
-    // get text chat conversations and list
-    const textChats = await getRequest("/conversations");
-    console.log('textChats: ', textChats);
-    textChats.forEach(textChat => {
-        const textChatListItemClone = textChatListItemTemplate.content.cloneNode(true);
-        const li = textChatListItemClone.querySelector("li");
-        li.textContent = textChat.name;
-        li.dataset.id = textChat.id;
-        li.addEventListener("click", () => displayTextChat(textChat.id));
-        textChatList.appendChild(textChatListItemClone);
-    });
-
-    // Set up Settings tab
-    const settingsClone = settingsTemplate.content.cloneNode(true);
-    const settingsImg = settingsClone.querySelector("img");
-    const settingsDisplayName = settingsClone.querySelector("#user-display-name");
-    const settingLogoutButton = settingsClone.querySelector("#logout");
-
-    // update profile picture
-    const profileImageForm = settingsClone.querySelector("#profile-image-form");
-    const profileImageURLInput = settingsClone.querySelector("#image-url");
-    const profileImageFileInput = settingsClone.querySelector("#image-file");
-    const imageUploadStatus = settingsClone.querySelector('#image-upload-status');
-    let uploadedImageURL = "";
-
-    // check if image hosted on Nexmo Media Server
-    if (myUser.image_url.includes("nexmo.com")){
-        const uploadedImageResponse = await getImageRequest(myUser.image_url);
-        console.log("uploadedImageResponse: ", uploadedImageResponse);
-        const objectURL = URL.createObjectURL(uploadedImageResponse);
-        settingsImg.src = objectURL;
-    } else {
-        settingsImg.src = myUser.image_url === null ? `https://robohash.org/${myUser.name}` : myUser.image_url;
+  tabFocus = 2;
+  loginSignUpSection.style.display = 'none';
+  myUser = data.user;
+  jwt = data.token;
+  await setupApplication();
+  users = data.users.sort(function (a, b) {
+    var nameA = a.display_name.toUpperCase(); // ignore upper and lowercase
+    var nameB = b.display_name.toUpperCase(); // ignore upper and lowercase
+    if (nameA < nameB) {
+      return -1;
     }
-    settingsDisplayName.innerText = myUser.display_name;
-    settingLogoutButton.addEventListener("click", logoutClickHandler);
+    if (nameA > nameB) {
+      return 1;
+    }
+    // names must be equal
+    return 0;
+  });
 
-    // handling profile image file input
-    profileImageFileInput.addEventListener('change', async() => {
-        console.log("profileImageFileInput files: ", profileImageFileInput.files);
-        imageUploadStatus.textContent = "starting...";
-        // create a conversation and upload to Nexmo Media Servers and return URL
-        const uploadImageConversationOptions = {
-            "display_name":"upload_images_only",
-            "properties": {
-                "ttl": 120
-            }
-        }
-        const newConversation = await app.newConversationAndJoin(uploadImageConversationOptions);
-        imageUploadStatus.textContent = "uploading...";
-        console.log("new conversation: ", newConversation);
-        const params = {
-            quality_ratio : "90",
-            medium_size_ratio: "40",
-            thumbnail_size_ratio: "20"
-        }
-        newConversation.uploadImage(profileImageFileInput.files[0], params).then((uploadImageRequest) => {
-            uploadImageRequest.onprogress = (e) => {
-                console.log("Image request progress: ", e);
-                console.log("Image progress: " + e.loaded + "/" + e.total);
-                imageUploadStatus.textContent = `${e.loaded}/${e.total}`;
-            };
-            uploadImageRequest.onabort = (e) => {
-                console.log("Image request aborted: ", e);
-                console.log("Image: " + e.type);
-                imageUploadStatus.textContent = `${e.type}`;
-            };
-            uploadImageRequest.onloadend = (e) => {
-                console.log("Image request successful: ", e);
-                console.log("Image: " + e.type);
-                imageUploadStatus.textContent = "uploaded!";
-            };
-            uploadImageRequest.onreadystatechange = async() => {
-                if (uploadImageRequest.readyState === 4 && uploadImageRequest.status === 200) {
-                    const representations = JSON.parse(uploadImageRequest.responseText);
-                    console.log("Original image url: ", representations.original.url);
-                    console.log("Medium image url: ", representations.medium.url);
-                    console.log("Thumbnail image url: ", representations.thumbnail.url);
-                    uploadedImageURL = representations.medium.url;
-                    // update profile image
-                    imageUploadStatus.textContent = "updating...";
-                    const responseData = await updateProfileImage(uploadedImageURL);
-                    imageUploadStatus.textContent = "updated!";
-                    const uploadedImageResponse = await getImageRequest(uploadedImageURL);
-                    console.log("uploadedImageResponse: ", uploadedImageResponse);
-                    const objectURL = URL.createObjectURL(uploadedImageResponse);
-                    settingsImg.src = objectURL;
-                    profileImageFileInput.value = null;
-                    uploadedImageURL = "";
-                    imageUploadStatus.textContent = "";
-                }
-            };
-        }).catch((error) => {
-            console.error("error uploading the image ", error);
-        });
-    });
+  users.forEach((user) => {
+    const userClone = usersListItemTemplate.content.cloneNode(true);
+    const button = userClone.querySelector('button');
+    button.textContent = user.display_name;
+    button.dataset.userId = user.id;
+    button.dataset.username = user.name;
+    button.dataset.userProfileImage = user.image_url;
+    button.addEventListener('click', showSelectedUser);
+    usersList.appendChild(userClone);
+  });
 
-    profileImageForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        console.log("profileImageForm submitted");
-        if (profileImageURLInput.value !== ""){
-            const responseData = await updateProfileImage(profileImageURLInput.value);
-            settingsImg.src = responseData.image_url;
-            profileImageURLInput.value = "";
-        }
-    });
+  updateTextChats();
 
-    settingsDiv.appendChild(settingsClone);
-    dashboardSection.style.display = "flex";
+  // Set up Settings tab
+  const settingsClone = settingsTemplate.content.cloneNode(true);
+  const settingsImg = settingsClone.querySelector('img');
+  const settingsDisplayName = settingsClone.querySelector('#user-display-name');
+  const settingLogoutButton = settingsClone.querySelector('#logout');
+
+  // update profile picture
+  const profileImageForm = settingsClone.querySelector('#profile-image-form');
+  const profileImageFileInput = settingsClone.querySelector('#image-file');
+  const imageUploadStatus = settingsClone.querySelector('#image-upload-status');
+
+  // check if an image was uploaded
+  if (myUser.image_url) {
+    settingsImg.src = myUser.image_url;
+  } else {
+    settingsImg.src = `https://robohash.org/${myUser.name}`;
+  }
+  settingsDisplayName.innerText = myUser.display_name;
+  settingLogoutButton.addEventListener('click', logoutClickHandler);
+
+  // handling profile image file input
+  profileImageFileInput.addEventListener('change', async () => {
+    imageUploadStatus.textContent = 'starting...';
+    const formData = new FormData();
+    formData.append('image', profileImageFileInput.files[0]);
+
+    try {
+      imageUploadStatus.textContent = 'updating...';
+      const uploadResponse = await upload(formData, '/users/image');
+      settingsImg.src = uploadResponse.image_url;
+      profileImageFileInput.value = null;
+      imageUploadStatus.textContent = 'success!';
+      setTimeout(() => {
+        imageUploadStatus.textContent = '';
+      }, 3000);
+    } catch (error) {
+      console.error('Error setting user image: ', error);
+    }
+  });
+
+  settingsDiv.appendChild(settingsClone);
+  dashboardSection.style.display = 'flex';
 }
 
 async function createGroupHandler(e) {
-    console.log("createGroupHandler: ", e);
-    e.preventDefault();
-    const createGroupChatButton = document.querySelector('#group-chat-create-button');
-    const status = document.querySelector('#group-chat-status');
-    status.innerText = "";
-    const checkedUsersNL = document.querySelectorAll('input[name="user"]:checked');
-    const checkedUsers = Array.from(checkedUsersNL).map((checkedUser) => checkedUser.value);
-    console.log("checkedUsers: ", checkedUsers);
-    if (checkedUsers.length === 0) {
-        status.innerText = "please select Users";
-    } else {
-        // check if selected users already in a group
-        const previousChats = conversations.filter((conversation) => checkedUsers.every((checkedUser) => conversation.users.find((convUser) => convUser.id === checkedUser)));
-        console.log("previousChat: ", previousChats);
-        if (previousChats.length > 0) {
-            contentDiv.innerHTML = "";
-            // list the group chats and add to ul
-            const foundPreviousChatsClone = foundPreviousChatsTemplate.content.cloneNode(true);
-            const foundPreviousChatsList = foundPreviousChatsClone.querySelector("#found-chat-list");
+  e.preventDefault();
+  const createGroupChatButton = document.querySelector(
+    '#group-chat-create-button'
+  );
+  const chatDisplayNameInput = document.querySelector('#chat-display-name');
+  const status = document.querySelector('#group-chat-status');
+  status.innerText = '';
+  const checkedUsersNL = document.querySelectorAll(
+    'input[name="user"]:checked'
+  );
+  const checkedUsers = Array.from(checkedUsersNL).map(
+    (checkedUser) => checkedUser.value
+  );
+  if (checkedUsers.length === 0) {
+    status.innerText = 'please select Users';
+  } else if (
+    chatDisplayNameInput.value === null ||
+    chatDisplayNameInput.value === ''
+  ) {
+    status.innerText = 'please enter chat name';
+  } else {
+    try {
+      createGroupChatButton.disabled = true;
+      status.innerText = 'Creating Group Chat...';
 
-            previousChats.forEach(textChat => {
-                const textChatListItemClone = textChatListItemTemplate.content.cloneNode(true);
-                const li = textChatListItemClone.querySelector("li");
-                li.textContent = textChat.name;
-                li.dataset.id = textChat.id;
-                li.addEventListener("click", () => displayTextChat(textChat.id));
-                foundPreviousChatsList.appendChild(textChatListItemClone);
-            });
+      // create a conversation
+      const params = {
+        displayName: chatDisplayNameInput.value,
+        ttl: null, // 600 (in seconds)
+        customData: { users: [myUser.name, ...checkedUsers] },
+      };
 
-            contentDiv.appendChild(foundPreviousChatsClone);
+      const conversationId = await client.createConversation(params);
 
-        } else {
-            // set the group chats container to display none;
-            try {
-                createGroupChatButton.disabled = true;
-                status.innerText = "Creating Group Chat..."
+      // Join yourself to the conversation
+      status.innerText = 'Joining Conversation...';
 
-                const bodyData = {
-                    users: checkedUsers
-                }
-                const groupConversation = await postRequest("/conversations", bodyData)
-                console.log('selected conversation: ', groupConversation.events);
+      const myMemberId = await client.joinConversation(conversationId);
 
-                displayTextChat(groupConversation.id);
+      // Invite other User to the conversation
+      status.innerText = `Inviting users...`;
+      checkedUsers.forEach(async (element) => {
+        await client.inviteToConversation(conversationId, element);
+      });
 
-            } catch (e) {
-                console.log("got an error: ", e);
-                createGroupChatButton.disabled = false;
-                status.innerText = e;
-            }
-        }
+      status.innerText = 'Success!';
+      setTimeout(() => {
+        status.innerText = '';
+      }, 3000);
+
+      displayTextChat(conversationId);
+      updateTextChats();
+    } catch (e) {
+      createGroupChatButton.disabled = false;
+      status.innerText = e;
     }
+  }
 }
 
-
-createGroupChatButton.addEventListener("click", () => {
-
-    contentDiv.innerHTML = "";
-    const groupChatCreateClone = groupChatCreateTemplate.content.cloneNode(true);
-    const groupChatUsers = groupChatCreateClone.querySelector("#group-chat-users");
-    const groupChatCreateForm = groupChatCreateClone.querySelector("#group-chat-create-form");
-    users.forEach(user => {
-        groupChatUsers.innerHTML += ` 
+createGroupChatButton.addEventListener('click', () => {
+  contentDiv.innerHTML = '';
+  const groupChatCreateClone = groupChatCreateTemplate.content.cloneNode(true);
+  const groupChatUsers =
+    groupChatCreateClone.querySelector('#group-chat-users');
+  const groupChatCreateForm = groupChatCreateClone.querySelector(
+    '#group-chat-create-form'
+  );
+  users.forEach((user) => {
+    groupChatUsers.innerHTML += ` 
         <div>
-          <input type="checkbox" id="${user.id}" name="user" value="${user.id}">
-          <label for="${user.id}">${user.display_name}</label>
-        </div>`
-    });
+          <input type="checkbox" id="${user.name}" name="user" value="${user.name}">
+          <label for="${user.name}">${user.display_name}</label>
+        </div>`;
+  });
 
-    groupChatCreateForm.addEventListener("submit", createGroupHandler);
-    contentDiv.appendChild(groupChatCreateClone);
-
+  groupChatCreateForm.addEventListener('submit', createGroupHandler);
+  contentDiv.appendChild(groupChatCreateClone);
+  chatContainerDiv.style.display = 'none';
+  contentDiv.style.display = 'block';
 });
 
 async function signUp() {
-    try {
-        const bodyData = {
-            name: usernameSignup.value,
-            display_name: displayNameSignup.value,
-            password: passwordSignup.value
-        }
-        const data = await postRequest("/signup", bodyData)
-        console.log("signUp data: ", data);
-        await showDashboard(data);
-    } catch (error) {
-        console.error("sign up error: ", error);
-        displayError(loginSignupStatus, error);
-    }
+  try {
+    const bodyData = {
+      name: usernameSignup.value,
+      display_name: displayNameSignup.value,
+      password: passwordSignup.value,
+    };
+    const data = await postRequest('/signup', bodyData);
+    await showDashboard(data);
+  } catch (error) {
+    console.error('sign up error: ', error);
+    displayError(loginSignupStatus, error);
+  }
 }
 
-signupForm.addEventListener('submit', event => {
-    loginSignupStatus.innerText = "";
-    event.preventDefault();
-    signUp();
+signupForm.addEventListener('submit', (event) => {
+  loginSignupStatus.innerText = '';
+  event.preventDefault();
+  signUp();
 });
 
 async function logIn() {
-    try {
-        const bodyData = {
-            name: usernameLogin.value,
-            password: passwordLogin.value
-        }
-        const data = await postRequest("/login", bodyData)
-        console.log("log in data: ", data);
-        await showDashboard(data);
-    } catch (error) {
-        console.error("log in error: ", error);
-        displayError(loginSignupStatus, error);
-    }
+  const loginButton = document.querySelector('#login button');
+  try {
+    loginButton.disabled = true;
+    loginButton.innerText = 'Logging In...';
+    const bodyData = {
+      name: usernameLogin.value,
+      password: passwordLogin.value,
+    };
+    const data = await postRequest('/login', bodyData);
+    await showDashboard(data);
+    loginButton.disabled = false;
+    loginButton.innerText = 'Log In';
+    usernameLogin.value = '';
+    passwordLogin.value = '';
+  } catch (error) {
+    console.error('log in error: ', error);
+    loginButton.disabled = false;
+    loginButton.innerText = 'Log In';
+    displayError(loginSignupStatus, error);
+  }
 }
 
-loginForm.addEventListener('submit', event => {
-    loginSignupStatus.innerText = "";
-    event.preventDefault();
-    logIn();
+loginForm.addEventListener('submit', (event) => {
+  loginSignupStatus.innerText = '';
+  event.preventDefault();
+  logIn();
 });
-
-async function updateProfileImage(imageURL){
-    console.log("imageURL: ", imageURL);
-    try {
-        const bodyData = {
-            image_url: imageURL
-        }
-        const data = await postRequest("/image",bodyData)
-        console.log("update profile image data: ", data);
-        return data;
-    } catch(error) {
-        console.error("log in error: ", error);
-    }
-}
